@@ -1,5 +1,8 @@
 import {
   Association,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  BelongsToCreateAssociationMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManySetAssociationsMixin,
   BelongsToManyAddAssociationMixin,
@@ -12,16 +15,6 @@ import {
   BelongsToManyCountAssociationsMixin,
   CreationOptional,
   DataTypes,
-  HasManyGetAssociationsMixin,
-  HasManySetAssociationsMixin,
-  HasManyAddAssociationMixin,
-  HasManyAddAssociationsMixin,
-  HasManyCreateAssociationMixin,
-  HasManyRemoveAssociationMixin,
-  HasManyRemoveAssociationsMixin,
-  HasManyHasAssociationMixin,
-  HasManyHasAssociationsMixin,
-  HasManyCountAssociationsMixin,
   InferCreationAttributes,
   InferAttributes,
   Model,
@@ -31,34 +24,25 @@ import {
 import type { Question } from "./Question";
 import type { User } from "./User";
 
-type QuizAssociations = "questions" | "users";
+type AnswerAssociations = "question" | "users";
 
-export class Quiz extends Model<
-  InferAttributes<Quiz, { omit: QuizAssociations }>,
-  InferCreationAttributes<Quiz, { omit: QuizAssociations }>
+export class Answer extends Model<
+  InferAttributes<Answer, { omit: AnswerAssociations }>,
+  InferCreationAttributes<Answer, { omit: AnswerAssociations }>
 > {
-  declare quizId: CreationOptional<string>;
-  declare quizName: string;
-  declare quizOwner: string;
-  declare category: string;
-  declare dateTime: Date;
+  declare answerId: CreationOptional<string>;
+  declare answer: string;
+  declare isCorrect: boolean;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
-  // Quiz hasMany Question
-  declare questions?: NonAttribute<Question[]>;
-  declare getQuestions: HasManyGetAssociationsMixin<Question>;
-  declare setQuestions: HasManySetAssociationsMixin<Question, string>;
-  declare addQuestion: HasManyAddAssociationMixin<Question, string>;
-  declare addQuestions: HasManyAddAssociationsMixin<Question, string>;
-  declare createQuestion: HasManyCreateAssociationMixin<Question>;
-  declare removeQuestion: HasManyRemoveAssociationMixin<Question, string>;
-  declare removeQuestions: HasManyRemoveAssociationsMixin<Question, string>;
-  declare hasQuestion: HasManyHasAssociationMixin<Question, string>;
-  declare hasQuestions: HasManyHasAssociationsMixin<Question, string>;
-  declare countQuestions: HasManyCountAssociationsMixin;
+  // Answer belongsTo Question
+  declare question?: NonAttribute<Question>;
+  declare getQuestion: BelongsToGetAssociationMixin<Question>;
+  declare setQuestion: BelongsToSetAssociationMixin<Question, string>;
+  declare createQuestion: BelongsToCreateAssociationMixin<Question>;
 
-  // Quiz belongsToMany User
+  // Answer belongsToMany User
   declare users?: NonAttribute<User[]>;
   declare getUsers: BelongsToManyGetAssociationsMixin<User>;
   declare setUsers: BelongsToManySetAssociationsMixin<User, string>;
@@ -72,34 +56,26 @@ export class Quiz extends Model<
   declare countUsers: BelongsToManyCountAssociationsMixin;
 
   declare static associations: {
-    questions: Association<Quiz, Question>;
-    users: Association<Quiz, User>;
+    question: Association<Answer, Question>;
+    users: Association<Answer, User>;
   };
 
-  static initModel(sequelize: Sequelize): typeof Quiz {
-    Quiz.init(
+  static initModel(sequelize: Sequelize): typeof Answer {
+    Answer.init(
       {
-        quizId: {
+        answerId: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
           unique: true,
           defaultValue: DataTypes.UUIDV4,
         },
-        quizName: {
+        answer: {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        quizOwner: {
-          type: DataTypes.UUID,
-          allowNull: false,
-        },
-        category: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        dateTime: {
-          type: DataTypes.DATE,
+        isCorrect: {
+          type: DataTypes.BOOLEAN,
           allowNull: false,
         },
         createdAt: {
@@ -114,6 +90,6 @@ export class Quiz extends Model<
       }
     );
 
-    return Quiz;
+    return Answer;
   }
 }
