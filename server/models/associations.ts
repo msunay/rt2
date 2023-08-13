@@ -1,4 +1,4 @@
-import type { Sequelize, Model } from "sequelize";
+import { Sequelize, Model, DataTypes } from "sequelize";
 import { User } from "./User";
 import { Quiz } from "./Quiz";
 import { Question } from "./Question";
@@ -12,17 +12,18 @@ export function initModels(sequelize: Sequelize) {
   Question.initModel(sequelize);
   Answer.initModel(sequelize);
 
+  const participant = sequelize.define("participant", {
+    isParticipant: DataTypes.BOOLEAN,
+  });
   User.belongsToMany(Quiz, {
-    through: "user_quiz",
+    through: participant,
     foreignKey: "users_id",
     otherKey: "quizzes_id",
-    onDelete: "CASCADE",
   });
   Quiz.belongsToMany(User, {
-    through: "user_quiz",
+    through: participant,
     foreignKey: "quizzes_id",
     otherKey: "users_id",
-    onDelete: "CASCADE",
   });
   Quiz.hasMany(Question, {
     foreignKey: "quiz_id",
@@ -30,7 +31,6 @@ export function initModels(sequelize: Sequelize) {
   Question.belongsTo(Quiz, {
     foreignKey: "quiz_id",
   });
-
   Question.hasMany(Answer, {
     foreignKey: "question_id",
   });
