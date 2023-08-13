@@ -1,12 +1,13 @@
 "use client";
 import styles from "./page.module.css";
-import * as mediasoup from "mediasoup";
-import { types as mediasoupTypes } from "mediasoup";
+import Link from 'next/link';
 
 export default function Home() {
 
-  
+
   return (
-    <main></main>
+    <main>
+      <Link href="/mediasoup">mediasoup</Link>
+    </main>
   );
 }
