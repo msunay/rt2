@@ -19,7 +19,7 @@ export default function Page() {
       <div
         className={styles.login_container}
         style={{ visibility: loginVisible ? 'visible' : 'hidden' }}>
-        {<Login />}
+        {<Login setSignupVisible={setSignupVisible} />}
       </div>
       <div
         className={styles.signup_container}
@@ -38,7 +38,6 @@ export default function Page() {
           onClick={() => setSignupVisible(true)}>
           Create new account
         </button>
-        <span>forgot your password?</span>
       </div>
 
       <div className={styles.oauth_container}>
