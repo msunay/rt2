@@ -11,7 +11,19 @@ async function addUser(req: Request, res: Response) {
   }
 }
 
-async function getUsers(req: Request, res: Response) {
+async function getOneUser(req: Request, res: Response) {
+  try {
+    const response = await models.User.findAll({
+      where: { username: req.params.username },
+    });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error("Could not get user::", err);
+    res.status(500).send();
+  }
+}
+
+async function getAllUsers(req: Request, res: Response) {
   try {
     const response = await models.User.findAll();
     res.status(200).send(response);
@@ -49,7 +61,8 @@ async function changePassword(req: Request, res: Response) {
 
 export default {
   addUser,
-  getUsers,
+  getOneUser,
+  getAllUsers,
   changeUsername,
   changePassword,
 };
