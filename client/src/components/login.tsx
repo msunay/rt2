@@ -8,27 +8,31 @@ interface SignUpForm {
 
 interface PageProps {
   setSignupVisible: (visibility: boolean) => void;
+  setLoginVisible: (visibility: boolean) => void;
 }
 
-export default function Login({ setSignupVisible }: PageProps) {
+export default function Login({ setSignupVisible, setLoginVisible }: PageProps) {
 
   const [form, setForm] = useState<SignUpForm | null>(null);
+
+  function onSignupClick() {
+    setSignupVisible(true);
+    setLoginVisible(false)
+  }
 
   return (
     <div className={styles.login_wrapper}>
       <form action="" className={styles.form}>
         <input
           required
-          id="email"
           name="email"
-          type="text"
+          type="email"
           placeholder="Email"
           value={form?.email || ''}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
         <input
           required
-          id="new-password"
           name="password"
           type="password"
           placeholder="Password"
@@ -38,7 +42,7 @@ export default function Login({ setSignupVisible }: PageProps) {
         />
         <button type="submit">Submit</button>
         <div className={styles.sign_options}>
-          <p onClick={() => setSignupVisible(true)}>sign-up</p>
+          <p onClick={() => onSignupClick()}>sign-up</p>
           <p>forgot your password?</p>
         </div>
       </form>

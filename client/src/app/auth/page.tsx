@@ -18,8 +18,14 @@ export default function Page() {
     <div className={styles.routing_container}>
       <div
         className={styles.login_container}
-        style={{ visibility: loginVisible ? 'visible' : 'hidden' }}>
-        {<Login setSignupVisible={setSignupVisible} />}
+        style={{ visibility: loginVisible ? 'visible' : 'hidden' }}
+      >
+        {
+          <Login
+            setSignupVisible={setSignupVisible}
+            setLoginVisible={setLoginVisible}
+          />
+        }
       </div>
       <div
         className={styles.signup_container}
