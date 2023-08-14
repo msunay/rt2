@@ -26,6 +26,7 @@
   align-items: center;
   height: 50%;
 }
+
 .local_signup_container button {
   background: var(--secondary-color);
   border: unset;

@@ -1,24 +1,26 @@
 "use client";
-import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
 import { setAuthState } from '../redux/features/authSlice'
 import { useRouter } from "next/navigation"
 
-export default function Home() {
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useEffect } from "react";
 
-  const authState = useSelector((state: RootState) => state.authSlice.authState)
-  const dispatch = useDispatch();
+export default function Home() {
+  const authState = useAppSelector((state: RootState) => state.authSlice.authState)
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
+  useEffect(() => {
+    if (authState) router.push('/auth')
+  }, [authState]);
 
   return (
     <main>
-      <>
-        <div onClick={() => dispatch(setAuthState(!authState))}> Click me</div>
-        {
-          !authState ? <>App</> : router.push('/login')
-        }
-      </>
+
+      <div onClick={() => dispatch(setAuthState(!authState))}> Click me</div>
+      <>App</>
+
     </main>
   );
 }
