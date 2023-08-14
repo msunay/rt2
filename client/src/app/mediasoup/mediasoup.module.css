@@ -1,4 +1,4 @@
-tr {
+.tr {
   vertical-align: top;
 }
 
@@ -8,11 +8,11 @@ tr {
   margin: 2px 0;
 }
 
-button {
+.button {
   margin: 2;
 }
 
-#sharedBtns {
+.sharedBtns {
   padding: 5;
   background-color: papayawhip;
   display: flex;

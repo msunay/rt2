@@ -1,11 +1,10 @@
 import { ClientToServerEvents, ServerToClientEvents } from "../Types";
 import { Socket } from "socket.io";
-import { io } from "../index";
 
-const socketInit = function (
+const peersSocketInit = function (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
 ) {
 
 };
 
-export default socketInit;
+export default peersSocketInit;

@@ -3,8 +3,8 @@ import cors from "cors";
 import router from "./router";
 import http from 'http';
 import https from 'https';
-import { Server } from "socket.io";
-import socketInit from "./controllers/socket.controller";
+import { Server, Socket } from "socket.io";
+import peersSocketInit from "./controllers/peers.socket.controller";
 import { ClientToServerEvents, ServerToClientEvents } from "./Types";
 import fs from 'fs';
 
@@ -20,9 +20,10 @@ const options = {
   cert: fs.readFileSync('./ssl/certificate.crt', 'utf-8')
 }
 
-export const server = https.createServer(options, app);
+// export const server = https.createServer(options, app);
+export const server = http.createServer(app);
 
-export const io = new Server<ClientToServerEvents, ServerToClientEvents>(
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(
   server,
   {
     cors: {
@@ -32,6 +33,13 @@ export const io = new Server<ClientToServerEvents, ServerToClientEvents>(
   }
 );
 
-io.on("connection", socketInit);
+const peers = io.of('/mediasoup')
+
+peers.on("connection", (socket: Socket<ServerToClientEvents, ClientToServerEvents>) => {
+  console.log(socket.id);
+  socket.emit('connection_success', {
+    socketId: socket.id
+  })
+});
 
 export default app;
