@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import styles from '../styles/signup.module.css'
 
 interface SignUpForm {
@@ -12,10 +12,26 @@ interface SignUpForm {
 export default function SignUp() {
 
   const [form, setForm] = useState<SignUpForm | null>(null);
+  const [passwordMatch, setPasswordMatch] = useState(false);
+
+  useEffect(() => {
+    setPasswordMatch(validatePassword());
+  }, [form?.repeatPassword]);
+
+  function validatePassword() {
+    return form?.password !== undefined && form?.password === form?.repeatPassword
+  }
+
+  function onSubmitClick(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    console.log(form);
+  }
+
+  // await fetch('')
 
   return (
     <div >
-      <form action="" className={styles.form}>
+      <form onSubmit={(e) => onSubmitClick(e)} className={styles.form}>
         <input
           required
           id="email"
@@ -56,7 +72,7 @@ export default function SignUp() {
           onChange={(event) => setForm({ ...form, repeatPassword: event.target.value })}
         />
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={!passwordMatch}>Submit</button>
       </form>
     </div>
   )
