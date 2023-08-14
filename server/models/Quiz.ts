@@ -91,7 +91,7 @@ export class Quiz extends Model<
           allowNull: false,
         },
         quizOwner: {
-          type: DataTypes.STRING,
+          type: DataTypes.UUID,
           allowNull: false,
         },
         category: {

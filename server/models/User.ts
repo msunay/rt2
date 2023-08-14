@@ -79,10 +79,12 @@ export class User extends Model<
         isPremiumMember: {
           type: DataTypes.BOOLEAN,
           allowNull: false,
+          defaultValue: false,
         },
         pointsWon: {
           type: DataTypes.INTEGER,
           allowNull: false,
+          defaultValue: 0,
         },
         createdAt: {
           type: DataTypes.DATE,
