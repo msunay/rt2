@@ -1,3 +1,20 @@
-main {
-  background-color: white;
+tr {
+  vertical-align: top;
+}
+
+.video {
+  width: 360px;
+  background-color: black;
+  margin: 2px 0;
+}
+
+button {
+  margin: 2;
+}
+
+#sharedBtns {
+  padding: 5;
+  background-color: papayawhip;
+  display: flex;
+  justify-content: center;
 }
