@@ -31,7 +31,7 @@ export class Answer extends Model<
   InferCreationAttributes<Answer, { omit: AnswerAssociations }>
 > {
   declare answerId: CreationOptional<string>;
-  declare answer: string;
+  declare answerText: string;
   declare isCorrect: boolean;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -70,7 +70,7 @@ export class Answer extends Model<
           unique: true,
           defaultValue: DataTypes.UUIDV4,
         },
-        answer: {
+        answerText: {
           type: DataTypes.STRING,
           allowNull: false,
         },

@@ -12,16 +12,13 @@ export function initModels(sequelize: Sequelize) {
   Question.initModel(sequelize);
   Answer.initModel(sequelize);
 
-  const participant = sequelize.define("participant", {
-    isParticipant: DataTypes.BOOLEAN,
-  });
   User.belongsToMany(Quiz, {
-    through: participant,
+    through: "participant",
     foreignKey: "users_id",
     otherKey: "quizzes_id",
   });
   Quiz.belongsToMany(User, {
-    through: participant,
+    through: "participant",
     foreignKey: "quizzes_id",
     otherKey: "users_id",
   });
