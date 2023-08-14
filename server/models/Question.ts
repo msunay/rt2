@@ -30,8 +30,9 @@ export class Question extends Model<
   InferAttributes<Question, { omit: QuestionAssociations }>,
   InferCreationAttributes<Question, { omit: QuestionAssociations }>
 > {
-  declare questionId: CreationOptional<string>;
+  declare id: CreationOptional<string>;
   declare questionText: string;
+  declare positionInQuiz: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -62,15 +63,18 @@ export class Question extends Model<
   static initModel(sequelize: Sequelize): typeof Question {
     Question.init(
       {
-        questionId: {
+        id: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
           unique: true,
-          defaultValue: DataTypes.UUIDV4,
         },
         questionText: {
           type: DataTypes.STRING,
+          allowNull: false,
+        },
+        positionInQuiz: {
+          type: DataTypes.INTEGER,
           allowNull: false,
         },
         createdAt: {

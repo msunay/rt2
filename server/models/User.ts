@@ -18,16 +18,15 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
-import type { Answer } from "./Answer";
 import type { Quiz } from "./Quiz";
 
-type UserAssociations = "quizzes" | "answers";
+type UserAssociations = "quizzes";
 
 export class User extends Model<
   InferAttributes<User, { omit: UserAssociations }>,
   InferCreationAttributes<User, { omit: UserAssociations }>
 > {
-  declare userId: CreationOptional<string>;
+  declare id: CreationOptional<string>;
   declare email: string;
   declare username: string;
   declare password: string;
@@ -49,28 +48,14 @@ export class User extends Model<
   declare hasQuizzes: BelongsToManyHasAssociationsMixin<Quiz, string>;
   declare countQuizzes: BelongsToManyCountAssociationsMixin;
 
-  // User belongsToMany Answer
-  declare answers?: NonAttribute<Answer[]>;
-  declare getAnswers: BelongsToManyGetAssociationsMixin<Answer>;
-  declare setAnswers: BelongsToManySetAssociationsMixin<Answer, string>;
-  declare addAnswer: BelongsToManyAddAssociationMixin<Answer, string>;
-  declare addAnswers: BelongsToManyAddAssociationsMixin<Answer, string>;
-  declare createAnswer: BelongsToManyCreateAssociationMixin<Answer>;
-  declare removeAnswer: BelongsToManyRemoveAssociationMixin<Answer, string>;
-  declare removeAnswers: BelongsToManyRemoveAssociationsMixin<Answer, string>;
-  declare hasAnswer: BelongsToManyHasAssociationMixin<Answer, string>;
-  declare hasAnswers: BelongsToManyHasAssociationsMixin<Answer, string>;
-  declare countAnswers: BelongsToManyCountAssociationsMixin;
-
   declare static associations: {
     quizzes: Association<User, Quiz>;
-    answers: Association<User, Answer>;
   };
 
   static initModel(sequelize: Sequelize): typeof User {
     User.init(
       {
-        userId: {
+        id: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
@@ -94,12 +79,10 @@ export class User extends Model<
         isPremiumMember: {
           type: DataTypes.BOOLEAN,
           allowNull: false,
-          defaultValue: false,
         },
         pointsWon: {
           type: DataTypes.INTEGER,
           allowNull: false,
-          defaultValue: 0,
         },
         createdAt: {
           type: DataTypes.DATE,

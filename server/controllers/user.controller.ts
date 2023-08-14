@@ -25,19 +25,31 @@ async function changeUsername(req: Request, res: Response) {
   try {
     const response = await models.User.update(
       { username: req.body.newUsername },
-      { where: { userId: req.body.userId } }
+      { where: { id: req.body.id } }
     );
     res.status(200).send(response);
   } catch (err) {
-    console.error("Could not get users::", err);
+    console.error("Could not change username::", err);
     res.status(500).send();
   }
 }
 
-
+async function changePassword(req: Request, res: Response) {
+  try {
+    const response = await models.User.update(
+      { password: req.body.newPassword },
+      { where: { id: req.body.id } }
+    );
+    res.status(200).send(response);
+  } catch (err) {
+    console.error("Could not change password::", err);
+    res.status(500).send();
+  }
+}
 
 export default {
   addUser,
   getUsers,
-  changeUsername
+  changeUsername,
+  changePassword,
 };

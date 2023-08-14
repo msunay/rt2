@@ -37,7 +37,7 @@ export class Quiz extends Model<
   InferAttributes<Quiz, { omit: QuizAssociations }>,
   InferCreationAttributes<Quiz, { omit: QuizAssociations }>
 > {
-  declare quizId: CreationOptional<string>;
+  declare id: CreationOptional<string>;
   declare quizName: string;
   declare quizOwner: string;
   declare category: string;
@@ -79,7 +79,7 @@ export class Quiz extends Model<
   static initModel(sequelize: Sequelize): typeof Quiz {
     Quiz.init(
       {
-        quizId: {
+        id: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
@@ -91,7 +91,7 @@ export class Quiz extends Model<
           allowNull: false,
         },
         quizOwner: {
-          type: DataTypes.UUID,
+          type: DataTypes.STRING,
           allowNull: false,
         },
         category: {

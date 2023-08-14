@@ -6,5 +6,6 @@ const router: Router = express.Router();
 router.post("/users", userController.addUser);
 router.get("/users", userController.getUsers);
 router.put("/username", userController.changeUsername);
+router.put("/password", userController.changePassword);
 
 export default router;
