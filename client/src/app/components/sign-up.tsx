@@ -1,9 +1,14 @@
 import { FormEvent, useEffect, useState } from "react";
-import styles from '../styles/signup.module.css'
+import styles from '../styles/signup.module.css';
+import { useAppDispatch } from "@/redux/hooks";
+import { genSaltSync, hashSync } from "bcrypt-ts"
+import { setAuthState } from '../../redux/features/authSlice'
+import { useRouter } from "next/navigation"
+import { useAddUserMutation } from '../../redux/services/userApi'
 
 interface SignUpForm {
   email?: string,
-  userName?: string,
+  username?: string,
   password?: string,
   repeatPassword?: string
 }
@@ -11,8 +16,11 @@ interface SignUpForm {
 
 export default function SignUp() {
 
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState<SignUpForm | null>(null);
   const [passwordMatch, setPasswordMatch] = useState(false);
+  const [addNewUser] = useAddUserMutation();
+  const router = useRouter();
 
   useEffect(() => {
     setPasswordMatch(validatePassword());
@@ -22,12 +30,24 @@ export default function SignUp() {
     return form?.password !== undefined && form?.password === form?.repeatPassword
   }
 
-  function onSubmitClick(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    console.log(form);
-  }
+  async function onSubmitClick(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (typeof form?.password === 'undefined') return;
+    const salt = genSaltSync(10);
+    const hash = hashSync(form.password, salt);
 
-  // await fetch('')
+    addNewUser({ email: form?.email, username: form?.username, password: hash })
+      .then((data) => {
+        if (data) {
+          dispatch(setAuthState(true))
+        }
+        else dispatch(setAuthState(false))
+        router.push('/')
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   return (
     <div >
@@ -48,8 +68,8 @@ export default function SignUp() {
           name="username"
           type="text"
           placeholder="User name"
-          value={form?.userName || ''}
-          onChange={(event) => setForm({ ...form, userName: event.target.value })}
+          value={form?.username || ''}
+          onChange={(event) => setForm({ ...form, username: event.target.value })}
         />
 
         <input
