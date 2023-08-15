@@ -21,7 +21,7 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
-import type { Participation } from "./Participation";
+import type { Participation } from "../reference_tables/Participation";
 import type { Question } from "./Question";
 
 type AnswerAssociations = "question" | "participations";
