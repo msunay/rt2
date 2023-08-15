@@ -1,43 +1,91 @@
-'use client'
+'use client';
 
-import React, { useRef } from "react";
-import styles from "./mediasoup.module.css";
-import { io } from "socket.io-client";
+import React, { useRef } from 'react';
+import styles from './mediasoup.module.css';
+import { ClientToServerEvents, ServerToClientEvents } from '../Types';
+import { io, Socket } from 'socket.io-client';
+import * as mediasoupClient from 'mediasoup-client';
+import { types as mediasoupTypes } from 'mediasoup-client';
 
 function stream() {
+  const localVideo = useRef<any>(null);
 
-  const localVideo = useRef<any>(null)
-
-  const socket = io("http://localhost:3001/mediasoup");
+  const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+    'http://localhost:3001/mediasoup'
+  );
 
   socket.on('connection_success', ({ socketId }) => {
     console.log(socketId);
-  })
+  });
+
+  let device: mediasoupTypes.Device;
+  let rtpCapabilities: mediasoupTypes.RtpCapabilities;
+  let params = {
+    //mediasoup params
+  };
 
   const streamSuccess = async (mediaStream: MediaStream) => {
     localVideo.current.srcObject = mediaStream;
-    const track = mediaStream.getVideoTracks()[0]
-
-  }
+    const track = mediaStream.getVideoTracks()[0];
+    params = {
+      track,
+      ...params,
+    };
+  };
 
   const getLocalStream = async () => {
-    await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        width: {
-          min: 640,
-          max: 1920
+    await navigator.mediaDevices
+      .getUserMedia({
+        audio: false,
+        video: {
+          width: {
+            min: 640,
+            max: 1920,
+          },
+          height: {
+            min: 400,
+            max: 1080,
+          },
         },
-        height: {
-          min : 400,
-          max: 1080
-        }
-      }
-    })
+      })
       .then((mediaStream) => {
-      streamSuccess(mediaStream);
+        streamSuccess(mediaStream);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const createDevice = async () => {
+    try {
+      device = new mediasoupClient.Device();
+
+      await device.load({
+        routerRtpCapabilities: rtpCapabilities,
+      });
+      console.log('RTP Capabilities', device.rtpCapabilities);
+    } catch (err: any) {
+      console.error(err);
+      if (err.name === 'UnsupportedError')
+        console.warn('Browser not supported');
+    }
+  };
+
+  const getRtpCapabilities = () => {
+    socket.emit('getRtpCapabilities', (data: any) => {
+      console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
+
+      rtpCapabilities = data.rtpCapabilities;
+    });
+  };
+
+  const createSendTransport = () => {
+    socket.on('createWebRtcTransport', { sender: true }, ({ params }) => {
+      if (params.error) {
+        console.log(params.error);
+        return
+      }
+
+      console.log(params);
     })
-      .catch(err => console.error(err));
   }
 
   return (
@@ -53,7 +101,7 @@ function stream() {
           <tbody>
             <tr className={styles.tr}>
               <td>
-                <div className={styles.sharedBtns} id="sharedBtns">
+                <div id="sharedBtns" className={styles.sharedBtns}>
                   <video
                     ref={localVideo}
                     id="localVideo"
@@ -63,7 +111,7 @@ function stream() {
                 </div>
               </td>
               <td>
-                <div className={styles.sharedBtns} id="sharedBtns">
+                <div id="sharedBtns" className={styles.sharedBtns}>
                   <video
                     id="remoteVideo"
                     autoPlay={true}
@@ -74,8 +122,12 @@ function stream() {
             </tr>
             <tr>
               <td>
-                <div className={styles.sharedBtns} id="sharedBtns">
-                  <button className={styles.button} id="btnLocalVideo" onClick={getLocalStream}>
+                <div id="sharedBtns" className={styles.sharedBtns}>
+                  <button
+                    id="btnLocalVideo"
+                    className={styles.button}
+                    onClick={getLocalStream}
+                  >
                     1. Get Local Video
                   </button>
                 </div>
@@ -83,12 +135,20 @@ function stream() {
             </tr>
             <tr>
               <td colSpan={2}>
-                <div className={styles.sharedBtns} id="sharedBtns">
-                  <button className={styles.button} id="btnRtpCapabilities">
+                <div id="sharedBtns" className={styles.sharedBtns}>
+                  <button
+                    id="btnRtpCapabilities"
+                    className={styles.button}
+                    onClick={getRtpCapabilities}
+                  >
                     2. Get Rtp Capabilities
                   </button>
                   <br />
-                  <button className={styles.button} id="btnDevice">
+                  <button
+                    id="btnDevice"
+                    className={styles.button}
+                    onClick={createDevice}
+                  >
                     3. Create Device
                   </button>
                 </div>
@@ -96,28 +156,38 @@ function stream() {
             </tr>
             <tr>
               <td>
-                <div className={styles.sharedBtns} id="sharedBtns">
-                  <button className={styles.button} id="btnCreateSendTransport">
+                <div id="sharedBtns" className={styles.sharedBtns}>
+                  <button
+                    id="btnCreateSendTransport"
+                    className={styles.button}
+                    onClick={createSendTransport}
+                  >
                     4. Create Send Transport
                   </button>
                   <br />
                   <button
-                    className={styles.button}
                     id="btnConnectSendTransport"
+                    className={styles.button}
+                    // onClick={connectSendTransport}
                   >
                     5. Connect Send Transport & Produce
                   </button>
                 </div>
               </td>
               <td>
-                <div className={styles.sharedBtns} id="sharedBtns">
-                  <button className={styles.button} id="btnRecvSendTransport">
+                <div id="sharedBtns" className={styles.sharedBtns}>
+                  <button
+                    id="btnRecvSendTransport"
+                    className={styles.button}
+                    // onClick={createRecvTransport}
+                  >
                     6. Create Recv Transport
                   </button>
                   <br />
                   <button
-                    className={styles.button}
                     id="btnConnectRecvTransport"
+                    className={styles.button}
+                    // onClick={connectRecvTransport}
                   >
                     7. Connect Recv Transport & Consume
                   </button>
