@@ -1,4 +1,4 @@
-import "@/app/styles/globals.css";
+import "./globals.css";
 import type { Metadata } from "next";
 import { Providers } from "@/redux/provider";
 

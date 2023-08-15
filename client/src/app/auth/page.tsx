@@ -1,10 +1,10 @@
 'use client'
-import styles from '@/app/styles/auth.module.css';
+import styles from '@/app/auth/styles/auth.module.css';
 import Image from 'next/image';
 import google from '@/public/google_icon.svg';
 import facebook from '@/public/facebook.svg';
-import Login from '@/app/components/login';
-import SignUp from '@/app/components/sign-up';
+import Login from '@/components/auth/login';
+import SignUp from '@/components/auth/sign-up';
 import { useState } from 'react';
 
 

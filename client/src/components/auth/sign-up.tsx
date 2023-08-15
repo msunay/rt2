@@ -1,10 +1,10 @@
 import { FormEvent, useEffect, useState } from "react";
-import styles from '../styles/signup.module.css';
+import styles from '@/app/auth/styles/signup.module.css';
 import { useAppDispatch } from "@/redux/hooks";
 import { genSaltSync, hashSync } from "bcrypt-ts"
 import { setAuthState } from '../../redux/features/authSlice'
 import { useRouter } from "next/navigation"
-import { useAddUserMutation } from '../../redux/services/userApi'
+import { userApiService } from '../../redux/services/userApiService'
 
 interface SignUpForm {
   email?: string,
@@ -13,13 +13,12 @@ interface SignUpForm {
   repeatPassword?: string
 }
 
-
 export default function SignUp() {
 
   const dispatch = useAppDispatch();
   const [form, setForm] = useState<SignUpForm | null>(null);
   const [passwordMatch, setPasswordMatch] = useState(false);
-  const [addNewUser] = useAddUserMutation();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -32,21 +31,27 @@ export default function SignUp() {
 
   async function onSubmitClick(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (typeof form?.password === 'undefined') return;
+    if (typeof form?.password === 'undefined' ||
+      typeof form?.email === 'undefined' ||
+      typeof form?.username === 'undefined') return;
     const salt = genSaltSync(10);
     const hash = hashSync(form.password, salt);
-
-    addNewUser({ email: form?.email, username: form?.username, password: hash })
-      .then((data) => {
-        if (data) {
-          dispatch(setAuthState(true))
-        }
-        else dispatch(setAuthState(false))
-        router.push('/')
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const data = await userApiService.postUser({ email: form.email, username: form.username, password: hash })
+      if (data.dataValues.username) {
+        dispatch(setAuthState(data.token))
+        localStorage.setItem('jwt_token', data.token)
+        router.push('/');
+      } else {
+        dispatch(setAuthState(''));
+        localStorage.setItem('jwt_token', '');
+        router.push('/auth');
+      }
+    } catch (error) {
+      dispatch(setAuthState(''));
+      localStorage.setItem('jwt_token', '');
+      router.push('/auth');
+    }
   }
 
   return (
