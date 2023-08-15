@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import userController from "./controllers/user.controller";
 import quizController from "./controllers/quiz.controller";
 import participationController from "./controllers/referenceTables.controller";
+
 import { auth } from "./middleware/auth";
 const router: Router = express.Router();
 
@@ -40,6 +41,13 @@ router.get(
   "/participations",
   auth,
   participationController.getUserParticipations
+);
+
+// Reference tables routes
+router.post("/participation", participationController.createParticipation);
+router.post(
+  "/participationAnswer",
+  participationController.createParticipationAnswer
 );
 
 export default router;

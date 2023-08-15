@@ -19,8 +19,6 @@ import {
   Sequelize,
 } from "sequelize";
 import type { Answer } from "../objects/Answer";
-import { Quiz } from "../objects/Quiz";
-import { User } from "../objects/User";
 
 type ParticipationAssociations = "answers";
 
