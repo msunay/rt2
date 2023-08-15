@@ -18,15 +18,15 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
-import type { Answer } from "./Answer";
-import { Quiz } from "./Quiz";
-import { User } from "./User";
+import type { Answer } from "../objects/Answer";
+import { Quiz } from "../objects/Quiz";
+import { User } from "../objects/User";
 
 type ParticipationAssociations = "answers";
 
 export class Participation extends Model<
-  InferAttributes<Participation, {omit: ParticipationAssociations}>,
-  InferCreationAttributes<Participation, {omit: ParticipationAssociations}>
+  InferAttributes<Participation, { omit: ParticipationAssociations }>,
+  InferCreationAttributes<Participation, { omit: ParticipationAssociations }>
 > {
   declare id: CreationOptional<string>;
   declare UserId: string;
@@ -50,8 +50,6 @@ export class Participation extends Model<
 
   declare static associations: {
     answers: Association<Participation, Answer>;
-    // UserId: Association<Participation, User>;
-    // QuizId: Association<Participation, Quiz>;
   };
 
   static initModel(sequelize: Sequelize): typeof Participation {

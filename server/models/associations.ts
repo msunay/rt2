@@ -1,9 +1,9 @@
 import type { Sequelize, Model } from "sequelize";
-import { User } from "./User";
-import { Quiz } from "./Quiz";
-import { Question } from "./Question";
-import { Answer } from "./Answer";
-import { Participation } from "./Participation";
+import { User } from "./objects/User";
+import { Quiz } from "./objects/Quiz";
+import { Question } from "./objects/Question";
+import { Answer } from "./objects/Answer";
+import { Participation } from "./reference_tables/Participation";
 
 export { User, Quiz, Question, Answer, Participation };
 
