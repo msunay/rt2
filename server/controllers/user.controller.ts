@@ -6,7 +6,6 @@ async function addUser(req: Request, res: Response) {
   try {
     const response = await models.User.create(req.body);
     const token = tokenGenerator(response?.id, response?.username);
-    res.status(201);
     res.status(201).send({ ...response, token });
   } catch (err) {
     console.error("Could not add user::", err);
