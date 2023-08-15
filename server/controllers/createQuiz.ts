@@ -5,7 +5,7 @@ async function createBasicQuiz() {
   // Create the quiz
   const quiz = await models.Quiz.create({
     quizName: "Basic General Knowledge Quiz",
-    quizOwner: "dbd24314-d429-4041-b9b2-1441da34caf0",
+    quizOwner: "194ed83a-d138-40ef-805d-1c0fb62dcd70",
     category: "General Knowledge",
     dateTime: moment().add(5, "days").toDate(),
   });
