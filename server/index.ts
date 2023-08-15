@@ -108,7 +108,7 @@ const createWebRtcTransport = async (callback) => {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '127.0.0.1'
+          ip: '127.0.0.1' // TODO .env fly.io server ip
         }
       ],
       enableUdp: true,
@@ -116,7 +116,9 @@ const createWebRtcTransport = async (callback) => {
       preferUdp: true
     }
 
-    let transport = await router.createWebRtcransport
+    let transport = await msRouter.createWebRtcTransport(webRtcTransportOptions);
+
+
   } catch (error) {
     console.error(error);
     callback({
