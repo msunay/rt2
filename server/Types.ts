@@ -1,5 +1,5 @@
 export interface User {
-  userId?: string;
+  id?: string;
   email: string;
   username: string;
   password: string;
@@ -10,7 +10,7 @@ export interface User {
 }
 
 export interface Quiz {
-  quizId?: string;
+  id?: string;
   quizName: string;
   quizOwner: string;
   category: string;
@@ -20,16 +20,27 @@ export interface Quiz {
 }
 
 export interface Question {
-  questionId?: string;
+  id?: string;
   questionText: string;
   createdAt?: Date;
   updatedAt?: Date;
+  QuizId?: string;
 }
 
 export interface Answer {
-  answerId?: string;
+  id?: string;
   answerText: string;
   isCorrect: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  QuestionId?: string;
+}
+
+export interface Participation {
+  id?: string;
+  isPaid: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  UserId?: string;
+  QuizId?: string;
 }
