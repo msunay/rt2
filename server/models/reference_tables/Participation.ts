@@ -18,7 +18,7 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
-import type { Answer } from "./Answer";
+import type { Answer } from "../objects/Answer";
 
 type ParticipationAssociations = "answers";
 
@@ -27,6 +27,8 @@ export class Participation extends Model<
   InferCreationAttributes<Participation, { omit: ParticipationAssociations }>
 > {
   declare id: CreationOptional<string>;
+  declare UserId: string;
+  declare QuizId: string;
   declare isPaid: boolean;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -58,9 +60,18 @@ export class Participation extends Model<
           unique: true,
           defaultValue: DataTypes.UUIDV4,
         },
+        UserId: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
+        QuizId: {
+          type: DataTypes.UUID,
+          allowNull: false,
+        },
         isPaid: {
           type: DataTypes.BOOLEAN,
           allowNull: false,
+          defaultValue: true,
         },
         createdAt: {
           type: DataTypes.DATE,

@@ -1,12 +1,12 @@
 import models from "../models/index";
 import { Request, Response } from "express";
 import { tokenGenerator } from "../utils/token";
+import { CustomRequest } from "../middleware/auth";
 
 async function addUser(req: Request, res: Response) {
   try {
     const response = await models.User.create(req.body);
     const token = tokenGenerator(response?.id, response?.username);
-    res.status(201);
     res.status(201).send({ ...response, token });
   } catch (err) {
     console.error("Could not add user::", err);
@@ -19,7 +19,7 @@ async function getOneUser(req: Request, res: Response) {
     const response = await models.User.findOne({
       where: { username: req.params.username },
     });
-    const token = tokenGenerator(response?.id || '', response?.username || '');
+    const token = tokenGenerator(response?.id || "", response?.username || "");
     res.status(200).send({ ...response, token });
   } catch (err) {
     console.error("Could not get user::", err);
@@ -63,10 +63,21 @@ async function changePassword(req: Request, res: Response) {
   }
 }
 
+async function getUserId(req: Request, res: Response) {
+  try {
+    const response = (req as CustomRequest).userId;
+    res.status(200).send(response);
+  } catch (err) {
+    console.error("failed to get user id::", err);
+    res.status(500).send();
+  }
+}
+
 export default {
   addUser,
   getOneUser,
   getAllUsers,
   changeUsername,
   changePassword,
+  getUserId,
 };
