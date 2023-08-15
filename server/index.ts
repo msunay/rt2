@@ -38,6 +38,9 @@ const peers = io.of('/mediasoup');
 
 let msWorker: mediasoupTypes.Worker;
 let msRouter: mediasoupTypes.Router;
+let producerTransport: mediasoupTypes.Transport | undefined;
+let consumerTransport: mediasoupTypes.Transport | undefined;
+let producer: mediasoupTypes.Producer;
 
 const createWorker = async () => {
   msWorker = await mediasoup.createWorker();
@@ -100,10 +103,33 @@ peers.on(
       if (sender) producerTransport = await createWebRtcTransport(callback)
       else consumerTransport = await createWebRtcTransport(callback)
     })
+
+    socket.on('transport_connect', async ({ dtlsParameters }) => {
+      console.log('DTLS Params: ', { dtlsParameters });
+      await producerTransport!.connect({ dtlsParameters })
+    })
+
+    socket.on('transport_produce', async ({ kind, rtpParameters, appData }, callback) => {
+      producer = await producerTransport!.produce({
+        kind,
+        rtpParameters
+      })
+
+      console.log('Producer iD: ', producer.id, producer.kind);
+
+      producer.on('transportclose', () => {
+        console.log('transport for this producer closed');
+        producer.close()
+      })
+
+      callback({
+        id: producer.id
+      })
+    })
   }
 );
 
-const createWebRtcTransport = async (callback) => {
+const createWebRtcTransport = async (callback: any) => {
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
@@ -117,7 +143,27 @@ const createWebRtcTransport = async (callback) => {
     }
 
     let transport = await msRouter.createWebRtcTransport(webRtcTransportOptions);
+    console.log(`transport id: ${transport.id}`);
 
+    transport.on('dtlsstatechange', dtlsState => {
+      if (dtlsState === 'closed') {
+        transport.close()
+      }
+    })
+
+    transport.on('@close', () => {
+      console.log('Transport closed');
+    })
+
+    callback({
+      params: {
+        id: transport.id,
+        iceParameters: transport.iceParameters,
+        iceCandidates: transport.iceCandidates,
+        dtlsParameters: transport.dtlsParameters
+      }
+    })
+    return transport;
 
   } catch (error) {
     console.error(error);
@@ -128,4 +174,5 @@ const createWebRtcTransport = async (callback) => {
     })
   }
 }
+
 export default app;
