@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import userController from "./controllers/user.controller";
 import quizController from "./controllers/quiz.controller";
-import participationController from "./controllers/participation.controller";
+import participationController from "./controllers/referenceTables.controller";
 
 const router: Router = express.Router();
 
@@ -16,6 +16,11 @@ router.put("/password", userController.changePassword);
 router.get("/quizzes", quizController.getAllQuizzes);
 router.get("/quiz/:id", quizController.getOneQuiz);
 
-// Participation routes
+// Reference tables routes
 router.post("/participation", participationController.createParticipation);
+router.post(
+  "/participationAnswer",
+  participationController.createParticipationAnswer
+);
+
 export default router;

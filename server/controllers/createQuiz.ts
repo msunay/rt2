@@ -5,7 +5,7 @@ async function createBasicQuiz() {
   // Create the quiz
   const quiz = await models.Quiz.create({
     quizName: "Basic General Knowledge Quiz",
-    quizOwner: "194ed83a-d138-40ef-805d-1c0fb62dcd70",
+    quizOwner: "0cf7cbe4-0c52-4a1a-940a-65d47f769c08",
     category: "General Knowledge",
     dateTime: moment().add(5, "days").toDate(),
   });
@@ -31,10 +31,14 @@ async function createBasicQuiz() {
       });
     }
   }
-
   return quiz;
 }
 
 createBasicQuiz().then(() => {
   console.log("Quiz created and sent to the database");
 });
+
+
+async function populateDatabase() {
+  
+}

@@ -15,6 +15,22 @@ async function createParticipation(req: Request, res: Response) {
   }
 }
 
+async function createParticipationAnswer(req: Request, res: Response) {
+  try {
+    const participationAnswerInstance = await models.ParticipationAnswer.create(
+      {
+        AnswerId: req.body.answerId,
+        ParticipationId: req.body.participationId,
+      }
+    );
+    res.status(201).send(participationAnswerInstance);
+  } catch (err) {
+    console.error("Could not create participation answer::", err);
+    res.status(500).send();
+  }
+}
+
 export default {
   createParticipation,
+  createParticipationAnswer,
 };
