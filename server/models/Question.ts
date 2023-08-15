@@ -20,6 +20,7 @@ import {
   Model,
   NonAttribute,
   Sequelize,
+  UUIDV4,
 } from "sequelize";
 import type { Answer } from "./Answer";
 import type { Quiz } from "./Quiz";
@@ -30,8 +31,9 @@ export class Question extends Model<
   InferAttributes<Question, { omit: QuestionAssociations }>,
   InferCreationAttributes<Question, { omit: QuestionAssociations }>
 > {
-  declare questionId: CreationOptional<string>;
-  declare question: string;
+  declare id: CreationOptional<string>;
+  declare questionText: string;
+  declare positionInQuiz: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -62,15 +64,19 @@ export class Question extends Model<
   static initModel(sequelize: Sequelize): typeof Question {
     Question.init(
       {
-        questionId: {
+        id: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
           unique: true,
-          defaultValue: DataTypes.UUIDV4,
+          defaultValue: UUIDV4,
         },
-        question: {
+        questionText: {
           type: DataTypes.STRING,
+          allowNull: false,
+        },
+        positionInQuiz: {
+          type: DataTypes.INTEGER,
           allowNull: false,
         },
         createdAt: {

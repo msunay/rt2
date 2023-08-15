@@ -1,53 +1,45 @@
-import { Sequelize, Model, DataTypes } from "sequelize";
+import type { Sequelize, Model } from "sequelize";
 import { User } from "./User";
 import { Quiz } from "./Quiz";
 import { Question } from "./Question";
 import { Answer } from "./Answer";
+import { Participation } from "./Participation";
 
-export { User, Quiz, Question, Answer };
+export { User, Quiz, Question, Answer, Participation };
 
 export function initModels(sequelize: Sequelize) {
   User.initModel(sequelize);
   Quiz.initModel(sequelize);
   Question.initModel(sequelize);
   Answer.initModel(sequelize);
+  Participation.initModel(sequelize);
 
-  const participant = sequelize.define("participant", {
-    isParticipant: DataTypes.BOOLEAN,
-  });
   User.belongsToMany(Quiz, {
-    through: participant,
-    foreignKey: "users_id",
-    otherKey: "quizzes_id",
-  });
-  Quiz.belongsToMany(User, {
-    through: participant,
-    foreignKey: "quizzes_id",
-    otherKey: "users_id",
-  });
-  Quiz.hasMany(Question, {
-    foreignKey: "quiz_id",
-  });
-  Question.belongsTo(Quiz, {
-    foreignKey: "quiz_id",
-  });
-  Question.hasMany(Answer, {
-    foreignKey: "question_id",
-  });
-  Answer.belongsTo(Question, {
-    foreignKey: "question_id",
-  });
-
-  User.belongsToMany(Answer, {
-    through: "user_answer",
-    foreignKey: "users_id",
-    otherKey: "answers_id",
+    as: "quizzes",
+    through: Participation,
     onDelete: "CASCADE",
   });
-  Answer.belongsToMany(User, {
-    through: "user_answer",
-    foreignKey: "answers_id",
-    otherKey: "users_id",
+
+  Quiz.belongsToMany(User, {
+    as: "users",
+    through: Participation,
+    onDelete: "CASCADE",
+  });
+
+  Quiz.hasMany(Question);
+  Question.belongsTo(Quiz);
+
+  Question.hasMany(Answer);
+  Answer.belongsTo(Question);
+
+  Answer.belongsToMany(Participation, {
+    as: "answers",
+    through: "participation_answer",
+    onDelete: "CASCADE",
+  });
+  Participation.belongsToMany(Answer, {
+    as: "participations",
+    through: "participation_answer",
     onDelete: "CASCADE",
   });
 
@@ -56,5 +48,6 @@ export function initModels(sequelize: Sequelize) {
     Quiz,
     Question,
     Answer,
+    Participation,
   };
 }

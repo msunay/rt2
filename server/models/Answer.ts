@@ -21,17 +21,17 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
+import type { Participation } from "./Participation";
 import type { Question } from "./Question";
-import type { User } from "./User";
 
-type AnswerAssociations = "question" | "users";
+type AnswerAssociations = "question" | "participations";
 
 export class Answer extends Model<
   InferAttributes<Answer, { omit: AnswerAssociations }>,
   InferCreationAttributes<Answer, { omit: AnswerAssociations }>
 > {
-  declare answerId: CreationOptional<string>;
-  declare answer: string;
+  declare id: CreationOptional<string>;
+  declare answerText: string;
   declare isCorrect: boolean;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -42,35 +42,56 @@ export class Answer extends Model<
   declare setQuestion: BelongsToSetAssociationMixin<Question, string>;
   declare createQuestion: BelongsToCreateAssociationMixin<Question>;
 
-  // Answer belongsToMany User
-  declare users?: NonAttribute<User[]>;
-  declare getUsers: BelongsToManyGetAssociationsMixin<User>;
-  declare setUsers: BelongsToManySetAssociationsMixin<User, string>;
-  declare addUser: BelongsToManyAddAssociationMixin<User, string>;
-  declare addUsers: BelongsToManyAddAssociationsMixin<User, string>;
-  declare createUser: BelongsToManyCreateAssociationMixin<User>;
-  declare removeUser: BelongsToManyRemoveAssociationMixin<User, string>;
-  declare removeUsers: BelongsToManyRemoveAssociationsMixin<User, string>;
-  declare hasUser: BelongsToManyHasAssociationMixin<User, string>;
-  declare hasUsers: BelongsToManyHasAssociationsMixin<User, string>;
-  declare countUsers: BelongsToManyCountAssociationsMixin;
+  // Answer belongsToMany Participation
+  declare participations?: NonAttribute<Participation[]>;
+  declare getParticipations: BelongsToManyGetAssociationsMixin<Participation>;
+  declare setParticipations: BelongsToManySetAssociationsMixin<
+    Participation,
+    string
+  >;
+  declare addParticipation: BelongsToManyAddAssociationMixin<
+    Participation,
+    string
+  >;
+  declare addParticipations: BelongsToManyAddAssociationsMixin<
+    Participation,
+    string
+  >;
+  declare createParticipation: BelongsToManyCreateAssociationMixin<Participation>;
+  declare removeParticipation: BelongsToManyRemoveAssociationMixin<
+    Participation,
+    string
+  >;
+  declare removeParticipations: BelongsToManyRemoveAssociationsMixin<
+    Participation,
+    string
+  >;
+  declare hasParticipation: BelongsToManyHasAssociationMixin<
+    Participation,
+    string
+  >;
+  declare hasParticipations: BelongsToManyHasAssociationsMixin<
+    Participation,
+    string
+  >;
+  declare countParticipations: BelongsToManyCountAssociationsMixin;
 
   declare static associations: {
     question: Association<Answer, Question>;
-    users: Association<Answer, User>;
+    participations: Association<Answer, Participation>;
   };
 
   static initModel(sequelize: Sequelize): typeof Answer {
     Answer.init(
       {
-        answerId: {
+        id: {
           type: DataTypes.UUID,
           primaryKey: true,
           allowNull: false,
           unique: true,
           defaultValue: DataTypes.UUIDV4,
         },
-        answer: {
+        answerText: {
           type: DataTypes.STRING,
           allowNull: false,
         },
