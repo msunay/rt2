@@ -20,6 +20,7 @@ import {
   Model,
   NonAttribute,
   Sequelize,
+  UUIDV4,
 } from "sequelize";
 import type { Answer } from "./Answer";
 import type { Quiz } from "./Quiz";
@@ -68,6 +69,7 @@ export class Question extends Model<
           primaryKey: true,
           allowNull: false,
           unique: true,
+          defaultValue: UUIDV4,
         },
         questionText: {
           type: DataTypes.STRING,
