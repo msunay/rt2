@@ -18,14 +18,15 @@ import {
   NonAttribute,
   Sequelize,
 } from "sequelize";
-import { Quiz, User } from "../associations";
 import type { Answer } from "../objects/Answer";
+import { Quiz } from "../objects/Quiz";
+import { User } from "../objects/User";
 
 type ParticipationAssociations = "answers";
 
 export class Participation extends Model<
-  InferAttributes<Participation>,
-  InferCreationAttributes<Participation>
+  InferAttributes<Participation, { omit: ParticipationAssociations }>,
+  InferCreationAttributes<Participation, { omit: ParticipationAssociations }>
 > {
   declare id: CreationOptional<string>;
   declare UserId: string;
