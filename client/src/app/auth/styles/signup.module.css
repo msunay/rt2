@@ -1,0 +1,37 @@
+.form {
+  display: flex;
+  row-gap: 50px;
+  flex-direction: column;
+}
+
+.form input {
+  border-radius: 20px;
+  background: #FFF;
+  height: 49px;
+  width: 100%;
+  padding: 10px;
+  border: unset;
+  color: black;
+  font-family: Song Myung;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.form button {
+  height: 38px;
+  border-radius: 20px;
+  background: #98FDA2;
+  border: unset;
+  color: #415B5F;
+  text-align: center;
+  font-family: Song Myung;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+.form button:disabled {
+  background-color: lightgray;
+}
