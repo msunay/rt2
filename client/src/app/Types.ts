@@ -6,11 +6,13 @@ export interface ClientToServerEvents {
   createWebRtcTransport: (senderObj: {sender: boolean}, callback: (params: any) => void) => void
   transport_connect: (producerTransportConnect: producerTransportConnect) => void;
   transport_produce: (transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
+  transport_recv_connect: (producerTransportConnect: producerTransportConnect) => void;
+  consume: (rtp: { rtpCapabilities: mediasoupTypes.RtpCapabilities }, callback: (params: any) => void) => void;
+  consumer_resume: () => void;
 }
 
 export interface ServerToClientEvents {
   connection_success: (socketId: socketId) => void;
-
 }
 
 

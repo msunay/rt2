@@ -5,7 +5,6 @@ import { MediaKind } from 'mediasoup/node/lib/RtpParameters';
 
 export interface ClientToServerEvents {
   connection_success: (socketId: socketId) => void;
-
 }
 
 export interface ServerToClientEvents {
@@ -13,7 +12,9 @@ export interface ServerToClientEvents {
   getRtpCapabilities: (cb: any) => void;
   createWebRtcTransport: (sender: {sender: boolean}, cb: any) => void
   transport_connect: (params: { dtlsParameters: mediasoupTypes.DtlsParameters }, cb: any) => void;
-
+  transport_recv_connect: (params: { dtlsParameters: mediasoupTypes.DtlsParameters }) => void;
+  consume: (rtpObj: {rtpCapabilities: mediasoupTypes.RtpCapabilities}, cb: any) => void;
+  consumer_resume: () => void;
 }
 
 interface socketId {

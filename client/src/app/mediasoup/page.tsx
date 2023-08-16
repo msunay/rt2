@@ -9,6 +9,7 @@ import { types as mediasoupTypes } from 'mediasoup-client';
 
 function stream() {
   const localVideo = useRef<HTMLVideoElement>(null);
+  const remoteVideo = useRef<HTMLVideoElement>(null);
 
   const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
@@ -21,7 +22,9 @@ function stream() {
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: mediasoupTypes.Transport;
+  let consumerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
+  let consumer: mediasoupTypes.Consumer;
 
   let params: mediasoupTypes.ProducerOptions = {
     encodings:
@@ -145,7 +148,6 @@ function stream() {
         }
       })
     })
-
   }
 
   const connectSendTransport = async () => {
@@ -165,6 +167,59 @@ function stream() {
     })
   }
 
+  const createRecvTransport = async () => {
+    socket.emit('createWebRtcTransport', { sender: false }, ({params}) => {
+      if (params.error) {
+        console.log(params.error);
+        return;
+      }
+
+      console.log(params);
+
+      // Create recv transport
+      consumerTransport = device.createRecvTransport(params)
+
+      consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+        try {
+          // Signal local DTLS parameters to the server side transport
+          socket.emit('transport_recv_connect', {
+            // transportId: consumerTransport.id,
+            dtlsParameters
+          })
+
+          // Tell the transport that parameters were transmitted
+          callback()
+        } catch (err: any) {
+          errback(err)
+        }
+      })
+    })
+  }
+
+  const connectRecvTransport = async () => {
+    socket.emit('consume', {
+      rtpCapabilities: device.rtpCapabilities
+    }, async ({ params }) => {
+      if (params.error) {
+        console.log('Cannnot consume');
+        return;
+      }
+
+      console.log(params);
+      consumer = await consumerTransport.consume({
+        id: params.id,
+        producerId: params.producerId,
+        kind: params.kind,
+        rtpParameters: params.rtpParameters
+      })
+
+      const { track } = consumer;
+
+      remoteVideo.current!.srcObject = new MediaStream([track])
+
+      socket.emit('consumer_resume')
+    })
+  }
   return (
     <main>
       <div id="video">
@@ -190,6 +245,7 @@ function stream() {
               <td>
                 <div id="sharedBtns" className={styles.sharedBtns}>
                   <video
+                    ref={remoteVideo}
                     id="remoteVideo"
                     autoPlay={true}
                     className={styles.video}
@@ -256,7 +312,7 @@ function stream() {
                   <button
                     id="btnRecvSendTransport"
                     className={styles.button}
-                    // onClick={createRecvTransport}
+                    onClick={createRecvTransport}
                   >
                     6. Create Recv Transport
                   </button>
@@ -264,7 +320,7 @@ function stream() {
                   <button
                     id="btnConnectRecvTransport"
                     className={styles.button}
-                    // onClick={connectRecvTransport}
+                    onClick={connectRecvTransport}
                   >
                     7. Connect Recv Transport & Consume
                   </button>

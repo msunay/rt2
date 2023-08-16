@@ -10,7 +10,6 @@ import fs from 'fs';
 import * as mediasoup from 'mediasoup';
 import { types as mediasoupTypes } from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
-import util from 'util';
 
 const app = express();
 export const PORT = process.env.SERVER_PORT || 3001;
@@ -41,6 +40,7 @@ let msRouter: mediasoupTypes.Router;
 let producerTransport: mediasoupTypes.Transport | undefined;
 let consumerTransport: mediasoupTypes.Transport | undefined;
 let producer: mediasoupTypes.Producer;
+let consumer: mediasoupTypes.Consumer;
 
 const createWorker = async () => {
   msWorker = await mediasoup.createWorker();
@@ -94,85 +94,137 @@ peers.on(
       const rtpCapabilities = msRouter.rtpCapabilities;
       console.log('RTP Capabilities', rtpCapabilities);
 
-
       callback({ rtpCapabilities });
     });
 
     socket.on('createWebRtcTransport', async ({ sender }, callback) => {
       console.log(`Is this a sender request? ${sender}`);
-      if (sender) producerTransport = await createWebRtcTransport(callback)
-      else consumerTransport = await createWebRtcTransport(callback)
-    })
+      if (sender)
+        producerTransport = await createWebRtcTransport(callback);
+      else
+        consumerTransport = await createWebRtcTransport(callback);
+    });
 
     socket.on('transport_connect', async ({ dtlsParameters }) => {
       console.log('DTLS Params: ', { dtlsParameters });
-      await producerTransport!.connect({ dtlsParameters })
+      await producerTransport!.connect({ dtlsParameters });
+    });
+
+    socket.on(
+      'transport_produce',
+      async ({ kind, rtpParameters, appData }, callback) => {
+        producer = await producerTransport!.produce({
+          kind,
+          rtpParameters,
+        });
+
+        console.log('Producer iD: ', producer.id, producer.kind);
+
+        producer.on('transportclose', () => {
+          console.log('transport for this producer closed');
+          producer.close();
+        });
+
+        callback({
+          id: producer.id,
+        });
+      }
+    );
+    socket.on('transport_recv_connect', async ({ dtlsParameters }) => {
+      console.log(`DTLS params: ${dtlsParameters}`);
+      await consumerTransport?.connect({ dtlsParameters })
     })
 
-    socket.on('transport_produce', async ({ kind, rtpParameters, appData }, callback) => {
-      producer = await producerTransport!.produce({
-        kind,
-        rtpParameters
-      })
+    socket.on('consume', async ({ rtpCapabilities }, callback) => {
+      try {
+        if (msRouter.canConsume({
+          producerId: producer.id,
+          rtpCapabilities
+        })) {
+          consumer = await consumerTransport!.consume({
+            producerId: producer.id,
+            rtpCapabilities,
+            paused: true
+          })
+          consumer.on('transportclose', () => {
+            console.log('Transport closed from consumer');
+          })
 
-      console.log('Producer iD: ', producer.id, producer.kind);
+          consumer.on('producerclose', () => {
+            console.log('Producer of consumer closed');
+          })
 
-      producer.on('transportclose', () => {
-        console.log('transport for this producer closed');
-        producer.close()
-      })
+          const params = {
+            id: consumer.id,
+            producerId: producer.id,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters
+          }
 
-      callback({
-        id: producer.id
-      })
+          callback({ params })
+        }
+      } catch (err: any) {
+        console.error(err)
+        callback({
+          params: {
+            error: err
+          }
+        })
+      }
+    })
+    socket.on('consumer_resume',async () => {
+      console.log('consumer resume');
+      await consumer.resume()
     })
   }
 );
+
 
 const createWebRtcTransport = async (callback: any) => {
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '127.0.0.1' // TODO .env fly.io server ip
-        }
+          ip: '127.0.0.1', // TODO .env fly.io server ip
+        },
       ],
       enableUdp: true,
       enableTcp: true,
-      preferUdp: true
-    }
+      preferUdp: true,
+    };
 
-    let transport = await msRouter.createWebRtcTransport(webRtcTransportOptions);
+    let transport = await msRouter.createWebRtcTransport(
+      webRtcTransportOptions
+    );
     console.log(`transport id: ${transport.id}`);
 
-    transport.on('dtlsstatechange', dtlsState => {
+    transport.on('dtlsstatechange', (dtlsState) => {
       if (dtlsState === 'closed') {
-        transport.close()
+        transport.close();
       }
-    })
+    });
 
     transport.on('@close', () => {
       console.log('Transport closed');
-    })
+    });
 
     callback({
       params: {
         id: transport.id,
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
-        dtlsParameters: transport.dtlsParameters
-      }
-    })
+        dtlsParameters: transport.dtlsParameters,
+      },
+    });
     return transport;
-
   } catch (error) {
     console.error(error);
     callback({
       params: {
-        error
-      }
-    })
+        error,
+      },
+    });
   }
-}
+};
 
 export default app;
