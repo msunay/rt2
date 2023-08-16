@@ -1,7 +1,7 @@
 import models from "../models/index";
 import { Request, Response } from "express";
 
-async function getAllQuizzes(req: Request, res: Response) {
+async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
   try {
     const response = await models.Quiz.findAll({
       include: {
@@ -9,6 +9,16 @@ async function getAllQuizzes(req: Request, res: Response) {
         include: [models.Answer],
       },
     });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error("Could not get quizzes::", err);
+    res.status(500).send();
+  }
+}
+
+async function getAllQuizzes(req: Request, res: Response) {
+  try {
+    const response = await models.Quiz.findAll();
     res.status(200).send(response);
   } catch (err) {
     console.error("Could not get quizzes::", err);
@@ -34,5 +44,6 @@ async function getOneQuiz(req: Request, res: Response) {
 
 export default {
   getAllQuizzes,
+  getQuizzesQuestionsAnswers,
   getOneQuiz,
 };

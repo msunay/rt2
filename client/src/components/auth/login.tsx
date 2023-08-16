@@ -4,7 +4,7 @@ import { compareSync } from "bcrypt-ts"
 import { useRouter } from "next/navigation"
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthState } from '@/redux/features/authSlice';
-import { userApiService } from "@/redux/services/userApiService";
+import { userApiService } from "@/redux/services/apiService";
 
 interface SignUpForm {
   username?: string,

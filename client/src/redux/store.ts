@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./features/authSlice";
-
+import discoverSlice from "./features/discoverSlice";
 
 export const store = configureStore({
   reducer: {
-    authSlice
+    authSlice,
+    discoverSlice,
   },
   devTools: process.env.NODE_ENV !== "production",
 });

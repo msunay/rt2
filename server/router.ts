@@ -5,9 +5,9 @@ import participationController from "./controllers/referenceTables.controller";
 import { auth } from "./middleware/auth";
 const router: Router = express.Router();
 
-//testing 
-router.get('/', auth, (req, res) => {
-  res.status(200).send({ message: 'all good' })
+//testing
+router.get("/", auth, (req, res) => {
+  res.status(200).send({ message: "all good" });
 });
 
 // User routes
@@ -18,6 +18,10 @@ router.put("/username", userController.changeUsername);
 router.put("/password", userController.changePassword);
 
 // Quiz routes
+router.get(
+  "/quizzesQuestionsAnswers",
+  quizController.getQuizzesQuestionsAnswers
+);
 router.get("/quizzes", quizController.getAllQuizzes);
 router.get("/quiz/:id", quizController.getOneQuiz);
 
