@@ -82,15 +82,29 @@ peers.on(
 
     socket.emit('connection_success', {
       socketId: socket.id,
+      producerAlreadyExists: producer ? true : false
     });
 
     socket.on('disconnect', () => {
       console.log('peer disconnected');
     });
 
-    msRouter = await msWorker.createRouter({ mediaCodecs });
+    socket.on('create_room', async (callback) => {
+      if (msRouter === undefined) {
+        msRouter = await msWorker.createRouter({ mediaCodecs });
+        console.log(`Router ID: ${msRouter.id}`);
+      }
 
-    socket.on('create_room', (callback) => {
+      getRtpCapabilities(callback)
+    })
+
+    const getRtpCapabilities = (callback: any) => {
+      const rtpCapabilities = msRouter.rtpCapabilities
+
+      callback({ rtpCapabilities })
+    }
+
+    socket.on('getRtpCapabilities', (callback) => {
       const rtpCapabilities = msRouter.rtpCapabilities;
       console.log('RTP Capabilities', rtpCapabilities);
 
@@ -160,7 +174,7 @@ peers.on(
             kind: consumer.kind,
             rtpParameters: consumer.rtpParameters
           }
-
+          console.log(params);
           callback({ params })
         }
       } catch (err: any) {

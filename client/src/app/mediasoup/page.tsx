@@ -11,7 +11,7 @@ function stream() {
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
-  const [isProducer, setIsProducer] = useState<boolean>(false);
+  // const [isProducer, setIsProducer] = useState<boolean>(false);
 
   const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
@@ -27,6 +27,7 @@ function stream() {
   let consumerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
   let consumer: mediasoupTypes.Consumer;
+  let isProducer = false;
 
   let params: mediasoupTypes.ProducerOptions = {
     encodings:
@@ -60,10 +61,12 @@ function stream() {
       track,
       ...params,
     };
+
+    goConnect(true)
   };
 
   const getLocalStream = async () => {
-    await navigator.mediaDevices
+    navigator.mediaDevices
       .getUserMedia({
         audio: false,
         video: {
@@ -81,9 +84,17 @@ function stream() {
       .catch((err) => console.error(err));
   };
 
-  const goConnect = (producerOrConsumer) => {
-    setIsProducer(producerOrConsumer)
-    getRtpCapabilities()
+  const goConsume = () => {
+    goConnect(false);
+  }
+
+  const goConnect = (producerOrConsumer: boolean) => {
+    isProducer = producerOrConsumer;
+    device === undefined ? getRtpCapabilities() : goCreateTransport()
+  }
+
+  const goCreateTransport = () => {
+    isProducer ? createSendTransport() : createRecvTransport();
   }
 
   const createDevice = async () => {
@@ -93,7 +104,10 @@ function stream() {
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
-      console.log('RTP Capabilities', device.rtpCapabilities);
+      console.log('Device RTP Capabilities', device.rtpCapabilities);
+
+      // once device loads create transport
+      goCreateTransport()
     } catch (err: any) {
       console.error(err);
       if (err.name === 'UnsupportedError')
@@ -103,11 +117,15 @@ function stream() {
 
   const getRtpCapabilities = () => {
     // get router rtp capabilities from server
-    // send
+    // send to client
     socket.emit('create_room', (data: any) => {
-      console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
+      console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
 
+      //assign to local variable
       rtpCapabilities = data.rtpCapabilities;
+      // create device with rtp capabilities
+      createDevice()
+
     });
   };
 
@@ -154,6 +172,8 @@ function stream() {
           errback(err);
         }
       })
+
+      connectSendTransport()
     })
   }
 
@@ -200,6 +220,8 @@ function stream() {
           errback(err)
         }
       })
+
+      connectRecvTransport()
     })
   }
 
@@ -258,6 +280,17 @@ function stream() {
                     className={styles.video}
                   ></video>
                 </div>
+                <br />
+                <div id="sharedBtns" className={styles.sharedBtns}>
+                  <button
+                    id="btnRtpCapabilities"
+                    className={styles.button}
+                    onClick={goConsume}
+                  >
+                    Consume
+                  </button>
+
+                </div>
               </td>
             </tr>
             <tr>
@@ -268,70 +301,16 @@ function stream() {
                     className={styles.button}
                     onClick={getLocalStream}
                   >
-                    1. Get Local Video
+                    Stream
                   </button>
                 </div>
+
+
               </td>
             </tr>
             <tr>
-              <td colSpan={2}>
-                <div id="sharedBtns" className={styles.sharedBtns}>
-                  <button
-                    id="btnRtpCapabilities"
-                    className={styles.button}
-                    onClick={getRtpCapabilities}
-                  >
-                    2. Get Rtp Capabilities
-                  </button>
-                  <br />
-                  <button
-                    id="btnDevice"
-                    className={styles.button}
-                    onClick={createDevice}
-                  >
-                    3. Create Device
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div id="sharedBtns" className={styles.sharedBtns}>
-                  <button
-                    id="btnCreateSendTransport"
-                    className={styles.button}
-                    onClick={createSendTransport}
-                  >
-                    4. Create Send Transport
-                  </button>
-                  <br />
-                  <button
-                    id="btnConnectSendTransport"
-                    className={styles.button}
-                    onClick={connectSendTransport}
-                  >
-                    5. Connect Send Transport & Produce
-                  </button>
-                </div>
-              </td>
-              <td>
-                <div id="sharedBtns" className={styles.sharedBtns}>
-                  <button
-                    id="btnRecvSendTransport"
-                    className={styles.button}
-                    onClick={createRecvTransport}
-                  >
-                    6. Create Recv Transport
-                  </button>
-                  <br />
-                  <button
-                    id="btnConnectRecvTransport"
-                    className={styles.button}
-                    onClick={connectRecvTransport}
-                  >
-                    7. Connect Recv Transport & Consume
-                  </button>
-                </div>
+              <td colSpan={1}>
+
               </td>
             </tr>
           </tbody>

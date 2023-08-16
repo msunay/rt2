@@ -12,7 +12,7 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents {
-  connection_success: (socketId: socketId) => void;
+  connection_success: (Obj: connectionSuccess) => void;
 }
 
 
@@ -30,4 +30,8 @@ interface transportProduce {
   kind: string;
   rtpParameters: mediasoupTypes.RtpParameters;
   appData: mediasoupTypes.AppData;
+}
+interface connectionSuccess {
+  socketId: string;
+  producerAlreadyExists: boolean;
 }
