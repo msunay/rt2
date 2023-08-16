@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 // import { AppState } from "../store";
@@ -9,10 +9,14 @@ interface AuthState {
   authToken: string;
 }
 
+let initialState = { authToken: "" };
+
 // Initial state
-const initialState: AuthState = {
-  authToken: localStorage.getItem('jwt_token') || '',
-};
+if (typeof window !== "undefined") {
+  initialState = {
+    authToken: localStorage.getItem("jwt_token") || "",
+  };
+}
 
 // Actual Slice
 export const authSlice = createSlice({
@@ -21,9 +25,9 @@ export const authSlice = createSlice({
   reducers: {
     // Action to set the authentication status
     setAuthState: (state, action) => {
-      state.authToken = action.payload;
+      state!.authToken = action.payload;
     },
-  }
+  },
 });
 
 export const { setAuthState } = authSlice.actions;
