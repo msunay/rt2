@@ -1,0 +1,93 @@
+.dashboard_container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-around;
+  height: 90vh;
+  padding: 12px 16px;
+  align-items: center;
+}
+
+.quiz_contaniner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 35%;
+  box-shadow: 1px 3px 3px 4px lightgray;
+  border-radius: 12px;
+  padding: 16px 0px;
+}
+
+.quiz_contaniner h4 {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.quiz_details {
+  display: flex;
+  height: 40%;
+
+  justify-content: space-around;
+}
+
+.quiz_details div {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 12px;
+}
+
+.quiz_details div:nth-child(1) {
+  width: 40%;
+}
+
+.quiz_details div:nth-child(2) {
+  width: 30%;
+}
+
+.divider {
+  height: 1px;
+  background-color: lightgray;
+}
+
+.date_container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 30px;
+
+}
+
+.date_container strong {
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.date_container span {
+  letter-spacing: 2px;
+}
+
+.dashboard_container button {
+  width: 100%;
+  height: 80px;
+  color: black;
+  background-color: inherit;
+  border: unset;
+  border-radius: 12px;
+  box-shadow: 1px 3px 3px 4px lightgray;
+  letter-spacing: 2px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 16px;
+}
+
+.arrow_next {
+  filter: invert(32%) sepia(28%) saturate(392%) hue-rotate(100deg) brightness(100%) contrast(89%);
+}

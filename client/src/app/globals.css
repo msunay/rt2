@@ -91,6 +91,20 @@ a {
   text-decoration: none;
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: var(--primary-color);
+  color: #9CC8C8;
+  text-align: center;
+  font-family: Jockey One;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { RootState } from "@/redux/store";
 import { useAppSelector } from "@/redux/hooks";
 import axios from "axios";
+import Dashboard from "./dashboard/page";
 
 
 export default function Home() {
@@ -25,7 +26,7 @@ export default function Home() {
 
   return (
     <main>
-      <>App</>
+      <Dashboard />
     </main>
   );
 }
