@@ -1,10 +1,12 @@
 import models from "../models/index";
 import { Request, Response } from "express";
+import { tokenGenerator } from "../utils/token";
 
 async function addUser(req: Request, res: Response) {
   try {
     const response = await models.User.create(req.body);
-    res.status(201).send(response);
+    const token = tokenGenerator(response?.id, response?.username);
+    res.status(201).send({ ...response, token });
   } catch (err) {
     console.error("Could not add user::", err);
     res.status(500).send();
@@ -13,10 +15,11 @@ async function addUser(req: Request, res: Response) {
 
 async function getOneUser(req: Request, res: Response) {
   try {
-    const response = await models.User.findAll({
+    const response = await models.User.findOne({
       where: { username: req.params.username },
     });
-    res.status(200).send(response);
+    const token = tokenGenerator(response?.id || '', response?.username || '');
+    res.status(200).send({ ...response, token });
   } catch (err) {
     console.error("Could not get user::", err);
     res.status(500).send();

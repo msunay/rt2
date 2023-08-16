@@ -6,12 +6,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Type for our state
 interface AuthState {
-  authState: boolean;
+  authToken: string;
 }
 
 // Initial state
 const initialState: AuthState = {
-  authState: false,
+  authToken: '', 
 };
 
 // Actual Slice
@@ -21,7 +21,7 @@ export const authSlice = createSlice({
   reducers: {
     // Action to set the authentication status
     setAuthState: (state, action) => {
-      state.authState = action.payload;
+      state.authToken = action.payload;
     },
   }
 });
