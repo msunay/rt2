@@ -4,7 +4,9 @@
   "description": "Real Time Trivia Server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "dev": "nodemon server.ts"
   },
   "author": "",
   "license": "ISC",
