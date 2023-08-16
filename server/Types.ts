@@ -9,7 +9,7 @@ export interface ClientToServerEvents {
 
 export interface ServerToClientEvents {
   transport_produce: (transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
-  getRtpCapabilities: (cb: any) => void;
+  create_room: (cb: any) => void;
   createWebRtcTransport: (sender: {sender: boolean}, cb: any) => void
   transport_connect: (params: { dtlsParameters: mediasoupTypes.DtlsParameters }, cb: any) => void;
   transport_recv_connect: (params: { dtlsParameters: mediasoupTypes.DtlsParameters }) => void;

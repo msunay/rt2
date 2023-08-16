@@ -90,7 +90,7 @@ peers.on(
 
     msRouter = await msWorker.createRouter({ mediaCodecs });
 
-    socket.on('getRtpCapabilities', (callback) => {
+    socket.on('create_room', (callback) => {
       const rtpCapabilities = msRouter.rtpCapabilities;
       console.log('RTP Capabilities', rtpCapabilities);
 

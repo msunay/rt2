@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './mediasoup.module.css';
 import { ClientToServerEvents, ServerToClientEvents } from '../Types';
 import { io, Socket } from 'socket.io-client';
@@ -11,12 +11,14 @@ function stream() {
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
+  const [isProducer, setIsProducer] = useState<boolean>(false);
+
   const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
   );
 
-  socket.on('connection_success', ({ socketId }) => {
-    console.log(socketId);
+  socket.on('connection_success', ({ socketId, producerAlreadyExists }) => {
+    console.log(socketId, producerAlreadyExists);
   });
 
   let device: mediasoupTypes.Device;
@@ -51,7 +53,7 @@ function stream() {
     }
   };
 
-  const streamSuccess = async (mediaStream: MediaStream) => {
+  const streamSuccess = (mediaStream: MediaStream) => {
     localVideo.current!.srcObject = mediaStream;
     const track = mediaStream.getVideoTracks()[0];
     params = {
@@ -75,11 +77,14 @@ function stream() {
           },
         },
       })
-      .then((mediaStream) => {
-        streamSuccess(mediaStream);
-      })
+      .then((mediaStream) => streamSuccess(mediaStream))
       .catch((err) => console.error(err));
   };
+
+  const goConnect = (producerOrConsumer) => {
+    setIsProducer(producerOrConsumer)
+    getRtpCapabilities()
+  }
 
   const createDevice = async () => {
     try {
@@ -97,7 +102,9 @@ function stream() {
   };
 
   const getRtpCapabilities = () => {
-    socket.emit('getRtpCapabilities', (data: any) => {
+    // get router rtp capabilities from server
+    // send
+    socket.emit('create_room', (data: any) => {
       console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
 
       rtpCapabilities = data.rtpCapabilities;

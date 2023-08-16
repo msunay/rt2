@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client"
 import { types as mediasoupTypes } from 'mediasoup-client';
 
 export interface ClientToServerEvents {
-  getRtpCapabilities: (cb: any) => void;
+  create_room: (cb: any) => void;
   createWebRtcTransport: (senderObj: {sender: boolean}, callback: (params: any) => void) => void
   transport_connect: (producerTransportConnect: producerTransportConnect) => void;
   transport_produce: (transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
