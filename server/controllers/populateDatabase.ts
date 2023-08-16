@@ -20,7 +20,7 @@ const mockHost = {
   id: "0cf7cbe4-0c52-4a1a-940a-65d47f769c08",
   email: "host@email.com",
   username: "hostname",
-  password: "testword",
+  password: "$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK",
   isPremiumMember: false,
   pointsWon: 0,
 };
@@ -29,7 +29,7 @@ const mockPlayer = {
   id: "efde9495-1ec4-4c7d-b344-b68000c00291",
   email: "player@email.com",
   username: "playername",
-  password: "testword",
+  password: "$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK",
   isPremiumMember: false,
   pointsWon: 0,
 };
