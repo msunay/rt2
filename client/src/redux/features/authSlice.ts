@@ -11,7 +11,7 @@ interface AuthState {
 
 // Initial state
 const initialState: AuthState = {
-  authToken: localStorage.getItem('jwt_token') || '',
+  authToken: '', 
 };
 
 // Actual Slice
