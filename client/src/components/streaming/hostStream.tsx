@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ClientToServerEvents,
   ServerToClientEvents,
@@ -8,6 +8,9 @@ import {
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
+import { userApiService } from '@/redux/services/apiService';
+import { Quiz, QuizQuestionAnswer } from '@/Types/Types';
+import Question from '../question/question';
 
 export default function HostStream() {
   const localVideo = useRef<HTMLVideoElement>(null);
@@ -200,13 +203,16 @@ export default function HostStream() {
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 
+
   return (
     <>
       <div className="host-unit">
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
         </div>
-        <div className="next-q-preview"></div>
+        <div className="next-q-preview">
+          <Question />
+        </div>
         <div className="quiz-controls">
           <button className="next-q-btn" onClick={getLocalStream}>
             Next Question
