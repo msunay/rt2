@@ -1,6 +1,5 @@
 import { ClientToServerEvents, ServerToClientEvents } from '../PeerSocketTypes';
 import { Socket } from 'socket.io';
-import { peers } from '../index';
 import { types as mediasoupTypes } from 'mediasoup';
 import * as mediasoup from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
@@ -74,8 +73,16 @@ const createWebRtcTransport = async (callback: any) => {
       console.log('Transport closed');
     });
 
+    console.log('Transport Params: ', {
+      transportParams: {
+        id: transport.id,
+        iceParameters: transport.iceParameters,
+        iceCandidates: transport.iceCandidates,
+        dtlsParameters: transport.dtlsParameters,
+      },
+    });
     callback({
-      params: {
+      transportParams: {
         id: transport.id,
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
@@ -86,7 +93,7 @@ const createWebRtcTransport = async (callback: any) => {
   } catch (error) {
     console.error(error);
     callback({
-      params: {
+      transportParams: {
         error,
       },
     });
@@ -128,9 +135,13 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
   });
 
   peers.on('createWebRtcTransport', async ({ sender }, callback) => {
-    console.log(`Is this a sender request? ${sender}`);
-    if (sender) producerTransport = await createWebRtcTransport(callback);
-    else consumerTransport = await createWebRtcTransport(callback);
+    try {
+      console.log(`Is this a sender request? ${sender}`);
+      if (sender) producerTransport = await createWebRtcTransport(callback);
+      else consumerTransport = await createWebRtcTransport(callback);
+    } catch (error) {
+      console.log(error)
+    }
   });
 
   peers.on('transport_connect', async ({ dtlsParameters }) => {
@@ -140,7 +151,8 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
 
   peers.on(
     'transport_produce',
-    async ({ kind, rtpParameters, appData }, callback) => {
+    async ({ kind, rtpParameters, appData }, sendServerTransportId) => {
+      console.log(producerTransport);
       producer = await producerTransport!.produce({
         kind,
         rtpParameters,
@@ -153,17 +165,18 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
         producer.close();
       });
 
-      callback({
+      sendServerTransportId({
         id: producer.id,
       });
     }
   );
+
   peers.on('transport_recv_connect', async ({ dtlsParameters }) => {
     console.log(`DTLS params: ${dtlsParameters}`);
     await consumerTransport?.connect({ dtlsParameters });
   });
 
-  peers.on('consume', async ({ rtpCapabilities }, callback) => {
+  peers.on('consume', async ({ rtpCapabilities }, initConsumer) => {
     try {
       if (
         msRouter.canConsume({
@@ -190,12 +203,11 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
           kind: consumer.kind,
           rtpParameters: consumer.rtpParameters,
         };
-        console.log(params);
-        callback({ params });
+        initConsumer({ params });
       }
     } catch (err: any) {
       console.error(err);
-      callback({
+      initConsumer({
         params: {
           error: err,
         },

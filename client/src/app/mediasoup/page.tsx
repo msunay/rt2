@@ -92,6 +92,7 @@ function stream() {
   }
 
   const goCreateTransport = () => {
+    console.log(isProducer);
     isProducer ? createSendTransport() : createRecvTransport();
   }
 
@@ -128,14 +129,14 @@ function stream() {
   };
 
   const createSendTransport = () => {
-    peers.emit('createWebRtcTransport', { sender: true }, ({ params }) => {
-      if (params.error) {
-        console.log(params.error);
-        return;
-      }
-      console.log(params);
+    peers.emit('createWebRtcTransport', { sender: true }, ({ transportParams }) => {
+      // if (sendTransportParams.error) {
+      //   console.log(sendTransportParams.error);
+      //   return;
+      // }
+      console.log(transportParams);
 
-      producerTransport = device.createSendTransport(params);
+      producerTransport = device.createSendTransport(transportParams);
 
       producerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
         try {
@@ -156,6 +157,7 @@ function stream() {
         console.log(parameters);
 
         try {
+          console.log('Is this working???');
           peers.emit('transport_produce', {
             // transportId: producerTransport.id,
             kind: parameters.kind,
@@ -164,6 +166,7 @@ function stream() {
           }, ({ id }) => {
             // Tell the transport that parameters were transmitted and provide it with the
             // server side producers's id
+            console.log(id)
             callback({ id })
           })
         } catch (err: any) {
@@ -193,16 +196,16 @@ function stream() {
   }
 
   const createRecvTransport = async () => {
-    peers.emit('createWebRtcTransport', { sender: false }, ({params}) => {
-      if (params.error) {
-        console.log(params.error);
+    peers.emit('createWebRtcTransport', { sender: false }, ({ transportParams }) => {
+      if (transportParams.error) {
+        console.log(transportParams.error);
         return;
       }
 
-      console.log(params);
+      console.log(transportParams);
 
       // Create recv transport
-      consumerTransport = device.createRecvTransport(params)
+      consumerTransport = device.createRecvTransport(transportParams)
 
       consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
         try {

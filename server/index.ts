@@ -17,7 +17,7 @@ export const server = http.createServer(app);
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
-    origin: `http://localhost:3000`,
+    origin: `http://localhost:3000`,  // TODO .env for prod origin
     methods: ['GET', 'POST'],
   },
 });
