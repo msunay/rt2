@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Participation } from "@/Types";
-import { createSlice } from "@reduxjs/toolkit";
+import { Participation } from '@/Types/Types';
+import { createSlice } from '@reduxjs/toolkit';
 
 interface participatingState {
   value: Participation[];
@@ -12,7 +12,7 @@ const initialState: participatingState = {
 };
 
 export const participatingSlice = createSlice({
-  name: "participating",
+  name: 'participating',
   initialState,
   reducers: {
     setParticipatingList: (state, action) => {

@@ -1,14 +1,16 @@
-"use client"
+'use client';
 
-import { useAppSelector } from "@/redux/hooks";
-import { Quiz } from "@/Types";
-import QuizCard from "./quizCard";
-import { userApiService } from "@/redux/services/apiService";
-import { useState, useEffect } from "react";
+import { useAppSelector } from '@/redux/hooks';
+import { Quiz } from '@/Types/Types';
+import QuizCard from './quizCard';
+import { userApiService } from '@/redux/services/apiService';
+import { useState, useEffect } from 'react';
 
 export default function ParticipatingList() {
-  const participationsList = useAppSelector((state) => state.participatingSlice.value);
-  const [quizList, setQuizList] = useState<Quiz[]>([]); 
+  const participationsList = useAppSelector(
+    (state) => state.participatingSlice.value
+  );
+  const [quizList, setQuizList] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,5 +39,5 @@ export default function ParticipatingList() {
         ))
       )}
     </div>
-    );
-  }
+  );
+}

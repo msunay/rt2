@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createSlice } from "@reduxjs/toolkit";
-import { Quiz } from "@/Types";
+import { createSlice } from '@reduxjs/toolkit';
+import { Quiz } from '@/Types/Types';
 
 interface DiscoverState {
   value: Quiz[];
@@ -12,7 +12,7 @@ const initialState: DiscoverState = {
 };
 
 export const discoverSlice = createSlice({
-  name: "discover",
+  name: 'discover',
   initialState,
   reducers: {
     setQuizList: (state, action) => {
