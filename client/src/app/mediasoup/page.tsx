@@ -87,6 +87,7 @@ function stream() {
   }
 
   const goConnect = (producerOrConsumer: boolean) => {
+    isProducer = producerOrConsumer;
     device === undefined ? getRtpCapabilities() : goCreateTransport()
   }
 
