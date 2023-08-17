@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from 'axios';
 import {
   User,
   ResponseUser,
@@ -6,7 +6,7 @@ import {
   Quiz,
   QuizQuestionAnswer,
   Participation,
-} from "../../Types";
+} from '../../Types/Types';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
 
@@ -37,7 +37,7 @@ export const userApiService = {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quizzes`);
       return response.data;
     } catch (err) {
-      console.log("Error fetching quizzes from database::", err);
+      console.log('Error fetching quizzes from database::', err);
       return [];
     }
   },
@@ -47,7 +47,7 @@ export const userApiService = {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
       return response.data;
     } catch (err) {
-      console.log("Error fetching quizzes from database::", err);
+      console.log('Error fetching quizzes from database::', err);
       return [];
     }
   },
@@ -61,8 +61,8 @@ export const userApiService = {
       });
       return response.data;
     } catch (err) {
-      console.log("Error fetching user id::", err);
-      return "";
+      console.log('Error fetching user id::', err);
+      return '';
     }
   },
 
@@ -80,7 +80,7 @@ export const userApiService = {
       );
       return response.data;
     } catch (err) {
-      console.log("Error fetching participations from database::", err);
+      console.log('Error fetching participations from database::', err);
       return [];
     }
   },
@@ -105,8 +105,8 @@ export const userApiService = {
     } catch (err) {
       console.log(err);
       return {
-        UserId: "",
-        QuizId: "",
+        UserId: '',
+        QuizId: '',
         isPaid: false,
       };
     }

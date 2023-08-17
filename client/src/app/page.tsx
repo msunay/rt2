@@ -33,7 +33,7 @@ export default function Home() {
     userApiService.getUserParticipations(authToken).then((data) => dispatch(setParticipatingList(data)));
 
     userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
-    
+
   }, []);
 
   return (
