@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '@/app/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -8,6 +8,25 @@ import { types as mediasoupTypes } from 'mediasoup-client';
 
 export default function UserStream() {
   const remoteVideo = useRef<HTMLVideoElement>(null);
+
+  interface screenSize {
+    width: number | undefined;
+    height: number | undefined;
+  }
+
+  const [screenSize, setScreenSize] = useState<screenSize>({
+    width: undefined,
+    height: undefined
+  });
+
+  useEffect(() => {
+    setScreenSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    })
+  }, [])
+
+
 
   const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
