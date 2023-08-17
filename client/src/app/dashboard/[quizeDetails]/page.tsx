@@ -7,13 +7,13 @@ export default function QuizDetails({ params }: { params: { quizeDetails: string
 
   switch (params.quizeDetails) {
     case 'participant':
-      element = <div>the main one</div>
+      element = <div>participant in list</div>
       break;
     case 'hosting':
-      element = <div>second</div>
+      element = <div>hosting details</div>
       break;
     case 'discovery':
-      element = <div>third</div>
+      element = <div>discovery</div>
       break;
     default:
       element = <></>
