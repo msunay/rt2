@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '@/app/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -19,11 +19,11 @@ export default function UserStream() {
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
-  let producerTransport: mediasoupTypes.Transport;
+  // let producerTransport: mediasoupTypes.Transport;
   let consumerTransport: mediasoupTypes.Transport;
-  let producer: mediasoupTypes.Producer;
+  // let producer: mediasoupTypes.Producer;
   let consumer: mediasoupTypes.Consumer;
-  let isProducer = false;
+  // let isProducer = false;
 
   // Consume Trigger
   const goConsume = () => {
@@ -81,7 +81,6 @@ export default function UserStream() {
             // transportId: consumerTransport.id,
             dtlsParameters
           })
-
           // Tell the transport that parameters were transmitted
           callback()
         } catch (err: any) {
@@ -117,6 +116,12 @@ export default function UserStream() {
       peers.emit('consumer_resume')
     })
   }
+
+  peers.on('producer_closed', () => {
+    // Server notified when producer is closed
+    consumerTransport.close()
+    consumer.close()
+  })
   return (
     <>
       <div id="sharedBtns">

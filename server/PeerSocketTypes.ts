@@ -4,6 +4,7 @@ import { MediaKind } from 'mediasoup/node/lib/RtpParameters';
 
 export interface ClientToServerEvents {
   connection_success: (Obj: connectionSuccess) => void;
+  producer_closed: () => void;
 }
 
 export interface ServerToClientEvents {

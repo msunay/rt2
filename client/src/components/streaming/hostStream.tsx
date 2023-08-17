@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '@/app/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -21,11 +21,7 @@ export default function HostStream() {
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: mediasoupTypes.Transport;
-  let consumerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
-  let consumer: mediasoupTypes.Consumer;
-  let isProducer = false;
-  let mediaStream: MediaStream;
 
   let params: mediasoupTypes.ProducerOptions = {
     encodings:
@@ -53,7 +49,7 @@ export default function HostStream() {
   };
 
   const stream = () => {
-    streamSuccess(mediaStream)
+    goConnect()
   }
   const streamSuccess = (mediaStream: MediaStream) => {
     localVideo.current!.srcObject = mediaStream;
@@ -62,8 +58,6 @@ export default function HostStream() {
       track,
       ...params,
     };
-
-    goConnect(true)
   };
 
   const getLocalStream = async () => {
@@ -81,12 +75,11 @@ export default function HostStream() {
           },
         },
       })
-      .then((stream) => mediaStream = stream)
+      .then((mediaStream) => streamSuccess(mediaStream))
       .catch((err) => console.error(err));
   };
 
-  const goConnect = (producerOrConsumer: boolean) => {
-    isProducer = producerOrConsumer;
+  const goConnect = () => {
     device === undefined ? getRtpCapabilities() : createSendTransport()
   }
 
@@ -176,9 +169,7 @@ export default function HostStream() {
 
     producer.on('trackended', () => {
       console.log('Track ended');
-
       // Close video track
-
     })
 
     producer.on('transportclose', () => {
@@ -187,59 +178,9 @@ export default function HostStream() {
     })
   }
 
-  const createRecvTransport = async () => {
-    peers.emit('createWebRtcTransport', { sender: false }, ({ transportParams }) => {
-      if (transportParams.error) {
-        console.log(transportParams.error);
-        return;
-      }
-
-      console.log(transportParams);
-
-      // Create recv transport
-      consumerTransport = device.createRecvTransport(transportParams)
-
-      consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
-        try {
-          // Signal local DTLS parameters to the server side transport
-          peers.emit('transport_recv_connect', {
-            // transportId: consumerTransport.id,
-            dtlsParameters
-          })
-
-          // Tell the transport that parameters were transmitted
-          callback()
-        } catch (err: any) {
-          errback(err)
-        }
-      })
-
-      connectRecvTransport()
-    })
-  }
-
-  const connectRecvTransport = async () => {
-    peers.emit('consume', {
-      rtpCapabilities: device.rtpCapabilities
-    }, async ({ params }) => {
-      if (params.error) {
-        console.log('Cannnot consume');
-        return;
-      }
-
-      console.log(params);
-      consumer = await consumerTransport.consume({
-        id: params.id,
-        producerId: params.producerId,
-        kind: params.kind,
-        rtpParameters: params.rtpParameters
-      })
-
-      const { track } = consumer;
-
-
-      peers.emit('consumer_resume')
-    })
+  const endStream = () => {
+    producer.close()
+    producerTransport.close()
   }
 
   return (
@@ -253,6 +194,7 @@ export default function HostStream() {
       </div>
       <button onClick={getLocalStream}>Start Video</button>
       <button onClick={stream}>Stream</button>
+      <button onClick={endStream}>End Stream</button>
     </>
   )
 }

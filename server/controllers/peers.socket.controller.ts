@@ -110,6 +110,10 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
 
   peers.on('disconnect', () => {
     console.log('peer disconnected');
+    consumer?.close()
+    producer?.close()
+    consumerTransport?.close()
+    producerTransport?.close()
   });
 
   peers.on('create_room', async (callback) => {
@@ -161,7 +165,7 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
       console.log('Producer iD: ', producer.id, producer.kind);
 
       producer.on('transportclose', () => {
-        console.log('transport for this producer closed');
+        console.log('transport for producer closed');
         producer.close();
       });
 
@@ -195,6 +199,9 @@ const peersSocketInit = async (peers: Socket<ServerToClientEvents, ClientToServe
 
         consumer.on('producerclose', () => {
           console.log('Producer of consumer closed');
+          peers.emit('producer_closed')
+
+          consumerTransport?.close()
         });
 
         const params = {

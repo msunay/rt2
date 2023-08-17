@@ -8,10 +8,12 @@ export interface ClientToServerEvents {
   transport_recv_connect: (producerTransportConnect: producerTransportConnect) => void;
   consume: (rtp: { rtpCapabilities: mediasoupTypes.RtpCapabilities }, callback: (params: any) => void) => void;
   consumer_resume: () => void;
+  disconnect: () => void;
 }
 
 export interface ServerToClientEvents {
   connection_success: (Obj: connectionSuccess) => void;
+  producer_closed: () => void;
 }
 
 interface producerTransportConnect {
