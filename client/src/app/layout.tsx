@@ -15,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav>Real Time Trivia</nav>
         <Providers>{children}</Providers>
       </body>
     </html>

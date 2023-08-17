@@ -105,6 +105,12 @@ nav {
   font-weight: 400;
   line-height: normal;
 }
+.quiz-details {
+  height: 100%;
+  background-color: white;
+  width: 100%;
+  padding: 10px;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

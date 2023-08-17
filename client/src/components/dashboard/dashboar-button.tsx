@@ -12,7 +12,7 @@ export default function DashboardButton({ title, directTo }: PageProps) {
   const router = useRouter();
 
   return (
-    <button onClick={() => router.push(directTo)}>
+    <button onClick={() => router.push(`dashboard/${directTo}`)}>
       {title}
       <Image
         src={arrowImage}

@@ -1,3 +1,4 @@
+'use client'
 import { getAllQuizzes, getOwner } from "@/redux/services/quizeApiService";
 import { useEffect, useState } from "react";
 import styles from './dashboard.module.css';
@@ -5,9 +6,6 @@ import moment from 'moment';
 import { Quiz, User } from "@/Types";
 import DashboardButton from "@/components/dashboard/dashboar-button";
 import { useRouter } from "next/navigation";
-
-
-
 
 export default function Dashboard() {
   const [quize, setQuize] = useState<Quiz>();
