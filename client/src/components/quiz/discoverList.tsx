@@ -6,7 +6,7 @@ export default function DiscoverList() {
   const quizList = useAppSelector((state) => state.discoverSlice.value)
 
   return (
-    <div className="">
+    <div className="quiz-list-container">
       { quizList.map((quizItem:Quiz) => 
       <div key={quizItem.id}>
         <QuizCard quiz={quizItem}/>

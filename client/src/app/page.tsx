@@ -10,6 +10,7 @@ import { setQuizList } from "@/redux/features/discoverSlice";
 import DiscoverList from "@/components/quiz/discoverList";
 
 
+
 export default function Home() {
   const authToken = useAppSelector((state: RootState) => state.authSlice.authToken)
   const router = useRouter();

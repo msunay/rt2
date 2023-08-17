@@ -64,10 +64,10 @@ export interface QuizQuestionAnswer {
 export interface Participation {
   id?: string;
   isPaid: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
   UserId?: string;
   QuizId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ResponseUser {

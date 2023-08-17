@@ -5,6 +5,7 @@ import {
   UserPost,
   Quiz,
   QuizQuestionAnswer,
+  Participation,
 } from "../../Types";
 
 const BASE_URL = "http://localhost:3001/";
@@ -38,6 +39,33 @@ export const userApiService = {
     } catch (err) {
       console.log("Error fetching quizzes from database::", err);
       return [];
+    }
+  },
+
+  addParticipation: async (
+    quizId: string,
+    authToken: string
+  ): Promise<Participation> => {
+    try {
+      const response = await axios.post<Participation>(
+        `${BASE_URL}participation`,
+        {
+          quizId: quizId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return {
+        UserId: "",
+        QuizId: "",
+        isPaid: false,
+      };
     }
   },
 };
