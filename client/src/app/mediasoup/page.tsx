@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './mediasoup.module.css';
-import { ClientToServerEvents, ServerToClientEvents } from '../Types';
+import { ClientToServerEvents, ServerToClientEvents } from '../PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
@@ -11,13 +11,11 @@ function stream() {
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
-  // const [isProducer, setIsProducer] = useState<boolean>(false);
-
-  const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
   );
 
-  socket.on('connection_success', ({ socketId, producerAlreadyExists }) => {
+  peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
     console.log(socketId, producerAlreadyExists);
   });
 
@@ -118,7 +116,7 @@ function stream() {
   const getRtpCapabilities = () => {
     // get router rtp capabilities from server
     // send to client
-    socket.emit('create_room', (data: any) => {
+    peers.emit('create_room', (data: any) => {
       console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
 
       //assign to local variable
@@ -130,7 +128,7 @@ function stream() {
   };
 
   const createSendTransport = () => {
-    socket.emit('createWebRtcTransport', { sender: true }, ({ params }) => {
+    peers.emit('createWebRtcTransport', { sender: true }, ({ params }) => {
       if (params.error) {
         console.log(params.error);
         return;
@@ -142,7 +140,7 @@ function stream() {
       producerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
         try {
           // Singnal local DTLS parameters to the server side transport
-          socket.emit('transport_connect', {
+          peers.emit('transport_connect', {
             // transportId: producerTransport.id,
             dtlsParameters: dtlsParameters
           })
@@ -158,7 +156,7 @@ function stream() {
         console.log(parameters);
 
         try {
-          socket.emit('transport_produce', {
+          peers.emit('transport_produce', {
             // transportId: producerTransport.id,
             kind: parameters.kind,
             rtpParameters: parameters.rtpParameters,
@@ -195,7 +193,7 @@ function stream() {
   }
 
   const createRecvTransport = async () => {
-    socket.emit('createWebRtcTransport', { sender: false }, ({params}) => {
+    peers.emit('createWebRtcTransport', { sender: false }, ({params}) => {
       if (params.error) {
         console.log(params.error);
         return;
@@ -209,7 +207,7 @@ function stream() {
       consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
         try {
           // Signal local DTLS parameters to the server side transport
-          socket.emit('transport_recv_connect', {
+          peers.emit('transport_recv_connect', {
             // transportId: consumerTransport.id,
             dtlsParameters
           })
@@ -226,7 +224,7 @@ function stream() {
   }
 
   const connectRecvTransport = async () => {
-    socket.emit('consume', {
+    peers.emit('consume', {
       rtpCapabilities: device.rtpCapabilities
     }, async ({ params }) => {
       if (params.error) {
@@ -246,7 +244,7 @@ function stream() {
 
       remoteVideo.current!.srcObject = new MediaStream([track])
 
-      socket.emit('consumer_resume')
+      peers.emit('consumer_resume')
     })
   }
   return (

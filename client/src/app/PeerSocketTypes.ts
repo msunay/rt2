@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client"
 import { types as mediasoupTypes } from 'mediasoup-client';
 
 export interface ClientToServerEvents {
@@ -13,11 +12,6 @@ export interface ClientToServerEvents {
 
 export interface ServerToClientEvents {
   connection_success: (Obj: connectionSuccess) => void;
-}
-
-
-interface socketId {
-  socketId: string;
 }
 
 interface producerTransportConnect {

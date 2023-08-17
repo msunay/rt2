@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io';
 import { types as mediasoupTypes } from 'mediasoup';
 import { MediaKind } from 'mediasoup/node/lib/RtpParameters';
 
@@ -16,15 +15,6 @@ export interface ServerToClientEvents {
   consume: (rtpObj: {rtpCapabilities: mediasoupTypes.RtpCapabilities}, cb: any) => void;
   consumer_resume: () => void;
   create_room: (cb: any) => void;
-}
-
-interface socketId {
-  socketId: string;
-}
-
-interface producerTransportConnect {
-  transportId: string;
-  dtlsParameters: mediasoupTypes.DtlsParameters;
 }
 
 interface transportProduce {
