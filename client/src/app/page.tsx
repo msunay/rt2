@@ -3,13 +3,12 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react";
 import { RootState } from "@/redux/store";
 import { useAppSelector } from "@/redux/hooks";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { userApiService } from "@/redux/services/apiService";
 import { setQuizList } from "@/redux/features/discoverSlice";
-import DiscoverList from "@/components/quiz/discoverList";
-
-
+import { setParticipatingList } from "@/redux/features/participatingSlice";
+import { setUserId } from "@/redux/features/userIdSlice";
+import axios from "axios";
 
 export default function Home() {
   const authToken = useAppSelector((state: RootState) => state.authSlice.authToken)
@@ -30,12 +29,15 @@ export default function Home() {
 
     userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
 
+    userApiService.getUserParticipations(authToken).then((data) => dispatch(setParticipatingList(data)));
+
+    userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
+    
   }, []);
 
   return (
     <main>
-      {/* <>App</> */}
-      {<DiscoverList />}
+      <>App</>
     </main>
   );
 }

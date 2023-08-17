@@ -12,10 +12,9 @@ export default function QuizCard({quiz}:{quiz:Quiz}) {
 
   const [isSignedUp, setIsSignedUp] = useState(false);
   
-  const authToken = useAppSelector((state) => state.authSlice.authToken)
+  const authToken = useAppSelector((state) => state.authSlice.authToken);
   const router = useRouter(); 
 
-  
   function handleClick() {
     setIsSignedUp(true);
     userApiService.addParticipation(quiz.id!, authToken);
@@ -27,7 +26,7 @@ export default function QuizCard({quiz}:{quiz:Quiz}) {
         <div className="quiz-info">
           <h2>{quiz.quizName}</h2>
           <h4>{quiz.category}</h4>
-          <h4>{moment(quiz.dateTime).format('dddd D MMM H:m')}</h4>
+          <h4>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</h4>
         </div>
         <div className="add-or-remove">
           {isSignedUp === true ? (

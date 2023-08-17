@@ -42,6 +42,49 @@ export const userApiService = {
     }
   },
 
+  getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
+    try {
+      const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
+      return response.data;
+    } catch (err) {
+      console.log("Error fetching quizzes from database::", err);
+      return [];
+    }
+  },
+
+  getUserId: async (authToken: string): Promise<string> => {
+    try {
+      const response = await axios.get<string>(`${BASE_URL}userId`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      return response.data;
+    } catch (err) {
+      console.log("Error fetching user id::", err);
+      return "";
+    }
+  },
+
+  getUserParticipations: async (
+    authToken: string
+  ): Promise<Participation[]> => {
+    try {
+      const response = await axios.get<Participation[]>(
+        `${BASE_URL}participations`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.log("Error fetching participations from database::", err);
+      return [];
+    }
+  },
+
   addParticipation: async (
     quizId: string,
     authToken: string
