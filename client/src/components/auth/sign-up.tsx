@@ -4,7 +4,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { genSaltSync, hashSync } from "bcrypt-ts"
 import { setAuthState } from '../../redux/features/authSlice'
 import { useRouter } from "next/navigation"
-import { userApiService } from '../../redux/services/userApiService'
+import { userApiService } from '../../redux/services/apiService'
 
 interface SignUpForm {
   email?: string,

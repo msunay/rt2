@@ -5,9 +5,9 @@ import participationController from "./controllers/referenceTables.controller";
 import { auth } from "./middleware/auth";
 const router: Router = express.Router();
 
-//testing 
-router.get('/', auth, (req, res) => {
-  res.status(200).send({ message: 'all good' })
+//testing
+router.get("/", auth, (req, res) => {
+  res.status(200).send({ message: "all good" });
 });
 
 // User routes
@@ -16,16 +16,30 @@ router.get("/user/:username", userController.getOneUser);
 router.get("/users", userController.getAllUsers);
 router.put("/username", userController.changeUsername);
 router.put("/password", userController.changePassword);
+router.get("/userId", auth, userController.getUserId);
 
 // Quiz routes
+router.get(
+  "/quizzesQuestionsAnswers",
+  quizController.getQuizzesQuestionsAnswers
+);
 router.get("/quizzes", quizController.getAllQuizzes);
+router.get("/quizQuestionAnswer/:id", quizController.getOneQuizQuestionAnswers);
 router.get("/quiz/:id", quizController.getOneQuiz);
-
 // Reference tables routes
-router.post("/participation", participationController.createParticipation);
+router.post(
+  "/participation",
+  auth,
+  participationController.createParticipation
+);
 router.post(
   "/participationAnswer",
   participationController.createParticipationAnswer
+);
+router.get(
+  "/participations",
+  auth,
+  participationController.getUserParticipations
 );
 
 export default router;

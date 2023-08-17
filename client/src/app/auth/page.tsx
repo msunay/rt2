@@ -7,8 +7,6 @@ import Login from '@/components/auth/login';
 import SignUp from '@/components/auth/sign-up';
 import { useState } from 'react';
 
-
-
 export default function Page() {
 
   const [loginVisible, setLoginVisible] = useState(false);

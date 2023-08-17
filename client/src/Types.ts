@@ -36,11 +36,47 @@ export interface Answer {
   QuestionId?: string;
 }
 
+export interface QuizQuestionAnswer {
+  id: string;
+  quizName: string;
+  quizOwner: string;
+  category: string;
+  dateTime: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  Questions: {
+    id: string;
+    questionText: string;
+    createdAt: Date;
+    updatedAt: Date;
+    QuizId?: string;
+    Answers: {
+      id: string;
+      answerText: string;
+      isCorrect: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+      QuestionId: string;
+    }[];
+  }[];
+}
+
 export interface Participation {
   id?: string;
   isPaid: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
   UserId?: string;
   QuizId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ResponseUser {
+  dataValues: User;
+  token: string;
+}
+
+export interface UserPost {
+  email: string;
+  username: string;
+  password: string;
 }
