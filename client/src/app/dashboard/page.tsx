@@ -24,7 +24,6 @@ export default function Dashboard() {
           setQuize(upcomingQuizz);
           setOwner(quizOwner);
         }
-
       } catch (error) {
         console.log('failed: ', error);
       }
@@ -41,7 +40,7 @@ export default function Dashboard() {
     <div className={styles.dashboard_container}>
       <div
         className={styles.quiz_contaniner}
-        onClick={() => router.push('/quize')}
+        onClick={() => console.log('show the route to page')}
       >
         <h4>next quize</h4>
         <div className={styles.quiz_details}>
