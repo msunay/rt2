@@ -31,7 +31,7 @@ export default function Dashboard() {
     })();
   }, []);
 
-  function kicksOfIn() {
+  function kicksOffIn() {
     const msLeft = moment().diff(quize?.dateTime)
     const duration = moment.duration(msLeft)
     return duration.humanize();
@@ -59,7 +59,7 @@ export default function Dashboard() {
         <span className={styles.divider}></span>
         <div className={styles.date_container}>
           <strong>starting in: </strong>
-          <span>{kicksOfIn()} </span>
+          <span>{kicksOffIn()} </span>
         </div>
       </div>
 
