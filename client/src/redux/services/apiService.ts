@@ -8,7 +8,7 @@ import {
   Participation,
 } from "../../Types";
 
-const BASE_URL = "http://localhost:3001/";
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
 
 export const userApiService = {
   postUser: async function (user: UserPost): Promise<ResponseUser> {
