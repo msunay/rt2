@@ -22,7 +22,7 @@ export default function HostStream() {
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
-
+  let mediaStream: MediaStream;
   let params: mediasoupTypes.ProducerOptions = {
     encodings:
     [
@@ -63,7 +63,7 @@ export default function HostStream() {
   const getLocalStream = async () => {
     navigator.mediaDevices
       .getUserMedia({
-        audio: false,
+        audio: true,
         video: {
           width: {
             min: 640,
@@ -75,7 +75,10 @@ export default function HostStream() {
           },
         },
       })
-      .then((mediaStream) => streamSuccess(mediaStream))
+      .then((stream) => {
+        mediaStream = stream;
+        streamSuccess(mediaStream)
+      })
       .catch((err) => console.error(err));
   };
 
@@ -181,20 +184,32 @@ export default function HostStream() {
   const endStream = () => {
     producer.close()
     producerTransport.close()
+    mediaStream.getTracks().forEach(track => track.stop())
   }
 
   return (
     <>
-      <div id="sharedBtns" >
-        <video
-          ref={localVideo}
-          id="localVideo"
-          autoPlay={true}
-        ></video>
+      <div className="host-unit">
+        <div className="video-container" >
+          <video
+            ref={localVideo}
+            className="video"
+            autoPlay={true}
+          ></video>
+        </div>
+        <div className='next-q-preview'>
+
+        </div>
+        <div className='quiz-controls'>
+          <button className='next-q-btn' onClick={getLocalStream}>Next Question</button>
+        </div>
+        <div className='stream-controls'>
+          <button className='stream-btns' onClick={getLocalStream}>Start Video</button>
+          <button className='stream-btns' onClick={stream}>Stream</button>
+          <button className='stream-btns' onClick={endStream}>End Stream</button>
+        </div>
       </div>
-      <button onClick={getLocalStream}>Start Video</button>
-      <button onClick={stream}>Stream</button>
-      <button onClick={endStream}>End Stream</button>
+
     </>
   )
 }

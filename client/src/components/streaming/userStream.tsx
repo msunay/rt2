@@ -142,15 +142,18 @@ export default function UserStream() {
     consumer.close()
   })
   return (
-    <>
-      <div id="sharedBtns">
+    <div className='user-unit'>
+      <div className="video-container">
         <video
           ref={remoteVideo}
-          id="remoteVideo"
+          className="video"
           autoPlay={true}
         ></video>
       </div>
       <button onClick={goConsume}>Join Stream</button>
-    </>
+      <div className='current-question'>
+
+      </div>
+    </div>
   )
 }
