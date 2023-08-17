@@ -15,6 +15,17 @@ import Question from '../question/question';
 export default function HostStream() {
   const localVideo = useRef<HTMLVideoElement>(null);
 
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
+
+  function startQuiz() {
+    setQuizStarted(true);
+  }
+
+  function nextQuestion() {
+    setCurrentQuestionNumber(currentQuestionNumber + 1);
+  }
+
   const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
   );
@@ -203,20 +214,34 @@ export default function HostStream() {
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 
-
+  // const value = {
+  //   currentQuestionNumber,
+  //   setCurrentQuestionNumber
+  // }
   return (
     <>
       <div className="host-unit">
+        <div className="question-component">
+          {quizStarted && (
+            <Question
+              currentQuestionNumber={currentQuestionNumber}
+              setCurrentQuestionNumber={setCurrentQuestionNumber}
+            />
+          )}
+        </div>
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
         </div>
-        <div className="next-q-preview">
-          <Question />
-        </div>
         <div className="quiz-controls">
-          <button className="next-q-btn" onClick={getLocalStream}>
-            Next Question
-          </button>
+          {quizStarted ? (
+            <button className="next-q-btn" onClick={nextQuestion}>
+              Next Question
+            </button>
+          ) : (
+            <button className="next-q-btn" onClick={startQuiz}>
+              Start Quiz
+            </button>
+          )}
         </div>
         <div className="stream-controls">
           <button className="stream-btns" onClick={getLocalStream}>
