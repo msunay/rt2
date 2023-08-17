@@ -87,7 +87,6 @@ function stream() {
   }
 
   const goConnect = (producerOrConsumer: boolean) => {
-    isProducer = producerOrConsumer;
     device === undefined ? getRtpCapabilities() : goCreateTransport()
   }
 
@@ -157,7 +156,6 @@ function stream() {
         console.log(parameters);
 
         try {
-          console.log('Is this working???');
           peers.emit('transport_produce', {
             // transportId: producerTransport.id,
             kind: parameters.kind,
@@ -166,7 +164,6 @@ function stream() {
           }, ({ id }) => {
             // Tell the transport that parameters were transmitted and provide it with the
             // server side producers's id
-            console.log(id)
             callback({ id })
           })
         } catch (err: any) {
