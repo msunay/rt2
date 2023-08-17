@@ -1,15 +1,15 @@
-# fly.toml app configuration file generated for throbbing-bush-5794 on 2023-08-15T23:54:52+01:00
+# fly.toml app configuration file generated for patient-star-685 on 2023-08-16T15:32:09+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "throbbing-bush-5794"
+app = "patient-star-685"
 primary_region = "lhr"
 
 [build]
 
 [http_service]
-  internal_port = 3000
+  internal_port = 3001
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
