@@ -126,6 +126,10 @@ nav {
   }
 }
 
+.video-container {
+  position: relative;
+}
+
 .stream-btns {
   background-color: rgb(255, 68, 0);
   border: none;

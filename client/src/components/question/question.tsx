@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { QuestionAnswer, QuizQuestionAnswer, Answer } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
+import style from './question.module.css';
 
 export default function Question({
   currentQuestionNumber,
@@ -21,7 +22,7 @@ export default function Question({
 
   useEffect(() => {
     userApiService
-      .getOneQuizQuestionAnswer('98e03864-eec4-4800-941c-4b1dbe78301f')
+      .getOneQuizQuestionAnswer('97c938e7-90f6-4794-b1ab-2fa5b6928444')
       .then((data) => {
         setQuiz(data);
       });
@@ -46,9 +47,9 @@ export default function Question({
   return (
     <>
       {currentQuestion && (
-        <div className="question-container">
-          <div className="question-text">{currentQuestion.questionText}</div>
-          <div className="answer-container">
+        <div className={style.question_container}>
+          <div className={style.answer_container}>
+          <h1 className={style.question_text}>{currentQuestion.questionText}</h1>
             {currentAnswers?.map((answer, index) => (
               <button key={index} className={`answer answer${index + 1}`}>
                 {answer.answerText}
