@@ -7,6 +7,8 @@ import { Socket } from 'socket.io';
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
 ) => {
+  console.log(quiz.id);
+
   quiz.emit('connection_success', {
     socketId: quiz.id
   })
