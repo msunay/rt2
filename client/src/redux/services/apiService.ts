@@ -102,28 +102,20 @@ export const userApiService = {
 
   addParticipation: async (
     quizId: string,
-    authToken: string
+    userId: string
   ): Promise<Participation> => {
     try {
       const response = await axios.post<Participation>(
         `${BASE_URL}participation`,
         {
           quizId: quizId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+          userId: userId,
         }
       );
       return response.data;
     } catch (err) {
       console.log(err);
-      return {
-        UserId: '',
-        QuizId: '',
-        isPaid: false,
-      };
+      return {} as Participation;
     }
   },
 

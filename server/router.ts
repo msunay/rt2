@@ -27,11 +27,7 @@ router.get('/quizzes', quizController.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quizController.getOneQuizQuestionAnswers);
 router.get('/quiz/:id', quizController.getOneQuiz);
 // Reference tables routes
-router.post(
-  '/participation',
-  auth,
-  participationController.createParticipation
-);
+router.post('/participation', participationController.createParticipation);
 router.post(
   '/participationAnswer',
   participationController.createParticipationAnswer
@@ -47,9 +43,9 @@ router.get(
 );
 
 // Reference tables routes
-router.post("/participation", participationController.createParticipation);
+router.post('/participation', participationController.createParticipation);
 router.post(
-  "/participationAnswer",
+  '/participationAnswer',
   participationController.createParticipationAnswer
 );
 

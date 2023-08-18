@@ -6,17 +6,15 @@ import tick from '@/public/check.gif';
 import { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
-import style from '@/app/dashboard/dashboard.module.css'
+import style from '@/app/dashboard/dashboard.module.css';
 
 export default function QuizCard({ quiz }: { quiz: Quiz }) {
   const [isSignedUp, setIsSignedUp] = useState(false);
-
-  const authToken = useAppSelector((state) => state.authSlice.authToken);
-  
+  const userId = useAppSelector((state) => state.userIdSlice.value);
 
   function handleClick() {
     setIsSignedUp(true);
-    userApiService.addParticipation(quiz.id!, authToken);
+    userApiService.addParticipation(quiz.id!, userId);
   }
 
   return (
@@ -29,10 +27,18 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         </div>
         <div className={style.add_or_remove}>
           {isSignedUp === true ? (
-            <Image className="tick-icon" src={tick} alt="tick sign" />
+            <Image
+              className="tick-icon toggle-participation"
+              src={tick}
+              alt="tick icon"
+            />
           ) : (
             <button className="btn" onClick={handleClick}>
-              <Image className="plus-icon" src={plus} alt="plus sign" />
+              <Image
+                className="plus-icon toggle-participation"
+                src={plus}
+                alt="plus icon"
+              />
             </button>
           )}
         </div>

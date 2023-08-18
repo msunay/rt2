@@ -16,6 +16,13 @@ async function createParticipation(req: Request, res: Response) {
   }
 }
 
+async function deleteParticipation(req: Request, res: Response) {
+  try {
+  } catch (err) {
+    console.error('Could not delete participation::', err);
+    res.status(500).send();
+  }
+}
 
 async function getUserParticipations(req: Request, res: Response) {
   try {
