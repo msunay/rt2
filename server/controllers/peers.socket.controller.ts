@@ -1,6 +1,6 @@
 import {
-  ClientToServerEvents,
-  ServerToClientEvents,
+  PeersClientToServerEvents,
+  PeersServerToClientEvents,
 } from '../Types/PeerSocketTypes';
 import { Socket } from 'socket.io';
 import { types as mediasoupTypes } from 'mediasoup';
@@ -103,7 +103,7 @@ const createWebRtcTransport = async (callback: any) => {
 };
 
 const peersSocketInit = async (
-  peers: Socket<ServerToClientEvents, ClientToServerEvents>
+  peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents>
 ) => {
   console.log(peers.id);
 

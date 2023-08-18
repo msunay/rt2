@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  ClientToServerEvents,
-  ServerToClientEvents,
+  PeersClientToServerEvents,
+  PeersServerToClientEvents,
 } from '@/Types/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -29,7 +29,7 @@ export default function UserStream() {
     });
   }, []);
 
-  const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
     'http://localhost:3001/mediasoup'
   );
 

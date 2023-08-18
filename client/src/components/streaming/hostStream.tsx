@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
-  ClientToServerEvents,
-  ServerToClientEvents,
+  PeersClientToServerEvents,
+  PeersServerToClientEvents,
 } from '@/Types/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -11,13 +11,33 @@ import { types as mediasoupTypes } from 'mediasoup-client';
 import { userApiService } from '@/redux/services/apiService';
 import { Quiz, QuizQuestionAnswer } from '@/Types/Types';
 import Question from '../question/question';
+import {
+  QuizClientToServerEvents,
+  QuizServerToClientEvents,
+} from '@/Types/QuizSocketTypes';
 
 export default function HostStream() {
+  const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
+    'http://localhost:3001/quizspace'
+  );
+
+    quiz.on('connection_success', ({ socketId }) => {
+      console.log(socketId);
+    })
+
+
+
+
+
+
+
+
+
+
   const localVideo = useRef<HTMLVideoElement>(null);
 
-  const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-    'http://localhost:3001/mediasoup'
-  );
+  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
+    io('http://localhost:3001/mediasoup');
 
   peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
     console.log(socketId, producerAlreadyExists);
@@ -202,7 +222,6 @@ export default function HostStream() {
     producerTransport.close();
     mediaStream.getTracks().forEach((track) => track.stop());
   };
-
 
   return (
     <>
