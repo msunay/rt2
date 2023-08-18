@@ -16,8 +16,14 @@ import {
   QuizServerToClientEvents,
 } from '@/Types/QuizSocketTypes';
 import { CurrentTime, createCountdownBar } from 'countdownbar'
+import CanvasCircularCountdown from 'canvas-circular-countdown';
 
 export default function HostStream() {
+  
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
+
+
   const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
     'http://localhost:3001/quizspace'
   );
@@ -38,6 +44,42 @@ export default function HostStream() {
         template: (current: CurrentTime) => `${current.seconds}.${current.milliseconds}`,
         onFinish: () => true
       })
+      const pickColorByPercentage = (percentage: any, time: any) => {
+        switch (true) {
+          case percentage >= 75:
+            return '#28a745'; // green
+          case percentage >= 50 && percentage < 75:
+            return '#17a2b8'; // blue
+          case percentage >= 25 && percentage < 50:
+            return '#ffc107'; // orange
+          default:
+            return '#dc3545'; // red
+        }
+      }
+      new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
+        duration: 7 * 1000,
+        radius: 150,
+        clockwise: true,
+
+        captionColor: pickColorByPercentage,
+        progressBarWidth: 20,
+        progressBarOffset: 0,
+        circleBackgroundColor: '#f5f5f5',
+        emptyProgressBarBackgroundColor: '#b9c1c7',
+        filledProgressBarBackgroundColor: '#17a2b8',
+        // captionColor: '#6c757d',
+        captionFont: '22px serif',
+        showCaption: true
+      }, (percentage: any, time: any, instance: any) => {
+        // if (time.elapsed >= 5000 ) {
+        //   instance.stop();
+        // }
+      }).start();
+
+    })
+
+    quiz.on('reveal_answers', () => {
+
     })
 
 
@@ -47,8 +89,6 @@ export default function HostStream() {
 
   const localVideo = useRef<HTMLVideoElement>(null);
 
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
 
   function startQuiz() {
     setQuizStarted(true);
@@ -267,6 +307,7 @@ export default function HostStream() {
         </div>
         </div>
         <div id="countdown-bar-container"></div>
+        <canvas id="countdown-canvas"></canvas>
         <div className="quiz-controls">
           {quizStarted ? (
             currentQuestionNumber === 9 ? (

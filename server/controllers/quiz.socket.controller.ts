@@ -22,9 +22,9 @@ const quizSocketInit = (
     // quiz.broadcast.emit('set_question', {
     //   currentQuestionNumber
     // })
-    // setTimeout(() => {
-    //   quiz.emit('reveal_answers')
-    // }, 7000)
+    setTimeout(() => {
+      quiz.broadcast.emit('reveal_answers')
+    }, 7000)
   })
 };
 

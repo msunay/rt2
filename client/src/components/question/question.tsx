@@ -54,7 +54,7 @@ export default function Question({
           <p className={style.question_text}>{currentQuestion.questionText}</p>
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
-              <button key={index} className={`answer answer${index + 1}`}>
+              <button key={index} className={`answer${index + 1}`}>
                 {answer.answerText}
               </button>
             ))}
