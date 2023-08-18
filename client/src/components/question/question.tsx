@@ -49,7 +49,7 @@ export default function Question({
       {currentQuestion && (
         <div className={style.question_container}>
           <div className={style.answer_container}>
-          <h1 className={style.question_text}>{currentQuestion.questionText}</h1>
+          <p className={style.question_text}>{currentQuestion.questionText}</p>
             {currentAnswers?.map((answer, index) => (
               <button key={index} className={`answer answer${index + 1}`}>
                 {answer.answerText}
