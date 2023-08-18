@@ -10,6 +10,13 @@ const quizSocketInit = (
   quiz.emit('connection_success', {
     socketId: quiz.id
   })
+
+  quiz.on('next_question', () => {
+    quiz.emit('start_question_timer')
+    setTimeout(() => {
+      quiz.emit('reveal_answers')
+    }, 7000)
+  })
 };
 
 export default quizSocketInit;

@@ -10,6 +10,29 @@ import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
 
 export default function UserStream() {
+
+
+  const quiz: Socket<QuizServerToClientEvent, QuizClientToServerEvents> = io(
+    'http://localhost:3001/quizspace'
+  );
+
+    quiz.on('connection_success', ({ socketId }) => {
+      console.log(socketId);
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
   interface screenSize {

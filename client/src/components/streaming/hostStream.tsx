@@ -25,7 +25,8 @@ export default function HostStream() {
       console.log(socketId);
     })
 
-
+    // wquestion button pressed
+    quiz.emit('next_question')
 
 
 
