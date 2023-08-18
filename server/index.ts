@@ -4,9 +4,10 @@ import router from './router';
 import http from 'http';
 import { Server } from 'socket.io';
 import peersSocketInit from './controllers/peers.socket.controller';
+import quizSocketInit from './controllers/quiz.socket.controller'
 import {
-  ClientToServerEvents,
-  ServerToClientEvents,
+  PeersClientToServerEvents,
+  PeersServerToClientEvents,
 } from './Types/PeerSocketTypes';
 
 const app = express();
@@ -25,7 +26,7 @@ app.use(router);
 
 export const server = http.createServer(app);
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
+const io = new Server<PeersClientToServerEvents, PeersServerToClientEvents>(server, {
   cors: {
     origin: `http://localhost:3000`, // TODO .env for prod origin
     methods: ['GET', 'POST'],
@@ -34,6 +35,10 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 
 export const peers = io.of('/mediasoup');
 
+export const quiz = io.of('/quizspace');
+
 peers.on('connection', peersSocketInit);
+
+quiz.on('connection', quizSocketInit);
 
 export default app;

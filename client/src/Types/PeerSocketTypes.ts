@@ -1,6 +1,6 @@
 import { types as mediasoupTypes } from 'mediasoup-client';
 
-export interface ClientToServerEvents {
+export interface PeersClientToServerEvents {
   create_room: (cb: any) => void;
   createWebRtcTransport: (senderObj: {sender: boolean}, callback: (params: any) => void) => void
   transport_connect: (producerTransportConnect: producerTransportConnect) => void;
@@ -11,7 +11,7 @@ export interface ClientToServerEvents {
   disconnect: () => void;
 }
 
-export interface ServerToClientEvents {
+export interface PeersServerToClientEvents {
   connection_success: (Obj: connectionSuccess) => void;
   producer_closed: () => void;
 }

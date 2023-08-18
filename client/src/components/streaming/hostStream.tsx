@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
-  ClientToServerEvents,
-  ServerToClientEvents,
+  PeersClientToServerEvents,
+  PeersServerToClientEvents,
 } from '@/Types/PeerSocketTypes';
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
@@ -11,13 +11,45 @@ import { types as mediasoupTypes } from 'mediasoup-client';
 import { userApiService } from '@/redux/services/apiService';
 import { Quiz, QuizQuestionAnswer } from '@/Types/Types';
 import Question from '../question/question';
+import {
+  QuizClientToServerEvents,
+  QuizServerToClientEvents,
+} from '@/Types/QuizSocketTypes';
 
 export default function HostStream() {
+  const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
+    'http://localhost:3001/quizspace'
+  );
+
+    quiz.on('connection_success', ({ socketId }) => {
+      console.log(socketId);
+    })
+
+    // wquestion button pressed
+    quiz.emit('next_question')
+
+
+
+
+
+
+
+
   const localVideo = useRef<HTMLVideoElement>(null);
 
-  const peers: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-    'http://localhost:3001/mediasoup'
-  );
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
+
+  function startQuiz() {
+    setQuizStarted(true);
+  }
+
+  function nextQuestion() {
+    setCurrentQuestionNumber(currentQuestionNumber + 1);
+  }
+
+  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
+    io('http://localhost:3001/mediasoup');
 
   peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
     console.log(socketId, producerAlreadyExists);
@@ -203,20 +235,34 @@ export default function HostStream() {
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 
-
+  // const value = {
+  //   currentQuestionNumber,
+  //   setCurrentQuestionNumber
+  // }
   return (
     <>
       <div className="host-unit">
+        <div className="question-component">
+          {quizStarted && (
+            <Question
+              currentQuestionNumber={currentQuestionNumber}
+              setCurrentQuestionNumber={setCurrentQuestionNumber}
+            />
+          )}
+        </div>
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
         </div>
-        <div className="next-q-preview">
-          <Question />
-        </div>
         <div className="quiz-controls">
-          <button className="next-q-btn" onClick={getLocalStream}>
-            Next Question
-          </button>
+          {quizStarted ? (
+            <button className="next-q-btn" onClick={nextQuestion}>
+              Next Question
+            </button>
+          ) : (
+            <button className="next-q-btn" onClick={startQuiz}>
+              Start Quiz
+            </button>
+          )}
         </div>
         <div className="stream-controls">
           <button className="stream-btns" onClick={getLocalStream}>

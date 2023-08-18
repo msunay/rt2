@@ -2,12 +2,12 @@ import { types as mediasoupTypes } from 'mediasoup';
 import { MediaKind } from 'mediasoup/node/lib/RtpParameters';
 
 
-export interface ClientToServerEvents {
+export interface PeersClientToServerEvents {
   connection_success: (Obj: connectionSuccess) => void;
   producer_closed: () => void;
 }
 
-export interface ServerToClientEvents {
+export interface PeersServerToClientEvents {
   transport_produce: (transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
   getRtpCapabilities: (cb: any) => void;
   createWebRtcTransport: (sender: {sender: boolean}, cb: any) => void
