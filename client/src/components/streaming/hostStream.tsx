@@ -32,6 +32,7 @@ export default function HostStream() {
       const countdownBar = createCountdownBar({
         container: '#countdown-bar-container',
         time: 7000,
+        color: '#FFFFFF',
         millisecond: true,
         autoStart: true,
         template: (current: CurrentTime) => `${current.seconds}.${current.milliseconds}`,
@@ -43,9 +44,6 @@ export default function HostStream() {
 
 
 
-
-  // wquestion button pressed
-  quiz.emit('next_question');
 
   const localVideo = useRef<HTMLVideoElement>(null);
 
@@ -60,7 +58,7 @@ export default function HostStream() {
   function nextQuestion() {
     setCurrentQuestionNumber(currentQuestionNumber + 1);
     console.log(currentQuestionNumber);
-    quiz.emit('next_question')
+    quiz.emit('next_question');
   }
 
   const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =

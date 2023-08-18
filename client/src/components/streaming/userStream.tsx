@@ -39,10 +39,11 @@ export default function UserStream() {
         container: '#countdown-bar-container',
         time: 7000,
         millisecond: true,
+        color: '#FFFFFF',
         autoStart: true,
         template: (current: CurrentTime) =>
           `${current.seconds}.${current.milliseconds}`,
-        onFinish: () => true, // TODO
+        onFinish: () => true
       });
     });
   }, []);
