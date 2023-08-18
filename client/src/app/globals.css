@@ -126,50 +126,6 @@ nav {
   }
 }
 
-/* Styling the quizList and quizCard components */
-
-.quiz-card-container {
-  display: flex;
-  justify-content: space-between;
-  box-shadow: 1px 3px 3px 4px lightgray;
-  height: 15vh;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
-    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  padding: 1em;
-}
-.quiz-card-container h2 {
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-.quiz-card-container h4 {
-  color: grey;
-}
-.quiz-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.add-or-remove {
-  margin: auto;
-}
-.plus-icon {
-  height: 40px;
-  width: 40px;
-}
-.tick-icon {
-  height: 60px;
-  width: 60px;
-}
-.btn {
-  background-color: transparent;
-  border: none;
-}
-
-/* .stream-controls {
-  margin-top: auto;
-  margin-bottom: 5vh;
-} */
-
 .stream-btns {
   background-color: rgb(255, 68, 0);
   border: none;
