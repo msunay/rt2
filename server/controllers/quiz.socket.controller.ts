@@ -13,11 +13,18 @@ const quizSocketInit = (
     socketId: quiz.id
   })
 
+  quiz.on('host_start_quiz', () => {
+    console.log('Is this working???');
+    quiz.broadcast.emit('start_quiz')
+  })
   quiz.on('next_question', () => {
-    quiz.emit('start_question_timer')
-    setTimeout(() => {
-      quiz.emit('reveal_answers')
-    }, 7000)
+    quiz.broadcast.emit('start_question_timer')
+    // quiz.broadcast.emit('set_question', {
+    //   currentQuestionNumber
+    // })
+    // setTimeout(() => {
+    //   quiz.emit('reveal_answers')
+    // }, 7000)
   })
 };
 

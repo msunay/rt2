@@ -3,7 +3,7 @@ import moment from 'moment';
 
 /*
   The following function populates the database with 2 users and one quiz.
-  The host user will be the owner of the quiz and the player user is a participant in the quiz. 
+  The host user will be the owner of the quiz and the player user is a participant in the quiz.
   The quiz has 10 questions associated with it.
   Each question has 4 answers associated with it.
 
@@ -65,13 +65,13 @@ const mocks = {
 
 async function populateDatabase() {
   // Add 2 users -> one player and one host
-  await models.User.create(mockHost);
-  await models.User.create(mockPlayer);
+  await models.User.create(mocks.hosts.mockHost);
+  await models.User.create(mocks.players.mockPlayer1);
 
   // Create the quiz
   const quiz = await models.Quiz.create({
     quizName: 'Mock Quiz',
-    quizOwner: mockHost.id,
+    quizOwner: mocks.hosts.mockHost.id,
     category: 'General Knowledge',
     dateTime: moment().add(5, 'days').toDate(),
   });
@@ -98,7 +98,7 @@ async function populateDatabase() {
   }
   // Create participation between player and quiz
   await models.Participation.create({
-    UserId: mockPlayer.id,
+    UserId: mocks.players.mockPlayer1.id,
     QuizId: quiz.id,
     isPaid: true,
   });
