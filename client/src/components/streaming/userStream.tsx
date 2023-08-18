@@ -8,30 +8,48 @@ import {
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
+import {
+  QuizClientToServerEvents,
+  QuizServerToClientEvents,
+} from '@/Types/QuizSocketTypes';
+import { CurrentTime, createCountdownBar } from 'countdownbar';
+import Question from '../question/question';
 
 export default function UserStream() {
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
 
+  const quiz = useRef<
+    Socket<QuizServerToClientEvents, QuizClientToServerEvents>
+  >(io('http://localhost:3001/quizspace'));
 
-  const quiz: Socket<QuizServerToClientEvent, QuizClientToServerEvents> = io(
-    'http://localhost:3001/quizspace'
-  );
-
-    quiz.on('connection_success', ({ socketId }) => {
+  useEffect(() => {
+    quiz.current.on('connection_success', ({ socketId }) => {
       console.log(socketId);
-    })
+    });
 
+    quiz.current.on('start_quiz', () => {
+      setQuizStarted(true);
+    });
 
+    quiz.current.on('start_question_timer', () => {
+      console.log('"START QUESTION TIME"');
+      setCurrentQuestionNumber((num) => num + 1);
+      const countdownBar = createCountdownBar({
+        container: '#countdown-bar-container',
+        time: 7000,
+        millisecond: true,
+        autoStart: true,
+        template: (current: CurrentTime) =>
+          `${current.seconds}.${current.milliseconds}`,
+        onFinish: () => true, // TODO
+      });
+    });
+  }, []);
 
-
-
-
-
-
-
-
-
-
-
+  // quiz.on('set_question', ({ currentQuestionNumber }) => {
+  //   setCurrentQuestionNumber(currentQuestionNumber);
+  // });
 
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
@@ -52,9 +70,8 @@ export default function UserStream() {
     });
   }, []);
 
-  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
-    'http://localhost:3001/mediasoup'
-  );
+  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
+    io('http://localhost:3001/mediasoup');
 
   peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
     console.log(socketId, producerAlreadyExists);
@@ -181,6 +198,17 @@ export default function UserStream() {
         <video ref={remoteVideo} className="video" autoPlay={true}></video>
       </div>
       <button onClick={goConsume}>Join Stream</button>
+      <div className="question-component">
+        <div className="question-component">
+          {quizStarted && (
+            <Question
+              currentQuestionNumber={currentQuestionNumber}
+              setCurrentQuestionNumber={setCurrentQuestionNumber}
+            />
+          )}
+        </div>
+      </div>
+      <div id="countdown-bar-container"></div>
       <div className="current-question"></div>
     </div>
   );
