@@ -15,15 +15,34 @@ import {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/Types/QuizSocketTypes';
+import { CurrentTime, createCountdownBar } from 'countdownbar'
 
 export default function HostStream() {
   const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
     'http://localhost:3001/quizspace'
   );
 
-  quiz.on('connection_success', ({ socketId }) => {
-    console.log(socketId);
-  });
+    quiz.on('connection_success', ({ socketId }) => {
+      console.log(socketId);
+    })
+
+    // wquestion button pressed
+
+    quiz.on('start_question_timer', () => {
+      const countdownBar = createCountdownBar({
+        container: '#countdown-bar-container',
+        time: 7000,
+        millisecond: true,
+        autoStart: true,
+        template: (current: CurrentTime) => `${current.seconds}.${current.milliseconds}`,
+        onFinish: () => true
+      })
+    })
+
+
+
+
+
 
   // wquestion button pressed
   quiz.emit('next_question');
@@ -35,11 +54,13 @@ export default function HostStream() {
 
   function startQuiz() {
     setQuizStarted(true);
+    quiz.emit('host_start_quiz')
   }
 
   function nextQuestion() {
     setCurrentQuestionNumber(currentQuestionNumber + 1);
-    console.log('QUESTION NUMBER', currentQuestionNumber);
+    console.log(currentQuestionNumber);
+    quiz.emit('next_question')
   }
 
   const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
@@ -247,6 +268,7 @@ export default function HostStream() {
           )}
         </div>
         </div>
+        <div id="countdown-bar-container"></div>
         <div className="quiz-controls">
           {quizStarted ? (
             currentQuestionNumber === 9 ? (
