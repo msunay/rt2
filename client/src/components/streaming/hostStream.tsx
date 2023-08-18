@@ -21,19 +21,12 @@ export default function HostStream() {
     'http://localhost:3001/quizspace'
   );
 
-    quiz.on('connection_success', ({ socketId }) => {
-      console.log(socketId);
-    })
+  quiz.on('connection_success', ({ socketId }) => {
+    console.log(socketId);
+  });
 
-    // wquestion button pressed
-    quiz.emit('next_question')
-
-
-
-
-
-
-
+  // wquestion button pressed
+  quiz.emit('next_question');
 
   const localVideo = useRef<HTMLVideoElement>(null);
 
@@ -46,6 +39,7 @@ export default function HostStream() {
 
   function nextQuestion() {
     setCurrentQuestionNumber(currentQuestionNumber + 1);
+    console.log('QUESTION NUMBER', currentQuestionNumber);
   }
 
   const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
@@ -255,15 +249,20 @@ export default function HostStream() {
         </div>
         <div className="quiz-controls">
           {quizStarted ? (
-            <button className="next-q-btn" onClick={nextQuestion}>
-              Next Question
-            </button>
+            currentQuestionNumber === 9 ? (
+              <button className="next-q-btn">Reveal Scores</button>
+            ) : (
+              <button className="next-q-btn" onClick={nextQuestion}>
+                Next Question
+              </button>
+            )
           ) : (
             <button className="next-q-btn" onClick={startQuiz}>
               Start Quiz
             </button>
           )}
         </div>
+
         <div className="stream-controls">
           <button className="stream-btns" onClick={getLocalStream}>
             Start Video

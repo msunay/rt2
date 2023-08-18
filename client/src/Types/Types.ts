@@ -86,6 +86,38 @@ export interface Participation {
   updatedAt?: Date;
 }
 
+export interface ParticipationAnswer {
+  id?: string;
+  ParticipationId: string;
+  AnswerId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ParticipationAndAnswers {
+  id: string;
+  isPaid: boolean;
+  UserId: string;
+  QuizId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  answers: {
+    id: string;
+    answerText: string;
+    isCorrect: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    QuestionId: string;
+    ParticipationAnswer: {
+      id: string;
+      ParticipationId: string;
+      AnswerId: string;
+      createdAt: string;
+      updatedAt: string;
+    }
+  }[]
+}
+
 export interface ResponseUser {
   dataValues: User;
   token: string;

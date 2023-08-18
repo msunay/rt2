@@ -35,7 +35,7 @@ export default function Question({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-  }, [quiz]);
+  }, [quiz, currentQuestionNumber]);
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {

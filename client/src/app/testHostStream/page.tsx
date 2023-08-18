@@ -1,8 +1,6 @@
-import React from 'react'
-import HostStream from '@/components/streaming/hostStream'
+import React from 'react';
+import HostStream from '@/components/streaming/hostStream';
 
 export default function hostStream() {
-  return (
-    <HostStream />
-  )
+  return <HostStream />;
 }

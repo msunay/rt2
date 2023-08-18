@@ -6,6 +6,7 @@ import {
   Quiz,
   QuizQuestionAnswer,
   Participation,
+  ParticipationAndAnswers,
 } from '../../Types/Types';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
@@ -123,6 +124,20 @@ export const userApiService = {
         QuizId: '',
         isPaid: false,
       };
+    }
+  },
+
+  getParticipationAnswers: async (
+    participationId: string
+  ): Promise<ParticipationAndAnswers[]> => {
+    try {
+      const response = await axios.get<ParticipationAndAnswers[]>(
+        `${BASE_URL}participationAnswers/${participationId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return [];
     }
   },
 };
