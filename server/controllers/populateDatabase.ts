@@ -1,5 +1,5 @@
-import models from "../models/index";
-import moment from "moment";
+import models from '../models/index';
+import moment from 'moment';
 
 /*
   The following function populates the database with 2 users and one quiz.
@@ -16,22 +16,51 @@ import moment from "moment";
   5. You will see the log "Database populated" -> this means it was successful.
 */
 
-const mockHost = {
-  id: "0cf7cbe4-0c52-4a1a-940a-65d47f769c08",
-  email: "host@email.com",
-  username: "hostname",
-  password: "$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK",
-  isPremiumMember: false,
-  pointsWon: 0,
-};
-
-const mockPlayer = {
-  id: "efde9495-1ec4-4c7d-b344-b68000c00291",
-  email: "player@email.com",
-  username: "playername",
-  password: "$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK",
-  isPremiumMember: false,
-  pointsWon: 0,
+const mocks = {
+  hosts: {
+    mockHost: {
+      id: '0cf7cbe4-0c52-4a1a-940a-65d47f769c08',
+      email: 'mock@host.com',
+      username: 'mockHost',
+      password: '$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK',
+      isPremiumMember: false,
+      pointsWon: 0,
+    },
+  },
+  players: {
+    mockPlayer1: {
+      id: 'efde9495-1ec4-4c7d-b344-b68000c00291',
+      email: 'player@email.com',
+      username: 'playername',
+      password: '$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK',
+      isPremiumMember: false,
+      pointsWon: 0,
+    },
+    mockPlayer2: {
+      id: '',
+      email: 'player@email.com',
+      username: 'playername',
+      password: '$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK',
+      isPremiumMember: false,
+      pointsWon: 0,
+    },
+    mockPlayer3: {
+      id: '',
+      email: 'player@email.com',
+      username: 'playername',
+      password: '$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK',
+      isPremiumMember: false,
+      pointsWon: 0,
+    },
+    mockPlayer4: {
+      id: '',
+      email: 'player@email.com',
+      username: 'playername',
+      password: '$2a$10$72VY7l.IIX49MmRSGNj8aebXRXyDyWkZyRU8DKl4gchKam410AJyK',
+      isPremiumMember: false,
+      pointsWon: 0,
+    },
+  },
 };
 
 async function populateDatabase() {
@@ -41,10 +70,10 @@ async function populateDatabase() {
 
   // Create the quiz
   const quiz = await models.Quiz.create({
-    quizName: "Mock Quiz",
+    quizName: 'Mock Quiz',
     quizOwner: mockHost.id,
-    category: "General Knowledge",
-    dateTime: moment().add(5, "days").toDate(),
+    category: 'General Knowledge',
+    dateTime: moment().add(5, 'days').toDate(),
   });
 
   // Create questions and answers
@@ -73,7 +102,7 @@ async function populateDatabase() {
     QuizId: quiz.id,
     isPaid: true,
   });
-  console.log("Database populated");
+  console.log('Database populated');
 }
 
 populateDatabase();

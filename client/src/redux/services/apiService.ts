@@ -42,6 +42,20 @@ export const userApiService = {
     }
   },
 
+  getOneQuizQuestionAnswer: async (
+    quizId: string
+  ): Promise<QuizQuestionAnswer> => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}quizQuestionAnswer/${quizId}`
+      );
+      return response.data[0]; //TODO
+    } catch (err) {
+      console.log(err);
+      return {} as QuizQuestionAnswer;
+    }
+  },
+
   getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
     try {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);

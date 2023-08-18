@@ -61,6 +61,22 @@ export interface QuizQuestionAnswer {
   }[];
 }
 
+export interface QuestionAnswer {
+    id: string;
+    questionText: string;
+    createdAt: Date;
+    updatedAt: Date;
+    QuizId?: string;
+    Answers: {
+      id: string;
+      answerText: string;
+      isCorrect: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+      QuestionId: string;
+    }[];
+}
+
 export interface Participation {
   id?: string;
   isPaid: boolean;
