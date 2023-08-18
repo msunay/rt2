@@ -1,15 +1,15 @@
-# fly.toml app configuration file generated for patient-star-685 on 2023-08-16T15:32:09+01:00
+# fly.toml app configuration file generated for sparkling-waterfall-6713 on 2023-08-15T11:55:23+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "patient-star-685"
+app = "sparkling-waterfall-6713"
 primary_region = "lhr"
 
 [build]
 
 [http_service]
-  internal_port = 3001
+  internal_port = 3000
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true

@@ -20,7 +20,6 @@ export default function Home() {
     axios.get('http://localhost:3001/', { headers: { "Authorization": `Bearer ${authToken}` } })
       .then(res => {
         if (res.status !== 200) {
-          console.log('failed here')
           router.push('/auth')
         }
       }).catch(error => {

@@ -46,4 +46,11 @@ router.get(
   participationController.getParticipationAnswers
 );
 
+// Reference tables routes
+router.post("/participation", participationController.createParticipation);
+router.post(
+  "/participationAnswer",
+  participationController.createParticipationAnswer
+);
+
 export default router;

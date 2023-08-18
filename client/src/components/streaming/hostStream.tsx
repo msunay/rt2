@@ -236,7 +236,9 @@ export default function HostStream() {
   return (
     <>
       <div className="host-unit">
-        <div className="question-component">
+        <div className="video-container">
+          <video ref={localVideo} className="video" autoPlay={true}></video>
+          <div className="question-component">
           {quizStarted && (
             <Question
               currentQuestionNumber={currentQuestionNumber}
@@ -244,8 +246,6 @@ export default function HostStream() {
             />
           )}
         </div>
-        <div className="video-container">
-          <video ref={localVideo} className="video" autoPlay={true}></video>
         </div>
         <div className="quiz-controls">
           {quizStarted ? (
