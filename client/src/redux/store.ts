@@ -3,6 +3,7 @@ import authSlice from "./features/authSlice";
 import discoverSlice from "./features/discoverSlice";
 import participatingSlice from "./features/participatingSlice";
 import userIdSlice from "./features/userIdSlice";
+import userParticipationAnswerSlice from "./features/userParticipationAnswerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     discoverSlice,
     participatingSlice,
     userIdSlice,
+    userParticipationAnswerSlice
   },
   devTools: process.env.NODE_ENV !== "production",
 });

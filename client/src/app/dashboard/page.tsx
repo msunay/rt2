@@ -17,16 +17,15 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('quiz: ', quiz);
     (async () => {
       try {
         const quizes = await getAllQuizzes();
         const sortedByDate = quizes.sort((a: Quiz, b: Quiz) =>
           moment(a.dateTime).diff(moment(b.dateTime))
-        );
-        if (sortedByDate.length) {
-          const upcomingQuiz = sortedByDate[0];
-          const responseUsers = await getOwner();
+          );
+          if (sortedByDate.length) {
+            const upcomingQuiz = sortedByDate[0];
+            const responseUsers = await getOwner();
           const quizOwner = responseUsers.find(
             (user) => user.id === upcomingQuiz.quizOwner
           );
@@ -38,6 +37,10 @@ export default function Dashboard() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    console.log('quiz: ', quiz);
+  }, [quiz])
 
   function kicksOffIn() {
     const msLeft = moment().diff(quiz?.dateTime);

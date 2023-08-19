@@ -44,6 +44,6 @@
   font-weight: 800;
 }
 
-.answer_container > button:hover {
+.answer_container > button:hover:enabled {
   background-color: rgb(213, 234, 237);
 }

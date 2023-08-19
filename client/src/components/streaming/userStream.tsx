@@ -24,9 +24,9 @@ export default function UserStream() {
   >(io('http://localhost:3001/quizspace'));
 
   useEffect(() => {
-    quiz.current.on('connection_success', ({ socketId }) => {
-      console.log(socketId);
-    });
+    // quiz.current.on('connection_success', ({ socketId }) => {
+    //   console.log(socketId);
+    // });
 
     quiz.current.on('start_quiz', () => {
       setQuizStarted(true);
@@ -203,6 +203,7 @@ export default function UserStream() {
         <div className="question-component">
           {quizStarted && (
             <Question
+              host={false}
               currentQuestionNumber={currentQuestionNumber}
               setCurrentQuestionNumber={setCurrentQuestionNumber}
             />
