@@ -26,6 +26,7 @@ router.get(
 router.get('/quizzes', quizController.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quizController.getOneQuizQuestionAnswers);
 router.get('/quiz/:id', quizController.getOneQuiz);
+router.get('/quiz/next/:userId', auth, quizController.getNextQuizForUser);
 // Reference tables routes
 router.post(
   '/participation',
