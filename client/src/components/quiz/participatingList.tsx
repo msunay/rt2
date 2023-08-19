@@ -2,7 +2,7 @@
 
 import { useAppSelector } from '@/redux/hooks';
 import { Quiz } from '@/Types/Types';
-import QuizCard from './quizCard';
+import ParticipationQuizCard from './partQuizCard';
 import { userApiService } from '@/redux/services/apiService';
 import { useState, useEffect } from 'react';
 
@@ -34,7 +34,11 @@ export default function ParticipatingList() {
       ) : (
         quizList.map((quizItem: Quiz) => (
           <div key={quizItem.id}>
-            <QuizCard quiz={quizItem} quizList={quizList} setQuizList={setQuizList}/>
+            <ParticipationQuizCard
+              quiz={quizItem}
+              quizList={quizList}
+              setQuizList={setQuizList}
+            />
           </div>
         ))
       )}

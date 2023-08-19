@@ -6,17 +6,17 @@ import DiscoverList from '../../../components/quiz/discoverList'
 import HostingList from '@/components/quiz/hostingList';
 import ParticipatingList from '@/components/quiz/participatingList';
 
-export default function QuizDetails({ params }: { params: { quizeDetails: string } }) {
+export default function QuizDetails({ params }: { params: { quizDetails: string } }) {
   let element: ReactElement;
 
-  switch (params.quizeDetails) {
+  switch (params.quizDetails) {
     case 'participant':
       element = <ParticipatingList />
       break;
     case 'hosting':
       element = <HostingList />
       break;
-    case 'discovery':
+    case 'discover':
       element = <DiscoverList />
       break;
     default:

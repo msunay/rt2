@@ -9,7 +9,7 @@ import { userApiService } from '@/redux/services/apiService';
 import { Dispatch, SetStateAction } from 'react';
 import style from '@/app/dashboard/dashboard.module.css';
 
-export default function QuizCard({
+export default function ParticipationQuizCard({
   quiz,
   quizList,
   setQuizList,

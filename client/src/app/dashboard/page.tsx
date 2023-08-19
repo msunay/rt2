@@ -17,6 +17,7 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('quiz: ', quiz);
     (async () => {
       try {
         const quizes = await getAllQuizzes();
@@ -80,7 +81,7 @@ export default function Dashboard() {
       <Link href="/testHostStream">HostQuiz</Link>
       <DashboardButton directTo="/participant" title="Participating in" />
       <DashboardButton directTo="/hosting" title="Hosting" />
-      <DashboardButton directTo="/discovery" title="Discover Quizzes" />
+      <DashboardButton directTo="/discover" title="Discover Quizzes" />
     </div>
   );
 }

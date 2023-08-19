@@ -2,7 +2,7 @@
 
 import { useAppSelector } from '@/redux/hooks';
 import { Quiz } from '@/Types/Types';
-import QuizCard from './quizCard';
+import HostQuizCard from './hostQuizCard';
 import { userApiService } from '@/redux/services/apiService';
 import { useState, useEffect } from 'react';
 
@@ -15,7 +15,7 @@ export default function HostingList() {
     <div className="quiz-list-container">
       {hostingQuizzes.map((quizItem: Quiz) => (
         <div key={quizItem.id}>
-          <QuizCard quiz={quizItem} />
+          <HostQuizCard quiz={quizItem} />
         </div>
       ))}
     </div>

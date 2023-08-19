@@ -1,15 +1,15 @@
 import { useAppSelector } from '@/redux/hooks';
 import { Quiz } from '@/Types/Types';
-import QuizCard from './quizCard';
+import DiscoverQuizCard from './discQuizCard';
 
 export default function DiscoverList() {
   const quizList = useAppSelector((state) => state.discoverSlice.value);
-
+  console.log('quizList: ', quizList);
   return (
     <div className="quiz-list-container">
       {quizList.map((quizItem: Quiz) => (
         <div key={quizItem.id}>
-          <QuizCard quiz={quizItem} />
+          <DiscoverQuizCard quiz={quizItem} />
         </div>
       ))}
     </div>
