@@ -18,13 +18,13 @@ export default function ParticipatingList() {
       const newQuizList: Quiz[] = [];
       for (const participation of participationsList) {
         const data = await userApiService.getOneQuiz(participation.QuizId!);
-        console.log(data);
         newQuizList.push(...data);
       }
       setQuizList(newQuizList);
       setLoading(false);
     };
     fetchData();
+    console.log(participationsList);
   }, [participationsList]);
 
   return (
@@ -34,7 +34,7 @@ export default function ParticipatingList() {
       ) : (
         quizList.map((quizItem: Quiz) => (
           <div key={quizItem.id}>
-            <QuizCard quiz={quizItem} />
+            <QuizCard quiz={quizItem} quizList={quizList} setQuizList={setQuizList}/>
           </div>
         ))
       )}

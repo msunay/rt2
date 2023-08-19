@@ -2,13 +2,22 @@ import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
 import Image from 'next/image';
 import plus from '@/public/plus-square.svg';
-import tick from '@/public/check.gif';
+import tick from '@/public/checked.svg';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
+import { Dispatch, SetStateAction } from 'react';
 import style from '@/app/dashboard/dashboard.module.css';
 
-export default function QuizCard({ quiz }: { quiz: Quiz }) {
+export default function QuizCard({
+  quiz,
+  quizList,
+  setQuizList,
+}: {
+  quiz: Quiz;
+  quizList: Quiz[];
+  setQuizList: Dispatch<SetStateAction<Quiz[]>>;
+}) {
   const [isSignedUp, setIsSignedUp] = useState(false);
   const [participationId, setParticipationId] = useState('');
   const [participationList, setParticipationList] = useState<Participation[]>(
@@ -53,6 +62,7 @@ export default function QuizCard({ quiz }: { quiz: Quiz }) {
         await userApiService.deleteParticipation(participationId);
       }
       setIsSignedUp(false);
+      setQuizList(quizList.filter((quizItem) => quizItem.id != quiz.id));
     } catch (err) {
       console.log(err);
     }
