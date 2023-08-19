@@ -1,7 +1,6 @@
 import '../globals.css';
-import { Providers } from "@/redux/provider";
+import { Providers } from '@/redux/provider';
 import styles from '@/app/auth/styles/auth.module.css';
-
 
 export default function RootLayout({
   children,

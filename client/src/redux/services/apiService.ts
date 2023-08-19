@@ -32,6 +32,19 @@ export const userApiService = {
     );
     return response.data;
   },
+
+  getUserDetails: async (userId: string): Promise<User> => {
+    try {
+      const response = await axios.get<User>(
+        `${BASE_URL}userDetails/${userId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log('Failed to fetch user details');
+      return {} as User;
+    }
+  },
+
   getAllQuizzes: async (): Promise<Quiz[]> => {
     try {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quizzes`);
@@ -135,19 +148,22 @@ export const userApiService = {
 
   createParticipationAnswer: async ({
     AnswerId,
-    ParticipationId
-  }: { AnswerId: string, ParticipationId: string }): Promise<ParticipationAnswer> => {
+    ParticipationId,
+  }: {
+    AnswerId: string;
+    ParticipationId: string;
+  }): Promise<ParticipationAnswer> => {
     try {
       const response = await axios.post<ParticipationAnswer>(
         `${BASE_URL}participationAnswer`,
         {
           AnswerId,
-          ParticipationId
+          ParticipationId,
         }
       );
       return response.data;
     } catch (err) {
       return {} as ParticipationAnswer;
     }
-  }
+  },
 };

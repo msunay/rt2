@@ -12,7 +12,8 @@ router.get('/', auth, (req, res) => {
 
 // User routes
 router.post('/users', userController.addUser);
-router.get('/user/:username', userController.getOneUser);
+router.get('/user/:id', userController.getOneUser);
+router.get('/userDetails/:id', userController.getUserDetails);
 router.get('/users', userController.getAllUsers);
 router.put('/username', userController.changeUsername);
 router.put('/password', userController.changePassword);

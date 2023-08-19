@@ -1,8 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authSlice from "./features/authSlice";
-import discoverSlice from "./features/discoverSlice";
-import participatingSlice from "./features/participatingSlice";
-import userIdSlice from "./features/userIdSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import authSlice from './features/authSlice';
+import discoverSlice from './features/discoverSlice';
+import participatingSlice from './features/participatingSlice';
+import userIdSlice from './features/userIdSlice';
+import userDetailsSlice from './features/userDetailsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,8 +11,9 @@ export const store = configureStore({
     discoverSlice,
     participatingSlice,
     userIdSlice,
+    userDetailsSlice,
   },
-  devTools: process.env.NODE_ENV !== "production",
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export type RootState = ReturnType<typeof store.getState>;

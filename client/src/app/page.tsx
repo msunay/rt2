@@ -10,6 +10,7 @@ import { setParticipatingList } from '@/redux/features/participatingSlice';
 import { setUserId } from '@/redux/features/userIdSlice';
 import axios from 'axios';
 import Dashboard from './dashboard/page';
+import { setUserDetails } from '@/redux/features/userDetailsSlice';
 
 export default function Home() {
   const authToken = useAppSelector(
@@ -39,6 +40,9 @@ export default function Home() {
     userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
 
     if (userId) {
+      userApiService
+        .getUserDetails(userId)
+        .then((data) => dispatch(setUserDetails(data)));
       userApiService
         .getUserParticipations(userId)
         .then((data) => dispatch(setParticipatingList(data)));

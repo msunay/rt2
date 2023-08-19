@@ -24,7 +24,6 @@ export default function ParticipatingList() {
       setLoading(false);
     };
     fetchData();
-    console.log(participationsList);
   }, [participationsList]);
 
   return (
