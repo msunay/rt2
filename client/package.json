@@ -17,6 +17,7 @@
     "axios": "^1.4.0",
     "bcrypt-ts": "^4.0.0",
     "bufferutil": "^4.0.7",
+    "canvas-circular-countdown": "^1.8.0",
     "countdownbar": "^1.5.3",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",

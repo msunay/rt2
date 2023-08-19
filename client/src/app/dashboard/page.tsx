@@ -8,6 +8,7 @@ import DashboardButton from '@/components/dashboard/dashboar-button';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const [quize, setQuize] = useState<Quiz>();
@@ -76,7 +77,7 @@ export default function Dashboard() {
           <span>{kicksOffIn()} </span>
         </div>
       </div>
-
+      <Link href="/testHostStream">HostQuiz</Link>
       <DashboardButton directTo="/participant" title="Participating in" />
       <DashboardButton directTo="/hosting" title="Hosting" />
       <DashboardButton directTo="/discovery" title="Discovery Quizzes" />

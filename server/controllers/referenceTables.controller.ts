@@ -37,6 +37,7 @@ async function getUserParticipations(req: Request, res: Response) {
         UserId: req.params.userId,
       },
     });
+    console.log(response);
     res.status(200).send(response);
   } catch (err) {
     console.error('Could not get participations::', err);

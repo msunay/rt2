@@ -18,12 +18,10 @@ export default function Home() {
   const userId = useAppSelector((state: RootState) => state.userIdSlice.value);
   const router = useRouter();
   const dispatch = useDispatch();
-
   useEffect(() => {
     userApiService
       .getUserId(authToken)
       .then((data) => dispatch(setUserId(data)));
-
     axios
       .get('http://localhost:3001/', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -46,7 +44,6 @@ export default function Home() {
         .then((data) => dispatch(setParticipatingList(data)));
     }
   }, []);
-
   return (
     <main>
       <Dashboard />
