@@ -81,17 +81,10 @@ export const userApiService = {
     }
   },
 
-  getUserParticipations: async (
-    authToken: string
-  ): Promise<Participation[]> => {
+  getUserParticipations: async (userId: string): Promise<Participation[]> => {
     try {
       const response = await axios.get<Participation[]>(
-        `${BASE_URL}participations`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
+        `${BASE_URL}participations/${userId}`
       );
       return response.data;
     } catch (err) {
@@ -111,6 +104,20 @@ export const userApiService = {
           quizId: quizId,
           userId: userId,
         }
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return {} as Participation;
+    }
+  },
+
+  deleteParticipation: async (
+    participationId: string
+  ): Promise<Participation> => {
+    try {
+      const response = await axios.delete<Participation>(
+        `${BASE_URL}participation/${participationId}`
       );
       return response.data;
     } catch (err) {

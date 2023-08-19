@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 export default function Dashboard() {
   const [quize, setQuize] = useState<Quiz>();
   const [owner, setOwner] = useState<User>();
-  const ownerId = useAppSelector((state: RootState) => state.userIdSlice.value)
+  const ownerId = useAppSelector((state: RootState) => state.userIdSlice.value);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,17 +43,14 @@ export default function Dashboard() {
     return duration.humanize();
   }
 
-  function streamDirection () {
+  function streamDirection() {
     if (ownerId === quize?.quizOwner) router.push('/testHostStream');
     else router.push('/testUserStream');
   }
 
   return (
     <div className={styles.dashboard_container}>
-      <div
-        className={styles.quiz_contaniner}
-        onClick={() => streamDirection()}
-      >
+      <div className={styles.quiz_contaniner} onClick={() => streamDirection()}>
         <h4>next quize</h4>
         <div className={styles.quiz_details}>
           <div>

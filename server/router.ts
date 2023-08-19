@@ -33,13 +33,16 @@ router.post(
   participationController.createParticipationAnswer
 );
 router.get(
-  '/participations',
-  auth,
+  '/participations/:userId',
   participationController.getUserParticipations
 );
 router.get(
   '/participationAnswers/:id',
   participationController.getParticipationAnswers
+);
+router.delete(
+  '/participation/:id',
+  participationController.deleteParticipation
 );
 
 // Reference tables routes

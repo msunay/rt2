@@ -18,6 +18,12 @@ async function createParticipation(req: Request, res: Response) {
 
 async function deleteParticipation(req: Request, res: Response) {
   try {
+    const response = await models.Participation.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+    res.status(200).send('Successfully deleted participation');
   } catch (err) {
     console.error('Could not delete participation::', err);
     res.status(500).send();
@@ -28,7 +34,7 @@ async function getUserParticipations(req: Request, res: Response) {
   try {
     const response = await models.Participation.findAll({
       where: {
-        UserId: (req as CustomRequest).userId,
+        UserId: req.params.userId,
       },
     });
     res.status(200).send(response);
@@ -76,4 +82,5 @@ export default {
   createParticipationAnswer,
   getUserParticipations,
   getParticipationAnswers,
+  deleteParticipation,
 };
