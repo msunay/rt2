@@ -52,7 +52,7 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboard_container}>
       <div className={styles.quiz_contaniner} onClick={() => streamDirection()}>
-        <h4>next quize</h4>
+        <h4>next quiz</h4>
         <div className={styles.quiz_details}>
           <div>
             <p>
@@ -80,7 +80,7 @@ export default function Dashboard() {
       <Link href="/testHostStream">HostQuiz</Link>
       <DashboardButton directTo="/participant" title="Participating in" />
       <DashboardButton directTo="/hosting" title="Hosting" />
-      <DashboardButton directTo="/discovery" title="Discovery Quizzes" />
+      <DashboardButton directTo="/discovery" title="Discover Quizzes" />
     </div>
   );
 }
