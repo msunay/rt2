@@ -26,14 +26,12 @@ export const userApiService = {
       throw error;
     }
   },
-
   loginUser: async (username: string): Promise<ResponseUser> => {
     const response = await axios.get<ResponseUser>(
       `${BASE_URL}user/${username}`
     );
     return response.data;
   },
-
   getAllQuizzes: async (): Promise<Quiz[]> => {
     try {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quizzes`);
@@ -43,7 +41,6 @@ export const userApiService = {
       return [];
     }
   },
-
   getOneQuizQuestionAnswer: async (
     quizId: string
   ): Promise<QuizQuestionAnswer> => {
@@ -57,7 +54,6 @@ export const userApiService = {
       return {} as QuizQuestionAnswer;
     }
   },
-
   getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
     try {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
@@ -67,7 +63,6 @@ export const userApiService = {
       return [];
     }
   },
-
   getUserId: async (authToken: string): Promise<string> => {
     try {
       const response = await axios.get<string>(`${BASE_URL}userId`, {
@@ -81,18 +76,10 @@ export const userApiService = {
       return '';
     }
   },
-
-  getUserParticipations: async (
-    authToken: string
-  ): Promise<Participation[]> => {
+  getUserParticipations: async (userId: string): Promise<Participation[]> => {
     try {
       const response = await axios.get<Participation[]>(
-        `${BASE_URL}participations`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
+        `${BASE_URL}participations/${userId}`
       );
       return response.data;
     } catch (err) {
@@ -100,34 +87,37 @@ export const userApiService = {
       return [];
     }
   },
-
   addParticipation: async (
     quizId: string,
-    authToken: string
+    userId: string
   ): Promise<Participation> => {
     try {
       const response = await axios.post<Participation>(
         `${BASE_URL}participation`,
         {
           quizId: quizId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+          userId: userId,
         }
       );
       return response.data;
     } catch (err) {
       console.log(err);
-      return {
-        UserId: '',
-        QuizId: '',
-        isPaid: false,
-      };
+      return {} as Participation;
     }
   },
-
+  deleteParticipation: async (
+    participationid: string
+  ): Promise<Participation> => {
+    try {
+      const response = await axios.delete<Participation>(
+        `${BASE_URL}participation/${participationid}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return {} as Participation;
+    }
+  },
   getParticipationAnswers: async (
     participationId: string
   ): Promise<ParticipationAndAnswers[]> => {
@@ -148,7 +138,11 @@ export const userApiService = {
   }: { AnswerId: string, ParticipationId: string }): Promise<ParticipationAnswer> => {
     try {
       const response = await axios.post<ParticipationAnswer>(
-        `${BASE_URL}participationAnswer`
+        `${BASE_URL}participationAnswer`,
+        {
+          AnswerId,
+          ParticipationId
+        }
       );
       return response.data;
     } catch (err) {

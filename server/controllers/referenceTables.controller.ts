@@ -21,9 +21,10 @@ async function getUserParticipations(req: Request, res: Response) {
   try {
     const response = await models.Participation.findAll({
       where: {
-        UserId: (req as CustomRequest).userId,
+        UserId: req.params.userId,
       },
     });
+    console.log(response);
     res.status(200).send(response);
   } catch (err) {
     console.error('Could not get participations::', err);

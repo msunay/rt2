@@ -19,7 +19,7 @@ import { CurrentTime, createCountdownBar } from 'countdownbar'
 import CanvasCircularCountdown from 'canvas-circular-countdown';
 
 export default function HostStream() {
-  
+
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
 
@@ -78,9 +78,9 @@ export default function HostStream() {
 
     })
 
-    quiz.on('reveal_answers', () => {
+    // quiz.on('reveal_answers', () => {
 
-    })
+    // })
 
 
 

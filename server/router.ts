@@ -37,8 +37,7 @@ router.post(
   participationController.createParticipationAnswer
 );
 router.get(
-  '/participations',
-  auth,
+  '/participations/:userId',
   participationController.getUserParticipations
 );
 router.get(
