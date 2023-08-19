@@ -11,7 +11,7 @@ router.get('/', auth, (req, res) => {
 });
 
 // User routes
-router.post('/users', userController.addUser);
+router.post('/user', userController.addUser);
 router.get('/user/:id', userController.getOneUser);
 router.get('/userDetails/:id', userController.getUserDetails);
 router.get('/users', userController.getAllUsers);

@@ -1,54 +1,11 @@
 'use client';
-import { getAllQuizzes, getOwner } from '@/redux/services/quizeApiService';
-import { useEffect, useState } from 'react';
+
 import styles from './dashboard.module.css';
-import moment from 'moment';
-import { Quiz, User } from '@/Types/Types';
 import DashboardButton from '@/components/dashboard/dashboardButton';
-import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/redux/hooks';
-import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
-  const [quiz, setQuiz] = useState<Quiz>();
-  const [owner, setOwner] = useState<User>();
-  const ownerId = useAppSelector((state: RootState) => state.userIdSlice.value);
-  const router = useRouter();
   const userDetails = useAppSelector((state) => state.userDetailsSlice.value);
-
-  // The following logic is due to be moved into the "Participating in" component
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const quizes = await getAllQuizzes();
-  //       const sortedByDate = quizes.sort((a: Quiz, b: Quiz) =>
-  //         moment(a.dateTime).diff(moment(b.dateTime))
-  //       );
-  //       if (sortedByDate.length) {
-  //         const upcomingQuiz = sortedByDate[0];
-  //         const responseUsers = await getOwner();
-  //         const quizOwner = responseUsers.find(
-  //           (user) => user.id === upcomingQuiz.quizOwner
-  //         );
-  //         setQuiz(upcomingQuiz);
-  //         setOwner(quizOwner);
-  //       }
-  //     } catch (error) {
-  //       console.log('failed: ', error);
-  //     }
-  //   })();
-  // }, []);
-  // function kicksOffIn() {
-  //   const msLeft = moment().diff(quiz?.dateTime);
-  //   const duration = moment.duration(msLeft);
-  //   return duration.humanize();
-  // }
-
-  function streamDirection() {
-    if (ownerId === quiz?.quizOwner) router.push('/testHostStream');
-    else router.push('/testUserStream');
-  }
 
   return (
     <>
@@ -76,3 +33,41 @@ export default function Dashboard() {
     </>
   );
 }
+
+// TODO Ask Atai -> Removing this code did not change functionality of the page. What was it meant for?
+
+// import { useRouter } from 'next/navigation';
+// const router = useRouter();
+// function streamDirection() {
+//   if (userDetails.id === quiz?.quizOwner) router.push('/testHostStream');
+//   else router.push('/testUserStream');
+// }
+
+// The following logic is due to be moved into the "Participating in" component
+
+// useEffect(() => {
+//   (async () => {
+//     try {
+//       const quizes = await getAllQuizzes();
+//       const sortedByDate = quizes.sort((a: Quiz, b: Quiz) =>
+//         moment(a.dateTime).diff(moment(b.dateTime))
+//       );
+//       if (sortedByDate.length) {
+//         const upcomingQuiz = sortedByDate[0];
+//         const responseUsers = await getOwner();
+//         const quizOwner = responseUsers.find(
+//           (user) => user.id === upcomingQuiz.quizOwner
+//         );
+//         setQuiz(upcomingQuiz);
+//         setOwner(quizOwner);
+//       }
+//     } catch (error) {
+//       console.log('failed: ', error);
+//     }
+//   })();
+// }, []);
+// function kicksOffIn() {
+//   const msLeft = moment().diff(quiz?.dateTime);
+//   const duration = moment.duration(msLeft);
+//   return duration.humanize();
+// }

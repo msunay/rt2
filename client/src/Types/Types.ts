@@ -1,3 +1,5 @@
+// Database model types
+
 export interface User {
   id?: string;
   email: string;
@@ -7,6 +9,18 @@ export interface User {
   pointsWon: number;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface UserAuth {
+  id?: string;
+  email: string;
+  username: string;
+  password: string;
+  isPremiumMember: boolean;
+  pointsWon: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  token?: string;
 }
 
 export interface Quiz {
@@ -36,6 +50,43 @@ export interface Answer {
   QuestionId?: string;
 }
 
+// Reference table types
+
+export interface Participation {
+  id?: string;
+  isPaid: boolean;
+  UserId?: string;
+  QuizId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ParticipationAnswer {
+  id?: string;
+  ParticipationId: string;
+  AnswerId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Compound data structure types
+
+export interface QuestionAnswer {
+  id: string;
+  questionText: string;
+  createdAt: Date;
+  updatedAt: Date;
+  QuizId?: string;
+  Answers: {
+    id: string;
+    answerText: string;
+    isCorrect: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    QuestionId: string;
+  }[];
+}
+
 export interface QuizQuestionAnswer {
   id: string;
   quizName: string;
@@ -61,39 +112,6 @@ export interface QuizQuestionAnswer {
   }[];
 }
 
-export interface QuestionAnswer {
-    id: string;
-    questionText: string;
-    createdAt: Date;
-    updatedAt: Date;
-    QuizId?: string;
-    Answers: {
-      id: string;
-      answerText: string;
-      isCorrect: boolean;
-      createdAt: Date;
-      updatedAt: Date;
-      QuestionId: string;
-    }[];
-}
-
-export interface Participation {
-  id?: string;
-  isPaid: boolean;
-  UserId?: string;
-  QuizId?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface ParticipationAnswer {
-  id?: string;
-  ParticipationId: string;
-  AnswerId: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface ParticipationAndAnswers {
   id: string;
   isPaid: boolean;
@@ -114,9 +132,11 @@ export interface ParticipationAndAnswers {
       AnswerId: string;
       createdAt: string;
       updatedAt: string;
-    }
-  }[]
+    };
+  }[];
 }
+
+// Authentication types
 
 export interface ResponseUser {
   dataValues: User;

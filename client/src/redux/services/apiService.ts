@@ -13,9 +13,11 @@ import {
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
 
 export const userApiService = {
+  // User methods
+
   postUser: async function (user: UserPost): Promise<ResponseUser> {
     try {
-      const res = await axios.post<ResponseUser>(`${BASE_URL}users`, {
+      const res = await axios.post<ResponseUser>(`${BASE_URL}user`, {
         email: user.email,
         username: user.username,
         password: user.password,
@@ -26,11 +28,26 @@ export const userApiService = {
       throw error;
     }
   },
+
   loginUser: async (username: string): Promise<ResponseUser> => {
     const response = await axios.get<ResponseUser>(
       `${BASE_URL}user/${username}`
     );
     return response.data;
+  },
+
+  getUserId: async (authToken: string): Promise<string> => {
+    try {
+      const response = await axios.get<string>(`${BASE_URL}userId`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      return response.data;
+    } catch (err) {
+      console.log('Error fetching user id::', err);
+      return '';
+    }
   },
 
   getUserDetails: async (userId: string): Promise<User> => {
@@ -45,6 +62,18 @@ export const userApiService = {
     }
   },
 
+  // Quiz methods
+
+  getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
+    try {
+      const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
+      return response.data;
+    } catch (err) {
+      console.log('Error fetching quizzes from database::', err);
+      return [];
+    }
+  },
+
   getAllQuizzes: async (): Promise<Quiz[]> => {
     try {
       const response = await axios.get<Quiz[]>(`${BASE_URL}quizzes`);
@@ -54,6 +83,7 @@ export const userApiService = {
       return [];
     }
   },
+
   getOneQuizQuestionAnswer: async (
     quizId: string
   ): Promise<QuizQuestionAnswer> => {
@@ -67,39 +97,9 @@ export const userApiService = {
       return {} as QuizQuestionAnswer;
     }
   },
-  getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
-    try {
-      const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
-      return response.data;
-    } catch (err) {
-      console.log('Error fetching quizzes from database::', err);
-      return [];
-    }
-  },
-  getUserId: async (authToken: string): Promise<string> => {
-    try {
-      const response = await axios.get<string>(`${BASE_URL}userId`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      return response.data;
-    } catch (err) {
-      console.log('Error fetching user id::', err);
-      return '';
-    }
-  },
-  getUserParticipations: async (userId: string): Promise<Participation[]> => {
-    try {
-      const response = await axios.get<Participation[]>(
-        `${BASE_URL}participations/${userId}`
-      );
-      return response.data;
-    } catch (err) {
-      console.log('Error fetching participations from database::', err);
-      return [];
-    }
-  },
+
+  // Participation methods
+
   addParticipation: async (
     quizId: string,
     userId: string
@@ -119,6 +119,18 @@ export const userApiService = {
     }
   },
 
+  getUserParticipations: async (userId: string): Promise<Participation[]> => {
+    try {
+      const response = await axios.get<Participation[]>(
+        `${BASE_URL}participations/${userId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log('Error fetching participations from database::', err);
+      return [];
+    }
+  },
+
   deleteParticipation: async (
     participationId: string
   ): Promise<Participation> => {
@@ -132,19 +144,8 @@ export const userApiService = {
       return {} as Participation;
     }
   },
-  getParticipationAnswers: async (
-    participationId: string
-  ): Promise<ParticipationAndAnswers[]> => {
-    try {
-      const response = await axios.get<ParticipationAndAnswers[]>(
-        `${BASE_URL}participationAnswers/${participationId}`
-      );
-      return response.data;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  },
+
+  // ParticipationAnswer reference table methods
 
   createParticipationAnswer: async ({
     AnswerId,
@@ -164,6 +165,19 @@ export const userApiService = {
       return response.data;
     } catch (err) {
       return {} as ParticipationAnswer;
+    }
+  },
+  getParticipationAnswers: async (
+    participationId: string
+  ): Promise<ParticipationAndAnswers[]> => {
+    try {
+      const response = await axios.get<ParticipationAndAnswers[]>(
+        `${BASE_URL}participationAnswers/${participationId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return [];
     }
   },
 };
