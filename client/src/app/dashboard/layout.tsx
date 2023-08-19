@@ -10,7 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <div className={styles.auth_container}>
-      <nav>Real Time Travia</nav>
+      <nav>Real Time Trivia</nav>
       <Providers>{children}</Providers>
     </div>
   );

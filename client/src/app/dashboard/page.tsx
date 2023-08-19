@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const [quize, setQuize] = useState<Quiz>();
+  const [quiz, setQuiz] = useState<Quiz>();
   const [owner, setOwner] = useState<User>();
   const ownerId = useAppSelector((state: RootState) => state.userIdSlice.value);
   const router = useRouter();
@@ -24,12 +24,12 @@ export default function Dashboard() {
           moment(a.dateTime).diff(moment(b.dateTime))
         );
         if (sortedByDate.length) {
-          const upcomingQuizz = sortedByDate[0];
+          const upcomingQuiz = sortedByDate[0];
           const responseUsers = await getOwner();
           const quizOwner = responseUsers.find(
-            (user) => user.id === upcomingQuizz.quizOwner
+            (user) => user.id === upcomingQuiz.quizOwner
           );
-          setQuize(upcomingQuizz);
+          setQuiz(upcomingQuiz);
           setOwner(quizOwner);
         }
       } catch (error) {
@@ -39,13 +39,13 @@ export default function Dashboard() {
   }, []);
 
   function kicksOffIn() {
-    const msLeft = moment().diff(quize?.dateTime);
+    const msLeft = moment().diff(quiz?.dateTime);
     const duration = moment.duration(msLeft);
     return duration.humanize();
   }
 
   function streamDirection() {
-    if (ownerId === quize?.quizOwner) router.push('/testHostStream');
+    if (ownerId === quiz?.quizOwner) router.push('/testHostStream');
     else router.push('/testUserStream');
   }
 
@@ -59,16 +59,16 @@ export default function Dashboard() {
               <strong>Name:</strong>
             </p>
             <p>
-              <strong>Quize host:</strong>
+              <strong>Quiz host:</strong>
             </p>
             <p>
-              <strong>Quize category:</strong>
+              <strong>Quiz category:</strong>
             </p>
           </div>
           <div>
-            <p>{quize?.quizName}</p>
+            <p>{quiz?.quizName}</p>
             <p>{owner?.username}</p>
-            <p>{quize?.category}</p>
+            <p>{quiz?.category}</p>
           </div>
         </div>
         <span className={styles.divider}></span>
