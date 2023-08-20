@@ -16,6 +16,7 @@ export default function Home() {
   const authToken = useAppSelector(
     (state: RootState) => state.authSlice.authToken
   );
+  const URL = process.env.A ||'http://localhost:3001/'
   const userId = useAppSelector((state: RootState) => state.userIdSlice.value);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ export default function Home() {
       .getUserId(authToken)
       .then((data) => dispatch(setUserId(data)));
     axios
-      .get('http://localhost:3001/', {
+      .get(URL, {
         headers: { Authorization: `Bearer ${authToken}` },
       })
       .then((res) => {

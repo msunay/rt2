@@ -3,6 +3,7 @@
 import styles from './dashboard.module.css';
 import DashboardButton from '@/components/dashboard/dashboardButton';
 import { useAppSelector } from '@/redux/hooks';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const userDetails = useAppSelector((state) => state.userDetailsSlice.value);
@@ -26,6 +27,7 @@ export default function Dashboard() {
             title="Create a Quiz"
           />
         </>
+        <Link href="/testHostStream">HostQuiz</Link>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>
