@@ -10,22 +10,24 @@ const quizSocketInit = (
   console.log(quiz.id);
 
   quiz.emit('connection_success', {
-    socketId: quiz.id
-  })
+    socketId: quiz.id,
+  });
 
   quiz.on('host_start_quiz', () => {
-    console.log('Is this working???');
-    quiz.broadcast.emit('start_quiz')
-  })
-  quiz.on('next_question', () => {
-    quiz.broadcast.emit('start_question_timer')
-    // quiz.broadcast.emit('set_question', {
-    //   currentQuestionNumber
-    // })
+    quiz.broadcast.emit('start_quiz');
+
     setTimeout(() => {
-      quiz.broadcast.emit('reveal_answers')
-    }, 7000)
-  })
+      quiz.broadcast.emit('reveal_answers');
+    }, 7000);
+  });
+
+  quiz.on('next_question', () => {
+    quiz.broadcast.emit('start_question_timer');
+
+    setTimeout(() => {
+      quiz.broadcast.emit('reveal_answers');
+    }, 7000);
+  });
 };
 
 export default quizSocketInit;

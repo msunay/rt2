@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
@@ -9,7 +9,6 @@ import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
 import { userApiService } from '@/redux/services/apiService';
-import { Quiz, QuizQuestionAnswer } from '@/Types/Types';
 import Question from '../question/question';
 import {
   QuizClientToServerEvents,
@@ -17,88 +16,89 @@ import {
 } from '@/Types/QuizSocketTypes';
 import { CurrentTime, createCountdownBar } from 'countdownbar'
 import CanvasCircularCountdown from 'canvas-circular-countdown';
+import { useAppSelector } from '@/redux/hooks';
 
 export default function HostStream() {
 
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
-
+  const userParticipationAnswer = useAppSelector(state => state.userParticipationAnswerSlice)
+  const [questionHidden, setQuestionHidden] = useState(false)
+  const [trigger, setTrigger] = useState(0);
 
   const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
     'http://localhost:3001/quizspace'
   );
 
-    quiz.on('connection_success', ({ socketId }) => {
-      console.log(socketId);
-    })
+  // quiz.on('connection_success', ({ socketId }) => {
+  //   console.log(socketId);
+  // })
 
-    // wquestion button pressed
-
+  useEffect(() => {
     quiz.on('start_question_timer', () => {
-      const countdownBar = createCountdownBar({
-        container: '#countdown-bar-container',
-        time: 7000,
-        color: '#FFFFFF',
-        millisecond: true,
-        autoStart: true,
-        template: (current: CurrentTime) => `${current.seconds}.${current.milliseconds}`,
-        onFinish: () => true
-      })
-      const pickColorByPercentage = (percentage: any, time: any) => {
-        switch (true) {
-          case percentage >= 75:
-            return '#28a745'; // green
-          case percentage >= 50 && percentage < 75:
-            return '#17a2b8'; // blue
-          case percentage >= 25 && percentage < 50:
-            return '#ffc107'; // orange
-          default:
-            return '#dc3545'; // red
-        }
-      }
-      new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
-        duration: 7 * 1000,
-        radius: 150,
-        clockwise: true,
-
-        captionColor: pickColorByPercentage,
-        progressBarWidth: 20,
-        progressBarOffset: 0,
-        circleBackgroundColor: '#f5f5f5',
-        emptyProgressBarBackgroundColor: '#b9c1c7',
-        filledProgressBarBackgroundColor: '#17a2b8',
-        // captionColor: '#6c757d',
-        captionFont: '22px serif',
-        showCaption: true
-      }, (percentage: any, time: any, instance: any) => {
-        // if (time.elapsed >= 5000 ) {
-        //   instance.stop();
-        // }
-      }).start();
-
+      startTimer()
     })
 
-    // quiz.on('reveal_answers', () => {
+    quiz.on('reveal_answers', () => {
+      console.log('reveal');
+      //@ts-ignore
+      document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = true)
 
-    // })
-
-
-
-
+      setTimeout(() => {
+        setQuestionHidden(true);
+        document.getElementById('countdown-canvas')!.hidden = true
+        setTrigger((trigger) => trigger + 1);
+      }, 2000)
+    })
+  })
 
 
   const localVideo = useRef<HTMLVideoElement>(null);
 
 
   function startQuiz() {
+    startTimer()
     setQuizStarted(true);
     quiz.emit('host_start_quiz')
   }
 
   function nextQuestion() {
+    //@ts-ignore
+    document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = false)
     setCurrentQuestionNumber(currentQuestionNumber + 1);
     console.log(currentQuestionNumber);
+    setQuestionHidden(false)
+    document.getElementById('countdown-canvas')!.hidden = false;
     quiz.emit('next_question');
+    // startTimer()
+  }
+
+  function startTimer () {
+    const pickColorByPercentage = (percentage: any, time: any) => {
+      switch (true) {
+        case percentage >= 75:
+          return '#28a745'; // green
+        case percentage >= 50 && percentage < 75:
+          return '#17a2b8'; // blue
+        case percentage >= 25 && percentage < 50:
+          return '#ffc107'; // orange
+        default:
+          return '#dc3545'; // red
+      }
+    }
+      new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
+      duration: 7 * 1000,
+      radius: 150,
+      clockwise: true,
+      captionColor: pickColorByPercentage,
+      progressBarWidth: 20,
+      progressBarOffset: 0,
+      circleBackgroundColor: '#f5f5f5',
+      emptyProgressBarBackgroundColor: '#b9c1c7',
+      filledProgressBarBackgroundColor: '#17a2b8',
+      captionFont: '22px serif',
+      showCaption: true
+    }).start();
   }
 
   const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
@@ -300,13 +300,15 @@ export default function HostStream() {
           <div className="question-component">
           {quizStarted && (
             <Question
+              trigger={trigger}
+              hidden={questionHidden}
+              host={true}
               currentQuestionNumber={currentQuestionNumber}
               setCurrentQuestionNumber={setCurrentQuestionNumber}
             />
           )}
         </div>
         </div>
-        <div id="countdown-bar-container"></div>
         <canvas id="countdown-canvas"></canvas>
         <div className="quiz-controls">
           {quizStarted ? (
