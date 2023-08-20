@@ -45,11 +45,12 @@ async function getUserParticipations(req: Request, res: Response) {
 }
 
 async function createParticipationAnswer(req: Request, res: Response) {
+  console.log('participationAnswer: ', req.body);
   try {
     const participationAnswerInstance = await models.ParticipationAnswer.create(
       {
-        AnswerId: req.body.answerId,
-        ParticipationId: req.body.participationId,
+        ParticipationId: req.body.ParticipationId,
+        AnswerId: req.body.AnswerId,
       }
     );
     res.status(201).send(participationAnswerInstance);

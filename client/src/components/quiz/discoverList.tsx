@@ -4,7 +4,6 @@ import DiscoverQuizCard from './discQuizCard';
 
 export default function DiscoverList() {
   const quizList = useAppSelector((state) => state.discoverSlice.value);
-  console.log('quizList: ', quizList);
   return (
     <div className="quiz-list-container">
       {quizList.map((quizItem: Quiz) => (

@@ -24,8 +24,7 @@ export default function HostStream() {
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const userParticipationAnswer = useAppSelector(state => state.userParticipationAnswerSlice)
   const [questionHidden, setQuestionHidden] = useState(false)
-
-  let countdown: any;
+  const [trigger, setTrigger] = useState(0);
 
   const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
     'http://localhost:3001/quizspace'
@@ -44,11 +43,11 @@ export default function HostStream() {
       console.log('reveal');
       //@ts-ignore
       document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = true)
-      userApiService.createParticipationAnswer(userParticipationAnswer)
 
       setTimeout(() => {
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true
+        setTrigger((trigger) => trigger + 1);
       }, 2000)
     })
   })
@@ -87,7 +86,7 @@ export default function HostStream() {
           return '#dc3545'; // red
       }
     }
-    countdown = new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
+      new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
       duration: 7 * 1000,
       radius: 150,
       clockwise: true,
@@ -301,6 +300,7 @@ export default function HostStream() {
           <div className="question-component">
           {quizStarted && (
             <Question
+              trigger={trigger}
               hidden={questionHidden}
               host={true}
               currentQuestionNumber={currentQuestionNumber}

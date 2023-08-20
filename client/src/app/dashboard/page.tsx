@@ -38,9 +38,9 @@ export default function Dashboard() {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log('quiz: ', quiz);
-  }, [quiz])
+  // useEffect(() => {
+  //   console.log('quiz: ', quiz);
+  // }, [quiz])
 
   function kicksOffIn() {
     const msLeft = moment().diff(quiz?.dateTime);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, LegacyRef } from 'react';
+import { useState, useEffect, useRef, LegacyRef, useImperativeHandle } from 'react';
 import {
   QuestionAnswer,
   QuizQuestionAnswer,
@@ -17,17 +17,20 @@ export default function Question({
   currentQuestionNumber,
   setCurrentQuestionNumber,
   host,
-  hidden
+  hidden,
+  trigger
 }: {
   currentQuestionNumber: number;
   setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
   host: boolean;
   hidden: boolean;
+  trigger: number;
 }) {
 
-  const dispatch = useAppDispatch();
+  const [userParticipationAnswer, setUserParticipationAnswer] = useState<ParticipationAnswer>({} as ParticipationAnswer);
+  // useImperativeHandle(createParticipationAnswer, createHandle, [userParticipationAnswer])
+
   const userId = useAppSelector((state) => state.userIdSlice.value);
-  // const dispatch = useAppDispatch();
   // LOGIC FOR HOSTING THE QUIZ
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
@@ -36,13 +39,17 @@ export default function Question({
 
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
     null
-    );
+  );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
   const [userParticipation, setUserParticipation] = useState<Participation>(
     {} as Participation
-    );
+  );
 
-  let participationAnswer: ParticipationAnswer;
+  useEffect(() => {
+    if (trigger) {
+      createHandle();
+    }
+  }, [trigger]);
 
   useEffect(() => {
     console.log('UserID: ', userId);
@@ -87,13 +94,18 @@ export default function Question({
     const match: number = e.target.className.match(/\w+(\d)/)[1];
 
     if (match) {
-      participationAnswer = {
+      setUserParticipationAnswer({
         AnswerId: currentAnswers[match - 1].id,
         ParticipationId: userParticipation.id,
-      } as ParticipationAnswer;
-      console.log(participationAnswer);
-      dispatch(setUserParticipationAnswer(participationAnswer))
+      } as ParticipationAnswer);
+      console.log('userParticionAnswer: ', userParticipationAnswer);
+      // dispatch(setUserParticipationAnswer(userParticipationAnswer))
     }
+  }
+
+  function createHandle () {
+    console.log('userParticipationAnswer2: ', userParticipationAnswer);
+    userApiService.createParticipationAnswer(userParticipationAnswer)
   }
 
   return (
