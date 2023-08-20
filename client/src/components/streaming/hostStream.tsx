@@ -1,74 +1,58 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/Types/PeerSocketTypes';
-import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import { userApiService } from '@/redux/services/apiService';
 import Question from '../question/question';
 import {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/Types/QuizSocketTypes';
-import { CurrentTime, createCountdownBar } from 'countdownbar'
-import { useAppSelector } from '@/redux/hooks';
-import { quizSocketService, startTimer } from '@/redux/services/quizSocketService';
+  quizSocketService,
+  startTimer,
+} from '@/redux/services/quizSocketService';
+import { peersSocketService } from '@/redux/services/peersSocketService';
 
 export default function HostStream() {
-
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
-  const userParticipationAnswer = useAppSelector(state => state.userParticipationAnswerSlice)
-  const [questionHidden, setQuestionHidden] = useState(false)
-  const [trigger, setTrigger] = useState(0);
-
-
-
-  useEffect(() => {
-    quizSocketService.successListener()
-    quizSocketService.startTimerListener()
-    quizSocketService.revealListener(setQuestionHidden, setTrigger)
-  })
-
+  const [questionHidden, setQuestionHidden] = useState(false);
+  const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
 
   const localVideo = useRef<HTMLVideoElement>(null);
 
-
-  function startQuiz() {
-    startTimer()
-    setQuizStarted(true);
-    quizSocketService.emitHostStartQuiz()
-  }
-
-  function nextQuestion() {
-    //@ts-ignore
-    document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = false)
-    setCurrentQuestionNumber(currentQuestionNumber + 1);
-    console.log(currentQuestionNumber);
-    setQuestionHidden(false)
-    document.getElementById('countdown-canvas')!.hidden = false;
-    quizSocketService.emitNextQ()
-    startTimer()
-  }
-
-
-
-  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
-    io('http://localhost:3001/mediasoup');
-
-  peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-    console.log(socketId, producerAlreadyExists);
-  });
-
   let device: mediasoupTypes.Device;
-  let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
   let mediaStream: MediaStream;
+
+  useEffect(() => {
+    quizSocketService.successListener();
+    quizSocketService.startTimerListener();
+    quizSocketService.revealListener(setQuestionHidden, trigger, setTrigger);
+    peersSocketService.successListener();
+  }, []);
+
+  function startQuiz() {
+    startTimer();
+    setQuizStarted(true);
+    quizSocketService.emitHostStartQuiz();
+  }
+
+  function nextQuestion() {
+    document
+    .querySelectorAll('button[name="a"]')
+    //@ts-ignore
+      .forEach((btn, i) => (btn.disabled = false));
+    setCurrentQuestionNumber(currentQuestionNumber + 1);
+    console.log(currentQuestionNumber);
+    setQuestionHidden(false);
+    document.getElementById('countdown-canvas')!.hidden = false;
+    quizSocketService.emitNextQ();
+    startTimer();
+  }
+
+  const stream = () => {
+    goConnect();
+  };
+
   let params: mediasoupTypes.ProducerOptions = {
     encodings: [
       {
@@ -92,9 +76,6 @@ export default function HostStream() {
     },
   };
 
-  const stream = () => {
-    goConnect();
-  };
   const streamSuccess = (mediaStream: MediaStream) => {
     localVideo.current!.srcObject = mediaStream;
     const track = mediaStream.getVideoTracks()[0];
@@ -130,10 +111,16 @@ export default function HostStream() {
     device === undefined ? getRtpCapabilities() : createSendTransport();
   };
 
-  const createDevice = async () => {
+  const getRtpCapabilities = () => {
+    // get router rtp capabilities from server
+    // send to client
+    peersSocketService.emitCreateRoom(createDevice);
+  };
+
+  const createDevice = async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
     try {
       device = new mediasoupClient.Device();
-
+      console.log('RTP Capabilities: ', rtpCapabilities);
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
@@ -148,93 +135,27 @@ export default function HostStream() {
     }
   };
 
-  const getRtpCapabilities = () => {
-    // get router rtp capabilities from server
-    // send to client
-    peers.emit('create_room', (data: any) => {
-      console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
-
-      //assign to local variable
-      rtpCapabilities = data.rtpCapabilities;
-      // create device with rtp capabilities
-      createDevice();
-    });
-  };
-
   const createSendTransport = () => {
-    peers.emit(
-      'createWebRtcTransport',
-      { sender: true },
-      ({ transportParams }) => {
-        // if (sendTransportParams.error) {
-        //   console.log(sendTransportParams.error);
-        //   return;
-        // }
-        console.log(transportParams);
-
-        producerTransport = device.createSendTransport(transportParams);
-
-        producerTransport.on(
-          'connect',
-          async ({ dtlsParameters }, callback, errback) => {
-            try {
-              // Singnal local DTLS parameters to the server side transport
-              peers.emit('transport_connect', {
-                // transportId: producerTransport.id,
-                dtlsParameters: dtlsParameters,
-              });
-
-              // Tell the transport that parameters were transmitted.
-              callback();
-            } catch (error: any) {
-              errback(error);
-            }
-          }
-        );
-
-        producerTransport.on(
-          'produce',
-          async (parameters, callback, errback) => {
-            console.log(parameters);
-
-            try {
-              peers.emit(
-                'transport_produce',
-                {
-                  // transportId: producerTransport.id,
-                  kind: parameters.kind,
-                  rtpParameters: parameters.rtpParameters,
-                  appData: parameters.appData,
-                },
-                ({ id }) => {
-                  // Tell the transport that parameters were transmitted and provide it with the
-                  // server side producers's id
-                  callback({ id });
-                }
-              );
-            } catch (err: any) {
-              errback(err);
-            }
-          }
-        );
-
-        connectSendTransport();
-      }
+    peersSocketService.emitcreateWebRtcTransport(
+      producerTransport,
+      device,
+      connectSendTransport
     );
   };
 
-  const connectSendTransport = async () => {
-    console.log(params);
+  const connectSendTransport = async (producerTransport: mediasoupTypes.Transport) => {
+    console.log('ConnectSendTransport params: ', params);
+    console.log('ConnectSendTransport producerTransport: ', producerTransport);
     producer = await producerTransport.produce(params);
 
     producer.on('trackended', () => {
       console.log('Track ended');
-      // Close video track
+      mediaStream.getTracks().forEach(track => track.stop())
     });
 
     producer.on('transportclose', () => {
       console.log('transport ended');
-      // Close video track
+      mediaStream.getTracks().forEach(track => track.stop())
     });
   };
 
@@ -244,26 +165,22 @@ export default function HostStream() {
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 
-  // const value = {
-  //   currentQuestionNumber,
-  //   setCurrentQuestionNumber
-  // }
   return (
     <>
       <div className="host-unit">
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
           <div className="question-component">
-          {quizStarted && (
-            <Question
-              trigger={trigger}
-              hidden={questionHidden}
-              host={true}
-              currentQuestionNumber={currentQuestionNumber}
-              setCurrentQuestionNumber={setCurrentQuestionNumber}
-            />
-          )}
-        </div>
+            {quizStarted && (
+              <Question
+                trigger={trigger}
+                hidden={questionHidden}
+                host={true}
+                currentQuestionNumber={currentQuestionNumber}
+                setCurrentQuestionNumber={setCurrentQuestionNumber}
+              />
+            )}
+          </div>
         </div>
         <canvas id="countdown-canvas"></canvas>
         <div className="quiz-controls">

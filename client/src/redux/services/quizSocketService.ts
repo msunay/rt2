@@ -13,7 +13,7 @@ const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
 export const quizSocketService = {
   successListener: () =>
     quiz.on('connection_success', ({ socketId }) => {
-      console.log(socketId);
+      console.log('quiz socket connected: ', socketId);
     }),
 
   startTimerListener: () =>
@@ -21,26 +21,29 @@ export const quizSocketService = {
       startTimer();
     }),
 
-  revealListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>, setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
+  revealListener: (
+    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
+    trigger: number,
+    setTrigger: React.Dispatch<React.SetStateAction<number>>
+  ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
+      document
+      .querySelectorAll('button[name="a"]')
       //@ts-ignore
-      document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = true)
+        .forEach((btn, i) => (btn.disabled = true));
 
       setTimeout(() => {
         setQuestionHidden(true);
-        document.getElementById('countdown-canvas')!.hidden = true
-        setTrigger((trigger) => trigger + 1);
-      }, 2000)
-    })
+        document.getElementById('countdown-canvas')!.hidden = true;
+        setTrigger(trigger + 1);
+      }, 2000);
+    });
   },
 
   emitNextQ: () => quiz.emit('next_question'),
 
   emitHostStartQuiz: () => quiz.emit('host_start_quiz'),
-
-  
-
 };
 
 export function startTimer() {

@@ -56,8 +56,6 @@ export default function Question({
   }, [userId]);
 
   useEffect(() => {
-
-
     userApiService
     .getOneQuizQuestionAnswer('98e03864-eec4-4800-941c-4b1dbe78301f')
     .then((data) => {
