@@ -1,56 +1,73 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState} from 'react';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/redux/hooks';
-import { useDispatch } from 'react-redux';
-import { userApiService } from '@/redux/services/apiService';
-import { setQuizList } from '@/redux/features/discoverSlice';
-import { setParticipatingList } from '@/redux/features/participatingSlice';
-import { setUserId } from '@/redux/features/userIdSlice';
-import axios from 'axios';
-import Dashboard from './dashboard/page';
-import { setUserDetails } from '@/redux/features/userDetailsSlice';
+import Image from 'next/image';
+import google from '@/public/google_icon.svg';
+import facebook from '@/public/facebook.svg';
+import Login from '@/components/auth/login';
+import SignUp from '@/components/auth/sign-up';
+import styles from '@/app/auth-styles/auth.module.css';
 
-export default function Home() {
+export default function Page() {
+
+  const [loginVisible, setLoginVisible] = useState(false);
+  const [signupVisible, setSignupVisible] = useState(false);
+  const router = useRouter();
   const authToken = useAppSelector(
     (state: RootState) => state.authSlice.authToken
   );
-  const userId = useAppSelector((state: RootState) => state.userIdSlice.value);
-  const router = useRouter();
-  const dispatch = useDispatch();
+
   useEffect(() => {
-    userApiService
-      .getUserId(authToken)
-      .then((data) => dispatch(setUserId(data)));
-    axios
-      .get('http://localhost:3001/', {
-        headers: { Authorization: `Bearer ${authToken}` },
-      })
-      .then((res) => {
-        if (res.status !== 200) {
-          router.push('/auth');
-        }
-      })
-      .catch((error) => {
-        router.push('/auth');
-        console.log('failed: ', error.message);
-      });
-
-    userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
-
-    if (userId) {
-      userApiService
-        .getUserDetails(userId)
-        .then((data) => dispatch(setUserDetails(data)));
-      userApiService
-        .getUserParticipations(userId)
-        .then((data) => dispatch(setParticipatingList(data)));
-    }
+    if (authToken) router.push('/dashboard');
   }, []);
+
+
   return (
-    <main>
-      <Dashboard />
-    </main>
-  );
+    <div className={styles.auth_container}>
+    <div className={styles.routing_container}>
+      <div
+        className={styles.login_container}
+        style={{ visibility: loginVisible ? 'visible' : 'hidden' }}
+      >
+        {
+          <Login
+            setSignupVisible={setSignupVisible}
+            setLoginVisible={setLoginVisible}
+          />
+        }
+      </div>
+      <div
+        className={styles.signup_container}
+        style={{ visibility: signupVisible ? 'visible' : 'hidden' }}>
+        {<SignUp />}
+      </div>
+      <div className={styles.local_signup_container}>
+        <button
+          className={styles.btn_login}
+          onClick={() => setLoginVisible(true)}
+        >
+          LOGIN
+        </button>
+        <button
+          className={styles.btn_signup}
+          onClick={() => setSignupVisible(true)}>
+          Create new account
+        </button>
+      </div>
+
+      <div className={styles.oauth_container}>
+        <Image
+          src={google}
+          alt='google-icon'
+        />
+        <Image
+          src={facebook}
+          alt='facebook-icon'
+        />
+      </div>
+    </div>
+    </div>
+  )
 }

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import styles from '@/app/auth/styles/signup.module.css';
+import styles from '@/app/auth-styles/signup.module.css';
 import { useAppDispatch } from "@/redux/hooks";
 import { genSaltSync, hashSync } from "bcrypt-ts"
 import { setAuthState } from '../../redux/features/authSlice'
@@ -41,16 +41,16 @@ export default function SignUp() {
       if (data.dataValues.username) {
         dispatch(setAuthState(data.token))
         localStorage.setItem('jwt_token', data.token)
-        router.push('/');
+        router.push('/dashboard');
       } else {
         dispatch(setAuthState(''));
         localStorage.setItem('jwt_token', '');
-        router.push('/auth');
+        router.push('/');
       }
     } catch (error) {
       dispatch(setAuthState(''));
       localStorage.setItem('jwt_token', '');
-      router.push('/auth');
+      router.push('/');
     }
   }
 

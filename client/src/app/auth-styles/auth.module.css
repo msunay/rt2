@@ -9,7 +9,6 @@
   color: var(--secondary-color);
 }
 
-
 .routing_container {
   position: relative;
   display: flex;
@@ -17,6 +16,7 @@
   justify-content: space-around;
   height: 50%;
   width: 80%;
+  background-color: var(--primary-color);
 }
 
 .local_signup_container {
