@@ -1,9 +1,6 @@
 import {
   useState,
   useEffect,
-  useRef,
-  LegacyRef,
-  useImperativeHandle,
 } from 'react';
 import {
   QuestionAnswer,
@@ -14,13 +11,7 @@ import {
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
 import style from './question.module.css';
-import { Socket } from 'socket.io-client';
-import {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/Types/QuizSocketTypes';
-import { setUserParticipationAnswer } from '@/redux/features/userParticipationAnswerSlice';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useAppSelector } from '@/redux/hooks';
 
 export default function HostQuestion({
   currentQuestionNumber,
@@ -37,7 +28,6 @@ export default function HostQuestion({
 }) {
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
-  // useImperativeHandle(createParticipationAnswer, createHandle, [userParticipationAnswer])
 
   const userId = useAppSelector((state) => state.userIdSlice.value);
 

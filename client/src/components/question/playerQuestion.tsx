@@ -1,9 +1,6 @@
 import {
   useState,
   useEffect,
-  useRef,
-  LegacyRef,
-  useImperativeHandle,
 } from 'react';
 import {
   QuestionAnswer,
@@ -14,8 +11,7 @@ import {
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
 import style from './question.module.css';
-import { setUserParticipationAnswer } from '@/redux/features/userParticipationAnswerSlice';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+
 
 export default function PlayerQuestion({
   currentQuestionNumber,

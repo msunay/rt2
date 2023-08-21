@@ -28,7 +28,9 @@ export const server = http.createServer(app);
 
 const io = new Server<PeersClientToServerEvents, PeersServerToClientEvents>(server, {
   cors: {
-    origin: `http://localhost:3000`, // TODO .env for prod origin
+    origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONT_URL
+    : 'http://localhost:3001/', // TODO .env for prod origin
     methods: ['GET', 'POST'],
   },
 });

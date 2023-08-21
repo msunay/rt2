@@ -5,7 +5,11 @@ import {
 } from '@/Types/QuizSocketTypes';
 import CanvasCircularCountdown from 'canvas-circular-countdown';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
+const BASE_URL =
+process.env.NODE_ENV === 'production'
+  ? process.env.BASE_URL
+  : 'http://localhost:3001/';
+  
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
   `${BASE_URL}quizspace`
 );
