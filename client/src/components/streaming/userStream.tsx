@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import Question from '../question/question';
+import PlayerQuestion from '../question/playerQuestion';
 import { quizSocketService } from '@/redux/services/quizSocketService';
 import { peersSocketService } from '@/redux/services/peersSocketService';
 import FinalScore from '../quiz/finalScore';
@@ -11,7 +11,7 @@ import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';
 import { Participation } from '@/Types/Types';
 
-export default function UserStream() {
+export default function UserStream({ partId }: { partId: string }) {
   const userId = useAppSelector((state) => state.userIdSlice.value);
 
   const [quizStarted, setQuizStarted] = useState(false);
@@ -23,13 +23,14 @@ export default function UserStream() {
   const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
     {} as mediasoupTypes.Consumer
   );
-  const [userParticipation, setUserParticipation] = useState<Participation>({} as Participation)
-
+  const [userParticipation, setUserParticipation] = useState<Participation>(
+    {} as Participation
+  );
 
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const host = false;
 
-  let nextQBtn: null = null
+  let nextQBtn: null = null;
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   // let producerTransport: mediasoupTypes.Transport;
@@ -39,10 +40,8 @@ export default function UserStream() {
   // let isProducer = false;
 
   useEffect(() => {
-    userApiService
-    .getOneParticipation(userId)
-    .then((participation) => {
-      setUserParticipation(participation)
+    userApiService.getOneParticipation(partId).then((participation) => {
+      setUserParticipation(participation);
     });
     quizSocketService.successListener();
     quizSocketService.startQuizListener(setQuizStarted);
@@ -143,8 +142,8 @@ export default function UserStream() {
           <div className="question-component">
             <div className="question-component">
               {quizStarted && (
-                <Question
-                  quizId={''}
+                <PlayerQuestion
+                  partId={partId}
                   trigger={trigger}
                   hidden={questionHidden}
                   currentQuestionNumber={currentQuestionNumber}

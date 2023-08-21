@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import Question from '../question/question';
+import HostQuestion from '../question/hostQuestion';
 import {
   quizSocketService,
   startTimer,
@@ -192,7 +192,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
           <canvas id="countdown-canvas"></canvas>
           <div className="question-component">
             {quizStarted && (
-              <Question
+              <HostQuestion
                 quizId={quizId}
                 trigger={trigger}
                 hidden={questionHidden}

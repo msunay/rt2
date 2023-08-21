@@ -1,4 +1,10 @@
-import { useState, useEffect, useRef, LegacyRef, useImperativeHandle } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  LegacyRef,
+  useImperativeHandle,
+} from 'react';
 import {
   QuestionAnswer,
   QuizQuestionAnswer,
@@ -9,33 +15,36 @@ import {
 import { userApiService } from '@/redux/services/apiService';
 import style from './question.module.css';
 import { Socket } from 'socket.io-client';
-import { QuizClientToServerEvents, QuizServerToClientEvents } from '@/Types/QuizSocketTypes';
+import {
+  QuizClientToServerEvents,
+  QuizServerToClientEvents,
+} from '@/Types/QuizSocketTypes';
 import { setUserParticipationAnswer } from '@/redux/features/userParticipationAnswerSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 
-export default function Question({
+export default function HostQuestion({
   currentQuestionNumber,
   setCurrentQuestionNumber,
   hidden,
   trigger,
-  quizId
+  quizId,
 }: {
   currentQuestionNumber: number;
   setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
   hidden: boolean;
   trigger: number;
-  quizId: string
+  quizId: string;
 }) {
-
-  const [userParticipationAnswer, setUserParticipationAnswer] = useState<ParticipationAnswer>({} as ParticipationAnswer);
+  const [userParticipationAnswer, setUserParticipationAnswer] =
+    useState<ParticipationAnswer>({} as ParticipationAnswer);
   // useImperativeHandle(createParticipationAnswer, createHandle, [userParticipationAnswer])
 
   const userId = useAppSelector((state) => state.userIdSlice.value);
+
   // LOGIC FOR HOSTING THE QUIZ
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
-
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
     null
   );
@@ -54,12 +63,23 @@ export default function Question({
 
   useEffect(() => {
     userApiService
-    .getOneQuizQuestionAnswer(quizId)
-    .then((data) => {
-        setQuiz(data);
+      .getUserParticipations(userId)
+      .then((participationArr) => {
+        const currentParticipation = participationArr.filter(
+          (elem) => elem.QuizId === quizId
+        )[0];
+        setUserParticipation(currentParticipation);
+        return currentParticipation;
       })
-    .catch(e => console.error(e))
-
+      .then((currentParticipation) => {
+        console.log('CURRENT PARTICIPATION::', currentParticipation);
+        userApiService
+          .getOneQuizQuestionAnswer(currentParticipation!.QuizId!)
+          .then((data) => {
+            setQuiz(data);
+          })
+          .catch((e) => console.error(e));
+      });
   }, []);
 
   useEffect(() => {
@@ -70,13 +90,6 @@ export default function Question({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-    userApiService
-      .getUserParticipations(userId)
-      .then((participationArr) => {
-          console.log('participationArr: ', participationArr);
-          setUserParticipation(participationArr.filter((elem) => elem.QuizId === quiz.id)[0]);
-        });
-
   }, [quiz, currentQuestionNumber]);
 
   useEffect(() => {
@@ -86,21 +99,20 @@ export default function Question({
   }, [currentQuestion]);
 
   async function handleAnswerClick(e: any) {
-
     const match: number = e.target.className.match(/\w+(\d)/)[1];
-    console.log('userParticipation: ', userParticipation);
+    // console.log('userParticipation: ', userParticipation);
     if (match) {
       setUserParticipationAnswer({
         AnswerId: currentAnswers[match - 1].id,
         ParticipationId: userParticipation.id,
       } as ParticipationAnswer);
-      console.log('userParticionAnswer: ', userParticipationAnswer);
+      // console.log('userParticionAnswer: ', userParticipationAnswer);
     }
   }
 
-  function createHandle () {
+  function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
-    userApiService.createParticipationAnswer(userParticipationAnswer)
+    userApiService.createParticipationAnswer(userParticipationAnswer);
   }
 
   return (
@@ -111,7 +123,7 @@ export default function Question({
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <button
-                name='a'
+                name="a"
                 key={index}
                 className={`answer${index + 1}`}
                 // className='a'
