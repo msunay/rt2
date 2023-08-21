@@ -38,7 +38,7 @@ export const peersSocketService = {
     );
   },
 
-  emitcreateWebRtcTransport: (
+  emitcreateProducerWebRtcTransport: (
     producerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
     connectSendTransport: (
@@ -117,4 +117,98 @@ export const peersSocketService = {
       }
     );
   },
+
+  emitcreateConsumerWebRtcTransport: (
+    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    device: mediasoupTypes.Device,
+    connectRecvTransport: (
+      consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+      device: mediasoupTypes.Device
+    ) => Promise<void>
+  ) => {
+    peers.emit(
+      'createWebRtcTransport',
+      { sender: false },
+      ({ transportParams }) => {
+        if (transportParams.error) {
+          console.log(transportParams.error);
+          return;
+        }
+        console.log('transportParams: ', transportParams);
+        // Create recv transport
+        consumerTransport = device.createRecvTransport(transportParams);
+
+        console.log(
+          'CreateRecvTransport consumerTransport: ',
+          consumerTransport
+        );
+
+        consumerTransport.on(
+          'connect',
+          async ({ dtlsParameters }, callback, errback) => {
+            try {
+              // Signal local DTLS parameters to the server side transport
+              peers.emit('transport_recv_connect', {
+                // transportId: consumerTransport.id,
+                dtlsParameters,
+              });
+              // Tell the transport that parameters were transmitted
+              callback();
+            } catch (err: any) {
+              errback(err);
+            }
+          }
+        );
+
+        connectRecvTransport(consumerTransport, device);
+      }
+    );
+  },
+
+  emitConsume: (
+    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    device: mediasoupTypes.Device,
+    consumer: mediasoupTypes.Consumer,
+    remoteVideo: React.RefObject<HTMLVideoElement>
+  ) => {
+    peers.emit(
+      'consume',
+      {
+        rtpCapabilities: device.rtpCapabilities,
+      },
+      async ({ params }) => {
+        if (params.error) {
+          console.log('Cannnot consume');
+          return;
+        }
+
+        console.log(params);
+        consumer = await consumerTransport.consume({
+          id: params.id,
+          producerId: params.producerId,
+          kind: params.kind,
+          rtpParameters: params.rtpParameters,
+        });
+
+        const { track } = consumer;
+
+        remoteVideo.current!.srcObject = new MediaStream([track]);
+
+        peers.emit('consumer_resume');
+      }
+    );
+    return {
+      consumerTransport,
+      consumer
+    }
+  },
+
+  producerClosedListener: (
+    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    consumer: mediasoupTypes.Consumer
+  ) => peers.on('producer_closed', () => {
+    // Server notified when producer is closed
+    consumerTransport.close();
+    consumer.close();
+  })
 };

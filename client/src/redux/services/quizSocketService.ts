@@ -16,15 +16,24 @@ export const quizSocketService = {
       console.log('quiz socket connected: ', socketId);
     }),
 
-  startTimerListener: () =>
+  startTimerListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>) =>
     quiz.on('start_question_timer', () => {
+      setQuestionHidden(false);
+      document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
+
     }),
+  startQuizListener: (setQuizStarted: React.Dispatch<React.SetStateAction<boolean>>) => quiz.on('start_quiz', () => {
+    setQuizStarted(true);
+    document.getElementById('countdown-canvas')!.hidden = false;
+    startTimer()
+  }),
 
   revealListener: (
     setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
-    trigger: number,
-    setTrigger: React.Dispatch<React.SetStateAction<number>>
+    setTrigger: React.Dispatch<React.SetStateAction<number>>,
+    setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>,
+    host: boolean
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
@@ -33,10 +42,16 @@ export const quizSocketService = {
       //@ts-ignore
         .forEach((btn, i) => (btn.disabled = true));
 
+      if (host) {
+        //@ts-ignore
+        document.getElementById('next-q-btn')!.disabled = false;
+      }
+
       setTimeout(() => {
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true;
-        setTrigger(trigger + 1);
+        setTrigger(trigger => trigger + 1);
+        setCurrentQuestionNumber(currentQuestionNumber => currentQuestionNumber + 1)
       }, 2000);
     });
   },

@@ -144,6 +144,8 @@ nav {
   align-items: center;
 }
 .next-q-btn {
+  position: absolute;
+  top: 0;
   border: none;
   width: 50vw;
   height: 60px;
@@ -167,6 +169,7 @@ nav {
 .video-container {
   display: flex;
   justify-content: center;
+  z-index: -1;
 }
 .toggle-participation {
   width: 50px;
@@ -181,4 +184,10 @@ nav {
 .btn {
   background-color: transparent;
   border: none;
+}
+
+#join-stream-btn {
+  z-index: 10;
+  position: absolute;
+  bottom: 0;
 }

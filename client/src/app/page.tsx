@@ -11,12 +11,12 @@ import { setUserId } from '@/redux/features/userIdSlice';
 import axios from 'axios';
 import Dashboard from './dashboard/page';
 import { setUserDetails } from '@/redux/features/userDetailsSlice';
+import { BASE_URL } from '@/redux/services/apiService';
 
 export default function Home() {
   const authToken = useAppSelector(
     (state: RootState) => state.authSlice.authToken
   );
-  const URL = process.env.A ||'http://localhost:3001/'
   const userId = useAppSelector((state: RootState) => state.userIdSlice.value);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -25,7 +25,7 @@ export default function Home() {
       .getUserId(authToken)
       .then((data) => dispatch(setUserId(data)));
     axios
-      .get(URL, {
+      .get(BASE_URL, {
         headers: { Authorization: `Bearer ${authToken}` },
       })
       .then((res) => {

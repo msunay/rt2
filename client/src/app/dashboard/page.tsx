@@ -28,6 +28,7 @@ export default function Dashboard() {
           />
         </>
         <Link href="/testHostStream">HostQuiz</Link>
+        <Link href="/testUserStream">UserQuiz</Link>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>

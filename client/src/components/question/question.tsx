@@ -16,13 +16,11 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 export default function Question({
   currentQuestionNumber,
   setCurrentQuestionNumber,
-  host,
   hidden,
   trigger
 }: {
   currentQuestionNumber: number;
   setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
-  host: boolean;
   hidden: boolean;
   trigger: number;
 }) {
@@ -46,9 +44,7 @@ export default function Question({
   );
 
   useEffect(() => {
-    if (trigger) {
-      createHandle();
-    }
+    if (trigger > 0) createHandle();
   }, [trigger]);
 
   useEffect(() => {
@@ -76,6 +72,7 @@ export default function Question({
     userApiService
       .getUserParticipations(userId)
       .then((participationArr) => {
+          console.log('participationArr: ', participationArr);
           setUserParticipation(participationArr.filter((elem) => elem.QuizId === quiz.id)[0]);
         });
 
@@ -90,7 +87,7 @@ export default function Question({
   async function handleAnswerClick(e: any) {
 
     const match: number = e.target.className.match(/\w+(\d)/)[1];
-
+    console.log('userParticipation: ', userParticipation);
     if (match) {
       setUserParticipationAnswer({
         AnswerId: currentAnswers[match - 1].id,

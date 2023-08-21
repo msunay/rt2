@@ -17,16 +17,20 @@ export default function HostStream() {
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
 
   const localVideo = useRef<HTMLVideoElement>(null);
+  const nextQBtn = useRef<HTMLButtonElement>(null);
+  const startBtn = useRef<HTMLButtonElement>(null);
 
+  const host = true;
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
   let mediaStream: MediaStream;
+  // let nextQBtn: HTMLButtonElement;
 
   useEffect(() => {
     quizSocketService.successListener();
-    quizSocketService.startTimerListener();
-    quizSocketService.revealListener(setQuestionHidden, trigger, setTrigger);
+    quizSocketService.startTimerListener(setQuestionHidden);
+    quizSocketService.revealListener(setQuestionHidden, setTrigger, setCurrentQuestionNumber, host);
     peersSocketService.successListener();
   }, []);
 
@@ -34,19 +38,23 @@ export default function HostStream() {
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
+
+    startBtn.current!.disabled = true
   }
 
   function nextQuestion() {
     document
     .querySelectorAll('button[name="a"]')
     //@ts-ignore
-      .forEach((btn, i) => (btn.disabled = false));
-    setCurrentQuestionNumber(currentQuestionNumber + 1);
+    .forEach((btn, i) => (btn.disabled = false));
+    setCurrentQuestionNumber(currentQuestionNumber => currentQuestionNumber + 1);
     console.log(currentQuestionNumber);
-    setQuestionHidden(false);
+    // setQuestionHidden(false);
     document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
     startTimer();
+
+    nextQBtn.current!.disabled = true
   }
 
   const stream = () => {
@@ -113,7 +121,6 @@ export default function HostStream() {
 
   const getRtpCapabilities = () => {
     // get router rtp capabilities from server
-    // send to client
     peersSocketService.emitCreateRoom(createDevice);
   };
 
@@ -136,7 +143,7 @@ export default function HostStream() {
   };
 
   const createSendTransport = () => {
-    peersSocketService.emitcreateWebRtcTransport(
+    peersSocketService.emitcreateProducerWebRtcTransport(
       producerTransport,
       device,
       connectSendTransport
@@ -175,29 +182,28 @@ export default function HostStream() {
               <Question
                 trigger={trigger}
                 hidden={questionHidden}
-                host={true}
                 currentQuestionNumber={currentQuestionNumber}
                 setCurrentQuestionNumber={setCurrentQuestionNumber}
               />
             )}
           </div>
         </div>
-        <canvas id="countdown-canvas"></canvas>
         <div className="quiz-controls">
           {quizStarted ? (
             currentQuestionNumber === 9 ? (
               <button className="next-q-btn">Reveal Scores</button>
             ) : (
-              <button className="next-q-btn" onClick={nextQuestion}>
+              <button ref={nextQBtn} className="next-q-btn" onClick={nextQuestion}>
                 Next Question
               </button>
             )
           ) : (
-            <button className="next-q-btn" onClick={startQuiz}>
+            <button ref={startBtn} className="next-q-btn" onClick={startQuiz}>
               Start Quiz
             </button>
           )}
         </div>
+        <canvas id="countdown-canvas"></canvas>
 
         <div className="stream-controls">
           <button className="stream-btns" onClick={getLocalStream}>
