@@ -1,24 +1,35 @@
-import React, { useState, useEffect } from 'react';
+'use client'
+
+import React, { useEffect } from 'react';
 import QuizLoadingLayout from './layout';
+import { AppDispatch, RootState } from '@/redux/store';
+import { useDispatch } from 'react-redux';
+import { userApiService } from '@/redux/services/apiService';
+import { useAppSelector } from '@/redux/hooks';
+import { setUserId } from '@/redux/features/userIdSlice';
+import QuizInfo from '../../components/QuizLoadingComponents/QuizInfo';
+//import CountdownTimer from '../components/QuizLoadingComponents/CountdownTimer';
 
 export default function QuizLoadingPage() {
-    // Redux hooks to fetch and display quiz's details
+  const dispatch = useDispatch<AppDispatch>();
+  const authToken = useAppSelector(
+    (state: RootState) => state.authSlice.authToken
+  );
+  const userId = useAppSelector((state: RootState) => state.userIdSlice.value);
 
-    return (
-        <QuizLoadingLayout>
-            {/* Static placeholders for now */}
-            <div>
-                Quiz Name: Next Big Quiz
-                <br />
-                Quiz Host: John Doe
-                <br />
-                Quiz Category: General Knowledge
-            </div>
-            <div>
-                STARTING, IN:
-                <br />
-                XX:XX:XX
-            </div>
-        </QuizLoadingLayout>
-    );
+  useEffect(() => {
+    userApiService.getUserId(authToken).then((data) => {
+      dispatch(setUserId(data));
+      console.log('QuizLoading page.tsx presents:' + data)
+    });
+  }, [authToken, dispatch]);
+
+  return (
+    <QuizLoadingLayout>
+      <QuizInfo userId={userId} />
+      {/* Uncomment
+      <CountdownTimer startTime={nextQuiz?.startTime} />*/}
+    </QuizLoadingLayout>
+  );
 }
+
