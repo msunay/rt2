@@ -33,7 +33,8 @@ export const quizSocketService = {
     setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
     setTrigger: React.Dispatch<React.SetStateAction<number>>,
     setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>,
-    host: boolean
+    host: boolean,
+    nextQBtn: React.RefObject<HTMLButtonElement> | null
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
@@ -43,8 +44,8 @@ export const quizSocketService = {
         .forEach((btn, i) => (btn.disabled = true));
 
       if (host) {
-        //@ts-ignore
-        document.getElementById('next-q-btn')!.disabled = false;
+
+        nextQBtn!.current!.disabled = false;
       }
 
       setTimeout(() => {

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
 import style from '@/app/dashboard/dashboard.module.css';
+import Link from 'next/link';
 
 export default function HostQuizCard({ quiz }: { quiz: Quiz }) {
   const [isSignedUp, setIsSignedUp] = useState(false);
@@ -59,7 +60,7 @@ export default function HostQuizCard({ quiz }: { quiz: Quiz }) {
   }
 
   return (
-    <>
+    <Link href={'/hostQuiz/' + quiz.id}>
       <div className={style.quiz_card_container}>
         <div className={style.quiz_info}>
           <h2>{quiz.quizName}</h2>
@@ -67,6 +68,6 @@ export default function HostQuizCard({ quiz }: { quiz: Quiz }) {
           <h4>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</h4>
         </div>
       </div>
-    </>
+    </Link>
   );
 }

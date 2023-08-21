@@ -23,9 +23,10 @@ const quizSocketInit = (
 
   quiz.on('next_question', () => {
     quiz.broadcast.emit('start_question_timer');
+    console.log('next qqq')
 
+    quiz.broadcast.emit('reveal_answers');
     setTimeout(() => {
-      quiz.broadcast.emit('reveal_answers');
     }, 7000);
   });
 };

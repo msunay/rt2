@@ -10,7 +10,7 @@ import {
 } from '@/redux/services/quizSocketService';
 import { peersSocketService } from '@/redux/services/peersSocketService';
 
-export default function HostStream() {
+export default function HostStream({ quizId }: { quizId: string }) {
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [questionHidden, setQuestionHidden] = useState(false);
@@ -30,7 +30,13 @@ export default function HostStream() {
   useEffect(() => {
     quizSocketService.successListener();
     quizSocketService.startTimerListener(setQuestionHidden);
-    quizSocketService.revealListener(setQuestionHidden, setTrigger, setCurrentQuestionNumber, host);
+    quizSocketService.revealListener(
+      setQuestionHidden,
+      setTrigger,
+      setCurrentQuestionNumber,
+      host,
+      nextQBtn
+    );
     peersSocketService.successListener();
   }, []);
 
@@ -38,23 +44,25 @@ export default function HostStream() {
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
-
-    startBtn.current!.disabled = true
+    quizSocketService.emitNextQ();
+    startBtn.current!.disabled = true;
   }
 
   function nextQuestion() {
     document
-    .querySelectorAll('button[name="a"]')
-    //@ts-ignore
-    .forEach((btn, i) => (btn.disabled = false));
-    setCurrentQuestionNumber(currentQuestionNumber => currentQuestionNumber + 1);
+      .querySelectorAll('button[name="a"]')
+      //@ts-ignore
+      .forEach((btn) => (btn.disabled = false));
+    setCurrentQuestionNumber(
+      (currentQuestionNumber) => currentQuestionNumber + 1
+    );
     console.log(currentQuestionNumber);
     // setQuestionHidden(false);
     document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
     startTimer();
 
-    nextQBtn.current!.disabled = true
+    nextQBtn.current!.disabled = true;
   }
 
   const stream = () => {
@@ -124,7 +132,9 @@ export default function HostStream() {
     peersSocketService.emitCreateRoom(createDevice);
   };
 
-  const createDevice = async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
+  const createDevice = async (
+    rtpCapabilities: mediasoupTypes.RtpCapabilities
+  ) => {
     try {
       device = new mediasoupClient.Device();
       console.log('RTP Capabilities: ', rtpCapabilities);
@@ -150,19 +160,21 @@ export default function HostStream() {
     );
   };
 
-  const connectSendTransport = async (producerTransport: mediasoupTypes.Transport) => {
+  const connectSendTransport = async (
+    producerTransport: mediasoupTypes.Transport
+  ) => {
     console.log('ConnectSendTransport params: ', params);
     console.log('ConnectSendTransport producerTransport: ', producerTransport);
     producer = await producerTransport.produce(params);
 
     producer.on('trackended', () => {
       console.log('Track ended');
-      mediaStream.getTracks().forEach(track => track.stop())
+      mediaStream.getTracks().forEach((track) => track.stop());
     });
 
     producer.on('transportclose', () => {
       console.log('transport ended');
-      mediaStream.getTracks().forEach(track => track.stop())
+      mediaStream.getTracks().forEach((track) => track.stop());
     });
   };
 
@@ -177,9 +189,11 @@ export default function HostStream() {
       <div className="host-unit">
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
+          <canvas id="countdown-canvas"></canvas>
           <div className="question-component">
             {quizStarted && (
               <Question
+                quizId={quizId}
                 trigger={trigger}
                 hidden={questionHidden}
                 currentQuestionNumber={currentQuestionNumber}
@@ -191,9 +205,22 @@ export default function HostStream() {
         <div className="quiz-controls">
           {quizStarted ? (
             currentQuestionNumber === 9 ? (
-              <button className="next-q-btn">Reveal Scores</button>
+              <button
+                className="next-q-btn"
+                onClick={() =>
+                  setCurrentQuestionNumber(
+                    (currentQuestionNumber) => currentQuestionNumber + 1
+                  )
+                }
+              >
+                Reveal Scores
+              </button>
             ) : (
-              <button ref={nextQBtn} className="next-q-btn" onClick={nextQuestion}>
+              <button
+                ref={nextQBtn}
+                className="next-q-btn"
+                onClick={nextQuestion}
+              >
                 Next Question
               </button>
             )
@@ -203,7 +230,6 @@ export default function HostStream() {
             </button>
           )}
         </div>
-        <canvas id="countdown-canvas"></canvas>
 
         <div className="stream-controls">
           <button className="stream-btns" onClick={getLocalStream}>

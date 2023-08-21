@@ -17,12 +17,14 @@ export default function Question({
   currentQuestionNumber,
   setCurrentQuestionNumber,
   hidden,
-  trigger
+  trigger,
+  quizId
 }: {
   currentQuestionNumber: number;
   setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
   hidden: boolean;
   trigger: number;
+  quizId: string
 }) {
 
   const [userParticipationAnswer, setUserParticipationAnswer] = useState<ParticipationAnswer>({} as ParticipationAnswer);
@@ -33,7 +35,6 @@ export default function Question({
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
-  const [isHost, setIsHost] = useState<boolean>(true);
 
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
     null
@@ -53,7 +54,7 @@ export default function Question({
 
   useEffect(() => {
     userApiService
-    .getOneQuizQuestionAnswer('98e03864-eec4-4800-941c-4b1dbe78301f')
+    .getOneQuizQuestionAnswer(quizId)
     .then((data) => {
         setQuiz(data);
       })
@@ -94,7 +95,6 @@ export default function Question({
         ParticipationId: userParticipation.id,
       } as ParticipationAnswer);
       console.log('userParticionAnswer: ', userParticipationAnswer);
-      // dispatch(setUserParticipationAnswer(userParticipationAnswer))
     }
   }
 

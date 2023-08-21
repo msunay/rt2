@@ -3,6 +3,7 @@ import userController from './controllers/user.controller';
 import quizController from './controllers/quiz.controller';
 import participationController from './controllers/referenceTables.controller';
 import { auth } from './middleware/auth';
+import referenceTablesController from './controllers/referenceTables.controller';
 const router: Router = express.Router();
 
 //testing
@@ -33,6 +34,7 @@ router.post(
   '/participationAnswer',
   participationController.createParticipationAnswer
 );
+router.get('/participation/:id', referenceTablesController.getOneParticipation)
 router.get(
   '/participations/:userId',
   participationController.getUserParticipations

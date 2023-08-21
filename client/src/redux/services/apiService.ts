@@ -131,6 +131,18 @@ export const userApiService = {
     }
   },
 
+  getOneParticipation: async (participationId: string): Promise<Participation> => {
+    try {
+      const response = await axios.get<Participation>(
+        `${BASE_URL}participation/${participationId}`
+      );
+      return response.data
+    } catch (err) {
+      console.log('Error fetching participation::',err);
+      return {} as Participation;
+    }
+  },
+
   deleteParticipation: async (
     participationId: string
   ): Promise<Participation> => {
