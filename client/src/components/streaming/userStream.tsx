@@ -30,7 +30,6 @@ export default function UserStream({ partId }: { partId: string }) {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const host = false;
 
-  let nextQBtn: null = null;
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   // let producerTransport: mediasoupTypes.Transport;
@@ -43,6 +42,7 @@ export default function UserStream({ partId }: { partId: string }) {
     userApiService.getOneParticipation(partId).then((participation) => {
       setUserParticipation(participation);
     });
+
     quizSocketService.successListener();
     quizSocketService.startQuizListener(setQuizStarted);
     quizSocketService.startTimerListener(setQuestionHidden);
@@ -50,8 +50,7 @@ export default function UserStream({ partId }: { partId: string }) {
       setQuestionHidden,
       setTrigger,
       setCurrentQuestionNumber,
-      host,
-      nextQBtn
+      host
     );
     peersSocketService.successListener();
     peersSocketService.producerClosedListener(

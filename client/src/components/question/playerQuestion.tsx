@@ -33,8 +33,6 @@ export default function PlayerQuestion({
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
 
-  const userId = useAppSelector((state) => state.userIdSlice.value);
-
   // LOGIC FOR HOSTING THE QUIZ
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
@@ -54,7 +52,15 @@ export default function PlayerQuestion({
   useEffect(() => {
     userApiService
       .getOneParticipation(partId)
-      .then((data) => setUserParticipation(data));
+      .then((newParticipation) => {
+        setUserParticipation(newParticipation);
+        return newParticipation;
+      })
+      .then((newParticipation) => {
+        userApiService
+          .getOneQuizQuestionAnswer(newParticipation.QuizId!)
+          .then((newQuiz) => setQuiz(newQuiz));
+      });
   }, []);
 
   useEffect(() => {

@@ -25,7 +25,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
   let mediaStream: MediaStream;
-  // let nextQBtn: HTMLButtonElement;
 
   useEffect(() => {
     quizSocketService.successListener();
@@ -34,21 +33,28 @@ export default function HostStream({ quizId }: { quizId: string }) {
       setQuestionHidden,
       setTrigger,
       setCurrentQuestionNumber,
-      host,
-      nextQBtn
+      host
     );
     peersSocketService.successListener();
   }, []);
 
   function startQuiz() {
+    // TODO nextQBtn is undefined because it is not on screen when startQuiz is clicked
+    // nextQBtn.current!.disabled = true;
+    // setTimeout(() => {
+    //   nextQBtn.current!.disabled = false;
+    // }, 9000);
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
     quizSocketService.emitNextQ();
-    startBtn.current!.disabled = true;
   }
 
   function nextQuestion() {
+    nextQBtn.current!.disabled = true;
+    setTimeout(() => {
+      nextQBtn.current!.disabled = false;
+    }, 9000);
     document
       .querySelectorAll('button[name="a"]')
       //@ts-ignore
@@ -56,13 +62,9 @@ export default function HostStream({ quizId }: { quizId: string }) {
     setCurrentQuestionNumber(
       (currentQuestionNumber) => currentQuestionNumber + 1
     );
-    console.log(currentQuestionNumber);
-    // setQuestionHidden(false);
     document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
     startTimer();
-
-    nextQBtn.current!.disabled = true;
   }
 
   const stream = () => {

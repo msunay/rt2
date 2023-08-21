@@ -98,18 +98,6 @@ export default function HostQuestion({
     }
   }, [currentQuestion]);
 
-  async function handleAnswerClick(e: any) {
-    const match: number = e.target.className.match(/\w+(\d)/)[1];
-    // console.log('userParticipation: ', userParticipation);
-    if (match) {
-      setUserParticipationAnswer({
-        AnswerId: currentAnswers[match - 1].id,
-        ParticipationId: userParticipation.id,
-      } as ParticipationAnswer);
-      // console.log('userParticionAnswer: ', userParticipationAnswer);
-    }
-  }
-
   function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
     userApiService.createParticipationAnswer(userParticipationAnswer);
@@ -122,14 +110,7 @@ export default function HostQuestion({
           <p className={style.question_text}>{currentQuestion.questionText}</p>
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
-              <button
-                name="a"
-                key={index}
-                className={`answer${index + 1}`}
-                // className='a'
-                onClick={handleAnswerClick}
-                // ref={pushRef}
-              >
+              <button name="a" key={index} className={`answer${index + 1}`}>
                 {answer.answerText}
               </button>
             ))}
