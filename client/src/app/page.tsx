@@ -8,7 +8,7 @@ import google from '@/public/google_icon.svg';
 import facebook from '@/public/facebook.svg';
 import Login from '@/components/auth/login';
 import SignUp from '@/components/auth/sign-up';
-import styles from '@/app/auth-styles/auth.module.css';
+import styles from '@/styles/auth.module.css';
 
 export default function Page() {
 

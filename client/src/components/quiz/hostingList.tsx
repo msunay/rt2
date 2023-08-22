@@ -3,8 +3,7 @@
 import { useAppSelector } from '@/redux/hooks';
 import { Quiz } from '@/Types/Types';
 import HostQuizCard from './hostQuizCard';
-import { userApiService } from '@/redux/services/apiService';
-import { useState, useEffect } from 'react';
+import styles from '@/styles/quiz.module.css'
 
 export default function HostingList() {
   const userId = useAppSelector((state) => state.userIdSlice.value);
@@ -12,11 +11,9 @@ export default function HostingList() {
   const hostingQuizzes = allQuizzes.filter((quiz) => quiz.quizOwner === userId);
 
   return (
-    <div className="quiz-list-container">
+    <div className={styles.quiz_list_container}>
       {hostingQuizzes.map((quizItem: Quiz) => (
-        <div key={quizItem.id}>
-          <HostQuizCard quiz={quizItem} />
-        </div>
+        <HostQuizCard key={quizItem.id} quiz={quizItem} />
       ))}
     </div>
   );
