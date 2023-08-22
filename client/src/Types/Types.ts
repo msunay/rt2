@@ -31,6 +31,7 @@ export interface Quiz {
   dateTime: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  host_name?: string;
 }
 
 export interface Question {
