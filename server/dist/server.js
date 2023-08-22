@@ -10,6 +10,6 @@ const PORT = 3001;
     await db_1.default.sync().then(() => console.log('Connected to the database'));
     index_1.server.listen(PORT);
     console.log(`Server running on ${process.env.NODE_ENV === 'production'
-        ? process.env.CORS_ORIGIN
+        ? 'https://patient-star-685.fly.dev'
         : `http://localhost:${PORT}`}`);
 })();
