@@ -11,13 +11,14 @@ import {
 } from './Types/PeerSocketTypes';
 
 const app = express();
-export const PORT = process.env.SERVER_PORT || 3001;
+export const PORT = 3001;
+
+const corsOrigin = process.env.NODE_ENV === 'production'
+? process.env.CORS_ORIGIN
+: 'http://localhost:3000';
 
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === 'production'
-      ? process.env.CORS_ORIGIN
-      : 'http://localhost:3000',
+  origin: corsOrigin,
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 app.use(cors(corsOptions));
@@ -26,11 +27,11 @@ app.use(router);
 
 export const server = http.createServer(app);
 
-const io = new Server<PeersClientToServerEvents, PeersServerToClientEvents>(server, {
+export const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONT_URL
-    : 'http://localhost:3001/', // TODO .env for prod origin
+    ? process.env.CORS_ORIGIN
+    : 'http://localhost:3000',
     methods: ['GET', 'POST'],
   },
 });

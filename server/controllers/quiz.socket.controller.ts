@@ -3,6 +3,9 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
+import { io } from '../index';
+
+const QUESTION_TIME = 7000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
@@ -17,17 +20,17 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
-      quiz.broadcast.emit('reveal_answers');
-    }, 7000);
+
+      quiz.emit('reveal_answers');
+    }, QUESTION_TIME);
   });
 
   quiz.on('next_question', () => {
     quiz.broadcast.emit('start_question_timer');
-    console.log('next qqq');
 
     setTimeout(() => {
       quiz.broadcast.emit('reveal_answers');
-    }, 7000);
+    }, QUESTION_TIME);
   });
 };
 

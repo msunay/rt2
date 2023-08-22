@@ -10,6 +10,8 @@ import {
 } from '@/redux/services/quizSocketService';
 import { peersSocketService } from '@/redux/services/peersSocketService';
 
+export const QUESTION_TIME = 7000;
+
 export default function HostStream({ quizId }: { quizId: string }) {
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
@@ -19,6 +21,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   const localVideo = useRef<HTMLVideoElement>(null);
   const nextQBtn = useRef<HTMLButtonElement>(null);
   const startBtn = useRef<HTMLButtonElement>(null);
+
 
   const host = true;
   let device: mediasoupTypes.Device;
@@ -38,12 +41,15 @@ export default function HostStream({ quizId }: { quizId: string }) {
     peersSocketService.successListener();
   }, []);
 
+
+
   function startQuiz() {
     // TODO nextQBtn is undefined because it is not on screen when startQuiz is clicked
     // nextQBtn.current!.disabled = true;
     // setTimeout(() => {
     //   nextQBtn.current!.disabled = false;
     // }, 9000);
+
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
@@ -51,10 +57,11 @@ export default function HostStream({ quizId }: { quizId: string }) {
   }
 
   function nextQuestion() {
+    setQuestionHidden(false)
     nextQBtn.current!.disabled = true;
     setTimeout(() => {
       nextQBtn.current!.disabled = false;
-    }, 9000);
+    }, QUESTION_TIME + 2000);
     document
       .querySelectorAll('button[name="a"]')
       //@ts-ignore

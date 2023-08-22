@@ -40,6 +40,10 @@ export default function PlayerQuestion({
   const [userParticipation, setUserParticipation] = useState<Participation>(
     {} as Participation
   );
+  useEffect(() => {
+    console.log('currentQuestion: ', currentQuestion);
+    console.log('currentQuestionNumber: ', currentQuestionNumber);
+  }, [currentQuestionNumber])
 
   useEffect(() => {
     if (trigger > 0) createHandle();
@@ -67,7 +71,7 @@ export default function PlayerQuestion({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-  }, [quiz, currentQuestionNumber]);
+  }, [quiz, trigger]);
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
@@ -88,6 +92,7 @@ export default function PlayerQuestion({
   function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
     userApiService.createParticipationAnswer(userParticipationAnswer);
+    setUserParticipationAnswer({} as ParticipationAnswer)
   }
 
   return (

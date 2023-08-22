@@ -19,8 +19,10 @@ export default function FinalScore({userParticipation}: {userParticipation: Part
 
         let count = 0;
 
-        data[0].answers.forEach((answer) => {
+        data[0].answers.forEach((answer, i) => {
+          console.log(`Answer${i}: `, answer);
           if (answer.isCorrect) count++;
+          console.log(count);
         });
 
         setPlayerScore(count);

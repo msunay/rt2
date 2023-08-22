@@ -4,12 +4,13 @@ import {
   QuizServerToClientEvents,
 } from '@/Types/QuizSocketTypes';
 import CanvasCircularCountdown from 'canvas-circular-countdown';
+import { QUESTION_TIME } from '@/components/streaming/hostStream';
 
 const BASE_URL =
 process.env.NODE_ENV === 'production'
   ? process.env.BASE_URL
   : 'http://localhost:3001/';
-  
+
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
   `${BASE_URL}quizspace`
 );
@@ -80,7 +81,7 @@ export function startTimer() {
     }
   };
   new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
-    duration: 7 * 1000,
+    duration: QUESTION_TIME,
     radius: 150,
     clockwise: true,
     captionColor: pickColorByPercentage,

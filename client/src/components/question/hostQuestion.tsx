@@ -43,9 +43,9 @@ export default function HostQuestion({
     {} as Participation
   );
 
-  useEffect(() => {
-    if (trigger > 0) createHandle();
-  }, [trigger]);
+  // useEffect(() => {
+  //   if (trigger > 0) createHandle();
+  // }, [trigger]);
 
   useEffect(() => {
     console.log('UserID: ', userId);
@@ -64,7 +64,7 @@ export default function HostQuestion({
       .then((currentParticipation) => {
         console.log('CURRENT PARTICIPATION::', currentParticipation);
         userApiService
-          .getOneQuizQuestionAnswer(currentParticipation!.QuizId!)
+          .getOneQuizQuestionAnswer(currentParticipation.QuizId!)
           .then((data) => {
             setQuiz(data);
           })
@@ -80,7 +80,7 @@ export default function HostQuestion({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-  }, [quiz, currentQuestionNumber]);
+  }, [quiz, trigger]);
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
@@ -88,10 +88,6 @@ export default function HostQuestion({
     }
   }, [currentQuestion]);
 
-  function createHandle() {
-    console.log('userParticipationAnswer2: ', userParticipationAnswer);
-    userApiService.createParticipationAnswer(userParticipationAnswer);
-  }
 
   return (
     <>
