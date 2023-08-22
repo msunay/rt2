@@ -23,10 +23,14 @@ export default function Dashboard() {
   const authToken = useAppSelector(
     (state: RootState) => state.authSlice.authToken
   );
+  const BASE_URL: string =
+  process.env.NODE_ENV === 'production'
+    ? process.env.BASE_URL!
+    : 'http://localhost:3001/';
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/', {
+      .get(BASE_URL, {
         headers: { Authorization: `Bearer ${authToken}` }})
       .then((res) => {
         if (res.status !== 200) {router.push('/')}
