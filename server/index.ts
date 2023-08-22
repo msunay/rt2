@@ -5,10 +5,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import peersSocketInit from './controllers/peers.socket.controller';
 import quizSocketInit from './controllers/quiz.socket.controller'
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from './Types/PeerSocketTypes';
+
 
 const app = express();
 

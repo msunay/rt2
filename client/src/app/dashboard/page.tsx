@@ -51,7 +51,7 @@ export default function Dashboard() {
       .getUserParticipations(userId)
       .then((data) => dispatch(setParticipatingList(data)));
     }
-  });
+  }, []);
 
   return (
     <>
