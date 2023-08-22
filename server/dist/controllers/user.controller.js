@@ -12,20 +12,32 @@ async function addUser(req, res) {
         res.status(201).send({ ...response, token });
     }
     catch (err) {
-        console.error("Could not add user::", err);
+        console.error('Could not add user::', err);
         res.status(500).send();
     }
 }
 async function getOneUser(req, res) {
     try {
         const response = await index_1.default.User.findOne({
-            where: { username: req.params.username },
+            where: { username: req.params.id },
         });
         const token = (0, token_1.tokenGenerator)(response?.id || '', response?.username || '');
         res.status(200).send({ ...response, token });
     }
     catch (err) {
-        console.error("Could not get user::", err);
+        console.error('Could not get user::', err);
+        res.status(500).send();
+    }
+}
+async function getUserDetails(req, res) {
+    try {
+        const response = await index_1.default.User.findOne({
+            where: { id: req.params.id },
+        });
+        res.status(200).send(response);
+    }
+    catch (err) {
+        console.error('Could not get user details::', err);
         res.status(500).send();
     }
 }
@@ -35,7 +47,7 @@ async function getAllUsers(req, res) {
         res.status(200).send(response);
     }
     catch (err) {
-        console.error("Could not get users::", err);
+        console.error('Could not get users::', err);
         res.status(500).send();
     }
 }
@@ -45,7 +57,7 @@ async function changeUsername(req, res) {
         res.status(200).send(response);
     }
     catch (err) {
-        console.error("Could not change username::", err);
+        console.error('Could not change username::', err);
         res.status(500).send();
     }
 }
@@ -55,7 +67,17 @@ async function changePassword(req, res) {
         res.status(200).send(response);
     }
     catch (err) {
-        console.error("Could not change password::", err);
+        console.error('Could not change password::', err);
+        res.status(500).send();
+    }
+}
+async function getUserId(req, res) {
+    try {
+        const response = req.userId;
+        res.status(200).send(response);
+    }
+    catch (err) {
+        console.error('failed to get user id::', err);
         res.status(500).send();
     }
 }
@@ -65,4 +87,6 @@ exports.default = {
     getAllUsers,
     changeUsername,
     changePassword,
+    getUserId,
+    getUserDetails,
 };

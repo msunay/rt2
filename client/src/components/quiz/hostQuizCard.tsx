@@ -1,12 +1,9 @@
 import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
-import Image from 'next/image';
-import plus from '@/public/plus-square.svg';
-import tick from '@/public/check.gif';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
-import style from '@/app/dashboard/dashboard.module.css';
+import style from '@/styles/quiz.module.css';
 import Link from 'next/link';
 
 export default function HostQuizCard({ quiz }: { quiz: Quiz }) {

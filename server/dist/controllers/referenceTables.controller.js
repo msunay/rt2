@@ -14,24 +14,89 @@ async function createParticipation(req, res) {
         res.status(201).send(participationInstance);
     }
     catch (err) {
-        console.error("Could not create participation::", err);
+        console.error('Could not create participation::', err);
+        res.status(500).send();
+    }
+}
+async function deleteParticipation(req, res) {
+    try {
+        const response = await index_1.default.Participation.destroy({
+            where: {
+                id: req.params.id,
+            },
+        });
+        res.status(200).send('Successfully deleted participation');
+    }
+    catch (err) {
+        console.error('Could not delete participation::', err);
+        res.status(500).send();
+    }
+}
+async function getUserParticipations(req, res) {
+    try {
+        const response = await index_1.default.Participation.findAll({
+            where: {
+                UserId: req.params.userId,
+            },
+        });
+        res.status(200).send(response);
+    }
+    catch (err) {
+        console.error('Could not get participations::', err);
+        res.status(500).send();
+    }
+}
+async function getOneParticipation(req, res) {
+    try {
+        const response = await index_1.default.Participation.findOne({
+            where: {
+                id: req.params.id,
+            },
+        });
+        res.status(200).send(response);
+    }
+    catch (err) {
+        console.error('Could not get participations::', err);
         res.status(500).send();
     }
 }
 async function createParticipationAnswer(req, res) {
+    console.log('participationAnswer: ', req.body);
     try {
         const participationAnswerInstance = await index_1.default.ParticipationAnswer.create({
-            AnswerId: req.body.answerId,
-            ParticipationId: req.body.participationId,
+            ParticipationId: req.body.ParticipationId,
+            AnswerId: req.body.AnswerId,
         });
         res.status(201).send(participationAnswerInstance);
     }
     catch (err) {
-        console.error("Could not create participation answer::", err);
+        console.error('Could not create participation answer::', err);
+        res.status(500).send();
+    }
+}
+async function getParticipationAnswers(req, res) {
+    try {
+        const response = await index_1.default.Participation.findAll({
+            where: {
+                id: req.params.id,
+            },
+            include: {
+                model: index_1.default.Answer,
+                as: 'answers',
+            },
+        });
+        res.status(200).send(response);
+    }
+    catch (err) {
+        console.error('Could not get participations::', err);
         res.status(500).send();
     }
 }
 exports.default = {
     createParticipation,
     createParticipationAnswer,
+    getUserParticipations,
+    getParticipationAnswers,
+    deleteParticipation,
+    getOneParticipation
 };
