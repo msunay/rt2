@@ -25,7 +25,7 @@ export default function Dashboard() {
   );
   const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BASE_URL!
+    ? process.env.BACKEND_URL!
     : 'http://localhost:3001/';
 
   useEffect(() => {
