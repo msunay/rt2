@@ -16,15 +16,21 @@
     "@types/react-dom": "18.2.7",
     "axios": "^1.4.0",
     "bcrypt-ts": "^4.0.0",
+    "bufferutil": "^4.0.7",
+    "canvas-circular-countdown": "^1.8.0",
+    "countdownbar": "^1.5.3",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",
+    "mediasoup-client": "^3.6.98",
+    "moment": "^2.29.4",
     "next": "13.4.13",
     "next-redux-wrapper": "^8.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-redux": "^8.1.2",
-    "socket.io": "^4.7.2",
-    "typescript": "5.1.6"
+    "socket.io-client": "^4.7.2",
+    "typescript": "5.1.6",
+    "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
     "prettier": "3.0.1"

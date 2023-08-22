@@ -1,6 +1,7 @@
-import models from "../models/index";
-import { Request, Response } from "express";
-import { tokenGenerator } from "../utils/token";
+import models from '../models/index';
+import { Request, response, Response } from 'express';
+import { tokenGenerator } from '../utils/token';
+import { CustomRequest } from '../middleware/auth';
 
 async function addUser(req: Request, res: Response) {
   try {
@@ -8,7 +9,7 @@ async function addUser(req: Request, res: Response) {
     const token = tokenGenerator(response?.id, response?.username);
     res.status(201).send({ ...response, token });
   } catch (err) {
-    console.error("Could not add user::", err);
+    console.error('Could not add user::', err);
     res.status(500).send();
   }
 }
@@ -16,12 +17,24 @@ async function addUser(req: Request, res: Response) {
 async function getOneUser(req: Request, res: Response) {
   try {
     const response = await models.User.findOne({
-      where: { username: req.params.username },
+      where: { username: req.params.id },
     });
     const token = tokenGenerator(response?.id || '', response?.username || '');
     res.status(200).send({ ...response, token });
   } catch (err) {
-    console.error("Could not get user::", err);
+    console.error('Could not get user::', err);
+    res.status(500).send();
+  }
+}
+
+async function getUserDetails(req: Request, res: Response) {
+  try {
+    const response = await models.User.findOne({
+      where: { id: req.params.id },
+    });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error('Could not get user details::', err);
     res.status(500).send();
   }
 }
@@ -31,7 +44,7 @@ async function getAllUsers(req: Request, res: Response) {
     const response = await models.User.findAll();
     res.status(200).send(response);
   } catch (err) {
-    console.error("Could not get users::", err);
+    console.error('Could not get users::', err);
     res.status(500).send();
   }
 }
@@ -44,7 +57,7 @@ async function changeUsername(req: Request, res: Response) {
     );
     res.status(200).send(response);
   } catch (err) {
-    console.error("Could not change username::", err);
+    console.error('Could not change username::', err);
     res.status(500).send();
   }
 }
@@ -57,7 +70,17 @@ async function changePassword(req: Request, res: Response) {
     );
     res.status(200).send(response);
   } catch (err) {
-    console.error("Could not change password::", err);
+    console.error('Could not change password::', err);
+    res.status(500).send();
+  }
+}
+
+async function getUserId(req: Request, res: Response) {
+  try {
+    const response = (req as CustomRequest).userId;
+    res.status(200).send(response);
+  } catch (err) {
+    console.error('failed to get user id::', err);
     res.status(500).send();
   }
 }
@@ -68,4 +91,6 @@ export default {
   getAllUsers,
   changeUsername,
   changePassword,
+  getUserId,
+  getUserDetails,
 };

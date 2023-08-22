@@ -1,10 +1,10 @@
-import type { Sequelize, Model } from "sequelize";
-import { User } from "./objects/User";
-import { Quiz } from "./objects/Quiz";
-import { Question } from "./objects/Question";
-import { Answer } from "./objects/Answer";
-import { Participation } from "./reference_tables/Participation";
-import { ParticipationAnswer } from "./reference_tables/ParticipationAnswer";
+import type { Sequelize, Model } from 'sequelize';
+import { User } from './objects/User';
+import { Quiz } from './objects/Quiz';
+import { Question } from './objects/Question';
+import { Answer } from './objects/Answer';
+import { Participation } from './reference_tables/Participation';
+import { ParticipationAnswer } from './reference_tables/ParticipationAnswer';
 
 export { User, Quiz, Question, Answer, Participation, ParticipationAnswer };
 
@@ -17,25 +17,25 @@ export function initModels(sequelize: Sequelize) {
   ParticipationAnswer.initModel(sequelize);
 
   User.belongsToMany(Quiz, {
-    as: "quizzes",
+    as: 'quizzes',
     through: Participation,
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   });
   Quiz.belongsToMany(User, {
-    as: "users",
+    as: 'users',
     through: Participation,
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   });
 
   Answer.belongsToMany(Participation, {
-    as: "answers",
+    as: 'participiations',
     through: ParticipationAnswer,
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   });
   Participation.belongsToMany(Answer, {
-    as: "participations",
+    as: 'answers',
     through: ParticipationAnswer,
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   });
 
   Quiz.hasMany(Question);

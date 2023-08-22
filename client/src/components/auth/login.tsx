@@ -1,10 +1,10 @@
-import styles from "@/app/auth/styles/login.module.css";
+import styles from "@/app/auth-styles/login.module.css";
 import { FormEvent, useState } from "react";
 import { compareSync } from "bcrypt-ts"
 import { useRouter } from "next/navigation"
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthState } from '@/redux/features/authSlice';
-import { userApiService } from "@/redux/services/userApiService";
+import { userApiService } from "@/redux/services/apiService";
 
 interface SignUpForm {
   username?: string,
@@ -33,10 +33,12 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
     try {
       const data = await userApiService.loginUser(form.username);
 
+      // BUG
+      //TODO bad security needs to be on backend
       if (compareSync(form.password, data.dataValues.password)) {
         dispatch(setAuthState(data.token))
         localStorage.setItem('jwt_token', data.token)
-        router.push('/');
+        router.push('/dashboard');
       } else {
         dispatch(setAuthState(""));
         localStorage.setItem('jwt_token', '');
@@ -44,7 +46,7 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
       }
     } catch (error) {
       console.log(error);
-      router.push('/auth');
+      router.push('/');
     }
   }
 
