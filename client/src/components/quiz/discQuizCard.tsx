@@ -1,12 +1,12 @@
 import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
 import Image from 'next/image';
-import plus from '@/public/plus-square.svg';
-import tick from '@/public/checked.svg';
+import plus from '@/public/add_icon.svg';
+import tick from '@/public/check_icon.svg';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
-import style from '@/app/dashboard/dashboard.module.css';
+import style from '@/styles/quiz.module.css';
 
 export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const [isSignedUp, setIsSignedUp] = useState(false);
@@ -59,33 +59,31 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   }
 
   return (
-    <>
       <div className={style.quiz_card_container}>
         <div className={style.quiz_info}>
           <h2>{quiz.quizName}</h2>
           <h4>{quiz.category}</h4>
-          <h4>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</h4>
+          <p>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</p>
         </div>
-        <div className={style.add_or_remove}>
-          {isSignedUp === true ? (
-            <button className="btn" onClick={handleRemove}>
+        {isSignedUp === true ? (
               <Image
-                className="tick-icon toggle-participation"
+                onClick={handleRemove}
+                className={style.btn_icon}
                 src={tick}
                 alt="tick icon"
+                width={60}
+                height={60}
               />
-            </button>
           ) : (
-            <button className="btn" onClick={handleAdd}>
               <Image
-                className="plus-icon toggle-participation"
+                onClick={handleAdd}
+                className={style.btn_icon}
                 src={plus}
                 alt="plus icon"
+                width={60}
+                height={60}
               />
-            </button>
           )}
-        </div>
       </div>
-    </>
   );
 }

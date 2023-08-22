@@ -10,7 +10,7 @@ import {
   ParticipationAnswer,
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
-import style from './question.module.css';
+import style from '@/styles/question.module.css';
 
 
 export default function PlayerQuestion({

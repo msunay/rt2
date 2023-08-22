@@ -84,10 +84,10 @@ export function startTimer() {
   };
   new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
     duration: QUESTION_TIME,
-    radius: 150,
+    radius: 40,
     clockwise: true,
     captionColor: pickColorByPercentage,
-    progressBarWidth: 20,
+    progressBarWidth: 15,
     progressBarOffset: 0,
     circleBackgroundColor: '#f5f5f5',
     emptyProgressBarBackgroundColor: '#b9c1c7',

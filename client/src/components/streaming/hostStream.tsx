@@ -1,5 +1,6 @@
 'use client';
 
+import styles from '@/styles/streaming.module.css';
 import React, { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
@@ -194,13 +195,11 @@ export default function HostStream({ quizId }: { quizId: string }) {
   };
 
   return (
-    <>
-      <div className="host-unit">
-        <div className="video-container">
-          <video ref={localVideo} className="video" autoPlay={true}></video>
-          <canvas id="countdown-canvas"></canvas>
+      <div className={styles.unit}>
+        <div className={styles.video_container}>
+          <video ref={localVideo} className={styles.video} autoPlay={true}></video>
           <div className="question-component">
-            {quizStarted && (
+          {quizStarted && (
               <HostQuestion
                 quizId={quizId}
                 trigger={trigger}
@@ -208,50 +207,50 @@ export default function HostStream({ quizId }: { quizId: string }) {
                 currentQuestionNumber={currentQuestionNumber}
                 setCurrentQuestionNumber={setCurrentQuestionNumber}
               />
-            )}
-          </div>
-        </div>
-        <div className="quiz-controls">
-          {quizStarted ? (
-            currentQuestionNumber === 9 ? (
-              <button
-                className="next-q-btn"
-                onClick={() =>
-                  setCurrentQuestionNumber(
-                    (currentQuestionNumber) => currentQuestionNumber + 1
-                  )
-                }
-              >
-                Reveal Scores
-              </button>
-            ) : (
-              <button
-                ref={nextQBtn}
-                className="next-q-btn"
-                onClick={nextQuestion}
-              >
-                Next Question
-              </button>
-            )
-          ) : (
-            <button ref={startBtn} className="next-q-btn" onClick={startQuiz}>
-              Start Quiz
-            </button>
           )}
         </div>
+        </div>
 
-        <div className="stream-controls">
-          <button className="stream-btns" onClick={getLocalStream}>
+        <div  className={styles.btn_holder}>
+          <div className={styles.quiz_controls}>
+          <canvas id="countdown-canvas"></canvas>
+            {quizStarted ? (
+              currentQuestionNumber === 9 ? (
+                <button
+                  className={styles.next_q_btn}
+                  onClick={() =>
+                    setCurrentQuestionNumber(
+                      (currentQuestionNumber) => currentQuestionNumber + 1
+                    )
+                  }
+                >
+                  Reveal Scores
+                </button>
+              ) : (
+                <button
+                  ref={nextQBtn}
+                  className={styles.next_q_btn}
+                  onClick={nextQuestion}
+                >
+                  Next Question
+                </button>
+              )
+            ) : (
+              <button ref={startBtn} className={styles.next_q_btn} onClick={startQuiz}>
+                Start Quiz
+              </button>
+            )}
+        </div>
+          <button className={styles.stream_btns} onClick={getLocalStream}>
             Start Video
           </button>
-          <button className="stream-btns" onClick={stream}>
+          <button className={styles.stream_btns} onClick={stream}>
             Stream
           </button>
-          <button className="stream-btns" onClick={endStream}>
+          <button className={styles.stream_btns} onClick={endStream}>
             End Stream
           </button>
         </div>
       </div>
-    </>
   );
 }
