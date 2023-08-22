@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './dashboard.module.css';
+import styles from '@/styles/dashboard.module.css';
 import DashboardButton from '@/components/dashboard/dashboardButton';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';

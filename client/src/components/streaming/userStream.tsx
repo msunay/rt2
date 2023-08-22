@@ -1,5 +1,6 @@
 'use client';
 
+import styles from '@/styles/streaming.module.css';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   PeersClientToServerEvents,
@@ -194,12 +195,11 @@ export default function UserStream() {
     consumer.close();
   });
   return (
-    <div className="user-unit">
-      <div className="video-container">
-        <video ref={remoteVideo} className="video" autoPlay={true}></video>
+    <div className={styles.unit}>
+      <div className={styles.video_container}>
+        <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
       </div>
-      <button onClick={goConsume}>Join Stream</button>
-      <div className="question-component">
+      <button className={styles.btn_join} onClick={goConsume}>Join Stream</button>
         <div className="question-component">
           {quizStarted && (
             <Question
@@ -209,7 +209,6 @@ export default function UserStream() {
             />
           )}
         </div>
-      </div>
       <div id="countdown-bar-container"></div>
       <div className="current-question"></div>
     </div>

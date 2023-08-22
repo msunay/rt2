@@ -7,7 +7,7 @@ import {
   ParticipationAnswer,
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
-import style from './question.module.css';
+import style from '@/styles/question.module.css';
 import { Socket } from 'socket.io-client';
 import { QuizClientToServerEvents, QuizServerToClientEvents } from '@/Types/QuizSocketTypes';
 import { setUserParticipationAnswer } from '@/redux/features/userParticipationAnswerSlice';
@@ -119,9 +119,7 @@ export default function Question({
                 name='a'
                 key={index}
                 className={`answer${index + 1}`}
-                // className='a'
                 onClick={handleAnswerClick}
-                // ref={pushRef}
               >
                 {answer.answerText}
               </button>

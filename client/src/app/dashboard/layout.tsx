@@ -1,7 +1,7 @@
 'use client'
 import '../globals.css';
 import { Providers } from '@/redux/provider';
-import styles from '@/app/auth-styles/auth.module.css';
+import styles from '@/styles/auth.module.css';
 import { useRouter } from 'next/navigation';
 
 export default function RootLayout({

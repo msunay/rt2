@@ -1,4 +1,4 @@
-import styles from "@/app/auth-styles/login.module.css";
+import styles from "@/styles/login.module.css";
 import { FormEvent, useState } from "react";
 import { compareSync } from "bcrypt-ts"
 import { useRouter } from "next/navigation"

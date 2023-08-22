@@ -1,7 +1,7 @@
 import Image from "next/image";
 import arrowImage from '@/public/swg-arrow.svg'
 import { useRouter } from "next/navigation";
-import styles from '@/app/dashboard/dashboard.module.css'
+import styles from '@/styles/dashboard.module.css'
 
 interface PageProps {
   directTo: string

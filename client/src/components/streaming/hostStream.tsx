@@ -1,5 +1,6 @@
 'use client';
 
+import styles from '@/styles/streaming.module.css';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   PeersClientToServerEvents,
@@ -8,13 +9,11 @@ import {
 import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import { userApiService } from '@/redux/services/apiService';
 import Question from '../question/question';
 import {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/Types/QuizSocketTypes';
-import { CurrentTime, createCountdownBar } from 'countdownbar'
 import CanvasCircularCountdown from 'canvas-circular-countdown';
 import { useAppSelector } from '@/redux/hooks';
 
@@ -88,10 +87,10 @@ export default function HostStream() {
     }
       new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
       duration: 7 * 1000,
-      radius: 150,
+      radius: 40,
       clockwise: true,
       captionColor: pickColorByPercentage,
-      progressBarWidth: 20,
+      progressBarWidth: 15,
       progressBarOffset: 0,
       circleBackgroundColor: '#f5f5f5',
       emptyProgressBarBackgroundColor: '#b9c1c7',
@@ -293,11 +292,10 @@ export default function HostStream() {
   //   setCurrentQuestionNumber
   // }
   return (
-    <>
-      <div className="host-unit">
-        <div className="video-container">
-          <video ref={localVideo} className="video" autoPlay={true}></video>
-          <div className="question-component">
+      <div className={styles.unit}>
+        <div className={styles.video_container}>
+          <video ref={localVideo} className={styles.video} autoPlay={true}></video>
+          <div>
           {quizStarted && (
             <Question
               trigger={trigger}
@@ -307,37 +305,35 @@ export default function HostStream() {
               setCurrentQuestionNumber={setCurrentQuestionNumber}
             />
           )}
+          </div>
         </div>
-        </div>
-        <canvas id="countdown-canvas"></canvas>
-        <div className="quiz-controls">
-          {quizStarted ? (
-            currentQuestionNumber === 9 ? (
-              <button className="next-q-btn">Reveal Scores</button>
+        <div className={styles.btn_holder}>
+          <div className={styles.quiz_controls}>
+            <canvas id='countdown-canvas'></canvas>
+            {quizStarted ? (
+              currentQuestionNumber === 9 ? (
+                <button className={styles.next_q_btn}>Reveal Scores</button>
+              ) : (
+                <button className={styles.next_q_btn} onClick={nextQuestion}>
+                  Next Question
+                </button>
+              )
             ) : (
-              <button className="next-q-btn" onClick={nextQuestion}>
-                Next Question
+              <button className={styles.next_q_btn} onClick={startQuiz}>
+                Start Quiz
               </button>
-            )
-          ) : (
-            <button className="next-q-btn" onClick={startQuiz}>
-              Start Quiz
-            </button>
-          )}
-        </div>
-
-        <div className="stream-controls">
-          <button className="stream-btns" onClick={getLocalStream}>
+            )}
+          </div>
+          <button className={styles.stream_btns} onClick={getLocalStream}>
             Start Video
           </button>
-          <button className="stream-btns" onClick={stream}>
+          <button className={styles.stream_btns} onClick={stream}>
             Stream
           </button>
-          <button className="stream-btns" onClick={endStream}>
+          <button className={styles.stream_btns} onClick={endStream}>
             End Stream
           </button>
         </div>
       </div>
-    </>
   );
 }

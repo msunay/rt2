@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/app/dashboard/dashboard.module.css';
+import styles from '@/styles/dashboard.module.css';
 import { ReactElement } from 'react';
 import DiscoverList from '../../../components/quiz/discoverList';
 import HostingList from '@/components/quiz/hostingList';
