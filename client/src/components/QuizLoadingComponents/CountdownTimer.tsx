@@ -1,62 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../app/QuizLoading/quizLoading.module.css';
 import router from 'next/router';
+import moment from 'moment';
 
 interface CountdownTimerProps {
   startTime: string;
 }
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ startTime }) => {
-  const [timeRemaining, setTimeRemaining] = useState<{
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-  }>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const startDate = new Date(startTime).getTime();
-      const distance = startDate - now;
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      setTimeRemaining({ days, hours, minutes, seconds });
-
-      if (distance <= 0) {
-        //TODO: Update the route
+    const updateDuration = () => {
+      const duration = moment.duration(moment(startTime).diff(moment()));
+      if (duration.asMilliseconds() <= 0) {
         router.push('/UserStream/');
+        return "00:00:00";
       }
+      const dayText = duration.days() === 1 ? 'day' : 'days';
+      return duration.days() > 0
+        ? `${duration.days()} ${dayText} ${String(duration.hours()).padStart(2, '0')}:${String(duration.minutes()).padStart(2, '0')}:${String(duration.seconds()).padStart(2, '0')}`
+        : `${String(duration.hours()).padStart(2, '0')}:${String(duration.minutes()).padStart(2, '0')}:${String(duration.seconds()).padStart(2, '0')}`;
+    };
+
+    setTimeRemaining(updateDuration());
+
+    const interval = setInterval(() => {
+      setTimeRemaining(updateDuration());
     }, 1000);
 
     return () => clearInterval(interval);
   }, [startTime, router]);
 
-  const renderTime = () => {
-    if (timeRemaining.days > 0) {
-      const dayText = timeRemaining.days === 1 ? 'day' : 'days';
-      return `${timeRemaining.days} ${dayText} ${String(timeRemaining.hours).padStart(2, '0')}:${String(
-        timeRemaining.minutes
-      ).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`;
-    }
-    return `${String(timeRemaining.hours).padStart(2, '0')}:${String(
-      timeRemaining.minutes
-    ).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`;
-  };
-
   return (
     <div className={styles.countdownContainer}>
       <p>STARTING, IN:</p>
-      <h3 className={styles.countdownTime}>{renderTime()}</h3>
+      <h3 className={styles.countdownTime}>{timeRemaining}</h3>
     </div>
   );
 };

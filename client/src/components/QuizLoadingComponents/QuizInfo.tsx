@@ -9,9 +9,15 @@ interface QuizInfoProps {
 const QuizInfo: React.FC<QuizInfoProps> = ({ quiz }) => {
   return (
     <div className={styles.quizInfoContainer}>
-      <h2 className={styles.quizName}>{quiz.quizName}</h2>
-      <p className={styles.hostName}>Hosted by: {quiz.host_name}</p>
-      <p className={styles.category}>Category: {quiz.category}</p>
+      <h2 className={styles.quizTitle}>{quiz.quizName}</h2>
+      <div className={styles.infoGroup}>
+        <span className={styles.label}>Quiz Host:</span>
+        <span className={styles.contentText}>{quiz.host_name}</span>
+      </div>
+      <div className={styles.infoGroup}>
+        <span className={styles.label}>Category:</span>
+        <span className={styles.contentText}>{quiz.category}</span>
+      </div>
     </div>
   );
 };

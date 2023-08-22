@@ -9,6 +9,7 @@ import CountdownTimer from '../../components/QuizLoadingComponents/CountdownTime
 import { userApiService } from '../../redux/services/apiService';
 import { getNextQuizForUser } from '../../redux/services/quizeApiService';
 import { RootState } from '../../redux/store';
+import styles from './quizLoading.module.css';
 
 export default function QuizLoadingPage() {
   const dispatch = useAppDispatch();
@@ -34,7 +35,7 @@ export default function QuizLoadingPage() {
 
   return (
     <QuizLoadingLayout>
-      <h1>QUIZ LOADING</h1>
+      <h1 className={styles.pageTitle}>QUIZ LOADING</h1>
       <QuizInfo quiz={quiz} />
       <CountdownTimer startTime={quiz.dateTime} />
     </QuizLoadingLayout>
