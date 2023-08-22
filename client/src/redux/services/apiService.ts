@@ -12,7 +12,7 @@ import {
 
 export const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BACKEND_URL!
+    ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
 console.log('BASE_URLapi: ', BASE_URL);
