@@ -21,7 +21,7 @@ ENV NODE_ENV="production"
 #RUN npm run build
 
 # Copy built application
-COPY --link /server/dist /dist
+COPY --link /dist /dist
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3001
