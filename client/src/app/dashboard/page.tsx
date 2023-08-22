@@ -13,6 +13,7 @@ import { setParticipatingList } from '@/redux/features/participatingSlice';
 import { setUserId } from '@/redux/features/userIdSlice';
 import { setUserDetails } from '@/redux/features/userDetailsSlice';
 import axios from 'axios';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const userDetails = useAppSelector((state) => state.userDetailsSlice.value);
@@ -22,10 +23,14 @@ export default function Dashboard() {
   const authToken = useAppSelector(
     (state: RootState) => state.authSlice.authToken
   );
+  const BASE_URL: string =
+  process.env.NODE_ENV === 'production'
+    ? process.env.BASE_URL!
+    : 'http://localhost:3001/';
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/', {
+      .get(BASE_URL, {
         headers: { Authorization: `Bearer ${authToken}` }})
       .then((res) => {
         if (res.status !== 200) {router.push('/')}
@@ -66,6 +71,8 @@ export default function Dashboard() {
             title="Create a Quiz"
           />
         </>
+        <Link href="/testHostStream">HostQuiz</Link>
+        <Link href="/testUserStream">UserQuiz</Link>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>

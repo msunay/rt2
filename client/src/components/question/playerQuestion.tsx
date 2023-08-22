@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef, LegacyRef, useImperativeHandle } from 'react';
+import {
+  useState,
+  useEffect,
+} from 'react';
 import {
   QuestionAnswer,
   QuizQuestionAnswer,
@@ -7,36 +10,29 @@ import {
   ParticipationAnswer,
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
-import style from '@/styles/question.module.css';
-import { Socket } from 'socket.io-client';
-import { QuizClientToServerEvents, QuizServerToClientEvents } from '@/Types/QuizSocketTypes';
-import { setUserParticipationAnswer } from '@/redux/features/userParticipationAnswerSlice';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import style from './question.module.css';
 
-export default function Question({
+
+export default function PlayerQuestion({
   currentQuestionNumber,
   setCurrentQuestionNumber,
-  host,
   hidden,
-  trigger
+  trigger,
+  partId,
 }: {
   currentQuestionNumber: number;
   setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
-  host: boolean;
   hidden: boolean;
   trigger: number;
+  partId: string;
 }) {
+  const [userParticipationAnswer, setUserParticipationAnswer] =
+    useState<ParticipationAnswer>({} as ParticipationAnswer);
 
-  const [userParticipationAnswer, setUserParticipationAnswer] = useState<ParticipationAnswer>({} as ParticipationAnswer);
-  // useImperativeHandle(createParticipationAnswer, createHandle, [userParticipationAnswer])
-
-  const userId = useAppSelector((state) => state.userIdSlice.value);
   // LOGIC FOR HOSTING THE QUIZ
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
-  const [isHost, setIsHost] = useState<boolean>(true);
-
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
     null
   );
@@ -44,27 +40,27 @@ export default function Question({
   const [userParticipation, setUserParticipation] = useState<Participation>(
     {} as Participation
   );
+  useEffect(() => {
+    console.log('currentQuestion: ', currentQuestion);
+    console.log('currentQuestionNumber: ', currentQuestionNumber);
+  }, [currentQuestionNumber])
 
   useEffect(() => {
-    if (trigger) {
-      createHandle();
-    }
+    if (trigger > 0) createHandle();
   }, [trigger]);
 
   useEffect(() => {
-    console.log('UserID: ', userId);
-  }, [userId]);
-
-  useEffect(() => {
-
-
     userApiService
-    .getOneQuizQuestionAnswer('98e03864-eec4-4800-941c-4b1dbe78301f')
-    .then((data) => {
-        setQuiz(data);
+      .getOneParticipation(partId)
+      .then((newParticipation) => {
+        setUserParticipation(newParticipation);
+        return newParticipation;
       })
-    .catch(e => console.error(e))
-
+      .then((newParticipation) => {
+        userApiService
+          .getOneQuizQuestionAnswer(newParticipation.QuizId!)
+          .then((newQuiz) => setQuiz(newQuiz));
+      });
   }, []);
 
   useEffect(() => {
@@ -75,13 +71,7 @@ export default function Question({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-    userApiService
-      .getUserParticipations(userId)
-      .then((participationArr) => {
-          setUserParticipation(participationArr.filter((elem) => elem.QuizId === quiz.id)[0]);
-        });
-
-  }, [quiz, currentQuestionNumber]);
+  }, [quiz, trigger]);
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
@@ -90,22 +80,19 @@ export default function Question({
   }, [currentQuestion]);
 
   async function handleAnswerClick(e: any) {
-
     const match: number = e.target.className.match(/\w+(\d)/)[1];
-
     if (match) {
       setUserParticipationAnswer({
         AnswerId: currentAnswers[match - 1].id,
         ParticipationId: userParticipation.id,
       } as ParticipationAnswer);
-      console.log('userParticionAnswer: ', userParticipationAnswer);
-      // dispatch(setUserParticipationAnswer(userParticipationAnswer))
     }
   }
 
-  function createHandle () {
+  function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
-    userApiService.createParticipationAnswer(userParticipationAnswer)
+    userApiService.createParticipationAnswer(userParticipationAnswer);
+    setUserParticipationAnswer({} as ParticipationAnswer)
   }
 
   return (
@@ -116,7 +103,7 @@ export default function Question({
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <button
-                name='a'
+                name="a"
                 key={index}
                 className={`answer${index + 1}`}
                 onClick={handleAnswerClick}

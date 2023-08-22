@@ -1,7 +1,7 @@
 'use client';
 import style from '@/styles/quiz.module.css';
 import { useAppSelector } from '@/redux/hooks';
-import { Quiz } from '@/Types/Types';
+import { Participation, Quiz } from '@/Types/Types';
 import ParticipationQuizCard from './partQuizCard';
 import { userApiService } from '@/redux/services/apiService';
 import { useState, useEffect } from 'react';

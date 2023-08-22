@@ -105,7 +105,7 @@ const createWebRtcTransport = async (callback: any) => {
 const peersSocketInit = async (
   peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents>
 ) => {
-  console.log(peers.id);
+  console.log('peers ID: ', peers.id);
 
   peers.emit('connection_success', {
     socketId: peers.id,
@@ -120,6 +120,12 @@ const peersSocketInit = async (
     producerTransport?.close();
   });
 
+  const getRtpCapabilities = (callback: any) => {
+    const rtpCapabilities = msRouter.rtpCapabilities;
+
+    callback({ rtpCapabilities });
+  };
+
   peers.on('create_room', async (callback) => {
     if (msRouter === undefined) {
       msRouter = await msWorker.createRouter({ mediaCodecs });
@@ -128,12 +134,6 @@ const peersSocketInit = async (
 
     getRtpCapabilities(callback);
   });
-
-  const getRtpCapabilities = (callback: any) => {
-    const rtpCapabilities = msRouter.rtpCapabilities;
-
-    callback({ rtpCapabilities });
-  };
 
   peers.on('getRtpCapabilities', (callback) => {
     const rtpCapabilities = msRouter.rtpCapabilities;
