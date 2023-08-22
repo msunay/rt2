@@ -133,6 +133,7 @@ export default function UserStream({ partId }: { partId: string }) {
   return (
     <>
       <div className={styles.unit}>
+      <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
           <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
         </div>
@@ -151,7 +152,7 @@ export default function UserStream({ partId }: { partId: string }) {
               )}
             </div>
         )}
-        <canvas id="countdown-canvas"></canvas>
+       
         <div className="current-question"></div>
       </div>
       <button className={styles.btn_join} id="join-stream-btn" onClick={goConsume} disabled={false}>

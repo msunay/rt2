@@ -82,3 +82,9 @@
   bottom: 0px;
   border: unset;
 }
+
+
+.count_down {
+  position: absolute;
+  z-index: 9999;
+}
