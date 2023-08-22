@@ -195,7 +195,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
   };
 
   return (
-    <>
       <div className="host-unit">
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
