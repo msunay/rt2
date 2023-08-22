@@ -45,14 +45,13 @@ export default function Dashboard() {
 
   function streamDirection () {
     if (ownerId === quize?.quizOwner) router.push('/testHostStream');
-    else router.push('/testUserStream');
+    else router.push('/QuizLoading');
   }
 
   return (
     <div className={styles.dashboard_container}>
       <div
         className={styles.quiz_contaniner}
-        onClick={() => streamDirection()}
       >
         <h4>next quize</h4>
         <div className={styles.quiz_details}>
@@ -77,6 +76,9 @@ export default function Dashboard() {
         <div className={styles.date_container}>
           <strong>starting in: </strong>
           <span>{kicksOffIn()} </span>
+        </div>
+        <div>
+          <button onClick={() => streamDirection()} className={styles.playNextQuizButton}>Play Quiz</button>
         </div>
       </div>
 

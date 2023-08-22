@@ -34,6 +34,7 @@ export default function QuizLoadingPage() {
 
   return (
     <QuizLoadingLayout>
+      <h1>QUIZ LOADING</h1>
       <QuizInfo quiz={quiz} />
       <CountdownTimer startTime={quiz.dateTime} />
     </QuizLoadingLayout>

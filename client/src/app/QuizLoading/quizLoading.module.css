@@ -1,0 +1,42 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  width: 100%;
+}
+
+.title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.quizInfoContainer, .countdownContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 800px;
+  background-color: #fff;
+  color: black;
+  box-shadow: 1px 3px 3px 4px lightgray;
+  border-radius: 12px;
+  padding: 16px 0px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .quizInfoContainer, .countdownContainer {
+    width: 90%;
+    padding: 14px 0px;
+  }
+}
+
+
+
+

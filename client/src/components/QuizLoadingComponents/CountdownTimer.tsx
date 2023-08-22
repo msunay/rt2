@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styles from '../../app/QuizLoading/quizLoading.module.css';
 
 interface CountdownTimerProps {
   startTime: string;
@@ -45,7 +46,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ startTime }) => {
     ).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`;
   };
 
-  return <div>{renderTime()}</div>;
+  return (
+    <div className={styles.countdownContainer}>
+      <p>STARTING, IN:</p>
+      <h3 className={styles.countdownTime}>{renderTime()}</h3>
+    </div>
+  );
 };
 
 export default CountdownTimer;
