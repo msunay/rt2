@@ -21,24 +21,24 @@ function initModels(sequelize) {
     Participation_1.Participation.initModel(sequelize);
     ParticipationAnswer_1.ParticipationAnswer.initModel(sequelize);
     User_1.User.belongsToMany(Quiz_1.Quiz, {
-        as: "quizzes",
+        as: 'quizzes',
         through: Participation_1.Participation,
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
     });
     Quiz_1.Quiz.belongsToMany(User_1.User, {
-        as: "users",
+        as: 'users',
         through: Participation_1.Participation,
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
     });
     Answer_1.Answer.belongsToMany(Participation_1.Participation, {
-        as: "answers",
+        as: 'participiations',
         through: ParticipationAnswer_1.ParticipationAnswer,
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
     });
     Participation_1.Participation.belongsToMany(Answer_1.Answer, {
-        as: "participations",
+        as: 'answers',
         through: ParticipationAnswer_1.ParticipationAnswer,
-        onDelete: "CASCADE",
+        onDelete: 'CASCADE',
     });
     Quiz_1.Quiz.hasMany(Question_1.Question);
     Question_1.Question.belongsTo(Quiz_1.Quiz);
