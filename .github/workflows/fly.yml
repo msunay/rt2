@@ -16,10 +16,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install server deps
-        run: cd server && npm i
+      - name: Install Server Deps
+        run: cd server && npm ci
 
-      - name: Build server deps
+      - name: Build Server
         run: cd server && npm run build
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
