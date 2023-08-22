@@ -11,7 +11,6 @@ import {
 } from './Types/PeerSocketTypes';
 
 const app = express();
-export const PORT = 3001;
 
 const corsOrigin = process.env.NODE_ENV === 'production'
 ? process.env.CORS_ORIGIN
