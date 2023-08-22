@@ -50,6 +50,11 @@ nav {
   transform: scale(1.1);
 }
 
+a {
+  all: unset;
+  text-decoration: none;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
