@@ -43,15 +43,15 @@
   font-size: 14px;
 }
 
-
-.add_or_remove {
-  margin: auto;
-}
-
 .btn_icon {
   background-color: rgb(211, 211, 211, 0.2);
   border-radius: 50%;
   padding: 10px;
+  transition: 0.3s;
+}
+
+.btn_icon:hover {
+  background-color: lightgray;
 }
 
 .btn {
