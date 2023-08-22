@@ -1,38 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface CountdownTimerProps {
-    startTime: string; // Expected ISO string format like "2023-08-24T11:15:10.620Z"
+  startTime: string;
 }
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ startTime }) => {
-    const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [timeRemaining, setTimeRemaining] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  }>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
-    useEffect(() => {
-        const startDate = new Date(startTime).getTime();
-        const updateInterval = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = startDate - now;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const startDate = new Date(startTime).getTime();
+      const distance = startDate - now;
 
-            setTimeRemaining(distance);
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            if (distance < 0) {
-                clearInterval(updateInterval);
-            }
-        }, 1000);
+      setTimeRemaining({ days, hours, minutes, seconds });
+    }, 1000);
 
-        return () => clearInterval(updateInterval);
-    }, [startTime]);
+    return () => clearInterval(interval);
+  }, [startTime]);
 
-    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+  const renderTime = () => {
+    if (timeRemaining.days > 0) {
+      return `${timeRemaining.days} days ${String(timeRemaining.hours).padStart(2, '0')}:${String(
+        timeRemaining.minutes
+      ).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`;
+    }
+    return `${String(timeRemaining.hours).padStart(2, '0')}:${String(
+      timeRemaining.minutes
+    ).padStart(2, '0')}:${String(timeRemaining.seconds).padStart(2, '0')}`;
+  };
 
-    return (
-        <div>
-            STARTING, IN:
-            <div>{hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</div>
-        </div>
-    );
-}
+  return <div>{renderTime()}</div>;
+};
 
 export default CountdownTimer;
