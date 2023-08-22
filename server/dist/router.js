@@ -9,6 +9,7 @@ const quiz_controller_1 = __importDefault(require("./controllers/quiz.controller
 const referenceTables_controller_1 = __importDefault(require("./controllers/referenceTables.controller"));
 const auth_1 = require("./middleware/auth");
 const referenceTables_controller_2 = __importDefault(require("./controllers/referenceTables.controller"));
+const demoQuiz_1 = require("./utils/demoQuiz");
 const router = express_1.default.Router();
 //testing
 router.get('/', auth_1.auth, (req, res) => {
@@ -23,6 +24,7 @@ router.put('/username', user_controller_1.default.changeUsername);
 router.put('/password', user_controller_1.default.changePassword);
 router.get('/userId', auth_1.auth, user_controller_1.default.getUserId);
 // Quiz routes
+router.post('/demoQuiz', demoQuiz_1.addDemoQuiz);
 router.get('/quizzesQuestionsAnswers', quiz_controller_1.default.getQuizzesQuestionsAnswers);
 router.get('/quizzes', quiz_controller_1.default.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quiz_controller_1.default.getOneQuizQuestionAnswers);
