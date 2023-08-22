@@ -1,5 +1,6 @@
 'use client';
 
+import styles from '@/styles/streaming.module.css';
 import React, { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
@@ -131,14 +132,14 @@ export default function UserStream({ partId }: { partId: string }) {
 
   return (
     <>
-      <div className="user-unit">
-        <div className="video-container">
-          <video ref={remoteVideo} className="video" autoPlay={true}></video>
+      <div className={styles.unit}>
+      <canvas className={styles.count_down} id="countdown-canvas"></canvas>
+        <div className={styles.video_container}>
+          <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
         </div>
         {currentQuestionNumber === 10 ? (
           <FinalScore userParticipation={userParticipation} />
         ) : (
-          <div className="question-component">
             <div className="question-component">
               {quizStarted && (
                 <PlayerQuestion
@@ -150,12 +151,11 @@ export default function UserStream({ partId }: { partId: string }) {
                 />
               )}
             </div>
-          </div>
         )}
-        <canvas id="countdown-canvas"></canvas>
+       
         <div className="current-question"></div>
       </div>
-      <button id="join-stream-btn" onClick={goConsume} disabled={false}>
+      <button className={styles.btn_join} id="join-stream-btn" onClick={goConsume} disabled={false}>
         Join Stream
       </button>
     </>
