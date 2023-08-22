@@ -20,7 +20,6 @@ export default function QuizLoadingPage() {
   useEffect(() => {
     userApiService.getUserId(authToken).then((data) => {
       dispatch(setUserId(data));
-      console.log('QuizLoading page.tsx presents:' + data)
     });
   }, [authToken, dispatch]);
 

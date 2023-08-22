@@ -22,6 +22,6 @@ const localConnection = [
 
 const connection = env.NODE_ENV === "production" ? cloudConnection : localConnection;
 
-const sequelize = new Sequelize(...connection)
+export const sequelize = new Sequelize(...connection)
 
 export default sequelize;

@@ -1,8 +1,7 @@
 import models from "../models/index";
 import { Request, Response } from "express";
-import { Participation } from "../models/reference_tables/Participation";
-import { Quiz } from "../models/objects/Quiz";
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
+import { sequelize } from "../db";
 
 async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
   try {
@@ -60,20 +59,22 @@ async function getOneQuiz(req: Request, res: Response) {
 async function getNextQuizForUser (req:Request, res: Response) {
   try {
     const userId = req.params.userId;
-    const participations = await Participation.findAll({
-      where: { UserId: userId }
-    });
-    const quizIds = participations.map(p => p.QuizId);
-    const upcomingQuizzes = await Quiz.findAll({
-      where: {
-          id: quizIds,
-          dateTime: { [Op.gt]: new Date() }
+
+    const [quiz] = await sequelize.query(
+      `SELECT "Quizzes"."id", "Quizzes"."quizName", "Quizzes"."quizOwner", "Quizzes"."category", "Quizzes"."dateTime", "Users"."username" AS "host_name"
+      FROM "Participations"
+      JOIN "Quizzes" ON "Participations"."QuizId" = "Quizzes"."id"
+      JOIN "Users" ON "Quizzes"."quizOwner" = "Users"."id"
+      WHERE "Participations"."UserId" = :userId AND "Quizzes"."dateTime" > NOW()
+      ORDER BY "Quizzes"."dateTime" ASC LIMIT 1`,
+      {
+        replacements: { userId: userId },
+        type: QueryTypes.SELECT,
       }
-    });
-    upcomingQuizzes.sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime());
-    const nextQuiz = upcomingQuizzes[0];
-    if (nextQuiz) {
-      res.json(nextQuiz);
+    );
+
+    if (quiz) {
+      res.json(quiz);
     } else {
       res.status(404).json({ message: "No upcoming quizzes found for the user." });
     }
