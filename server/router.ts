@@ -4,6 +4,7 @@ import quizController from './controllers/quiz.controller';
 import participationController from './controllers/referenceTables.controller';
 import { auth } from './middleware/auth';
 import referenceTablesController from './controllers/referenceTables.controller';
+import { addDemoQuiz } from './utils/demoQuiz';
 const router: Router = express.Router();
 
 //testing
@@ -21,6 +22,7 @@ router.put('/password', userController.changePassword);
 router.get('/userId', auth, userController.getUserId);
 
 // Quiz routes
+router.post('/demoQuiz', addDemoQuiz)
 router.get(
   '/quizzesQuestionsAnswers',
   quizController.getQuizzesQuestionsAnswers
