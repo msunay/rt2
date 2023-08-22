@@ -44,7 +44,19 @@ describe('User endpoint tests', () => {
     await models.User.create(mocks.players[0]);
 
     response = await request.get(`/userDetails/${mocks.players[0].id}`);
-    console.log('RESPONSE TEXT::', JSON.parse(response.text));
     expect(JSON.parse(response.text).id).toBe(mocks.players[0].id);
+  });
+
+  it('should add several users and fetch them', async () => {
+    let response = await request.get('/users');
+    expect(JSON.parse(response.text).length).toBe(0);
+
+    mocks.players.forEach(async (player) => {
+      await models.User.create(player);
+    });
+
+    response = await request.get('/users');
+    console.log('RESPONSE TEXT::', JSON.parse(response.text).length);
+    expect(JSON.parse(response.text).length).toBe(4);
   });
 });
