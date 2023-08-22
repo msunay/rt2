@@ -15,6 +15,8 @@ export const BASE_URL: string =
     ? process.env.BACKEND_URL!
     : 'http://localhost:3001/';
 
+console.log('BASE_URLapi: ', BASE_URL);
+
 export const userApiService = {
   // User methods
 
