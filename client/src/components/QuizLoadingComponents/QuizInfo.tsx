@@ -1,39 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { getNextQuizForUser } from '@/redux/services/quizeApiService';
+import React from 'react';
+import { Quiz } from '../../Types/Types';
 
 interface QuizInfoProps {
-  userId: string;
+  quiz: Quiz;
 }
 
-const QuizInfo: React.FC<QuizInfoProps> = ({ userId }) => {
-  const [quiz, setQuiz] = useState<{ quizName?: string, host_name?: string, category?: string } | null>(null);
-
-  useEffect(() => {
-    if (userId) {
-      getNextQuizForUser(userId).then((data) => {
-        if(data) {
-          setQuiz({
-            quizName: data.quizName,
-            host_name: data.host_name,
-            category: data.category
-          });
-        }
-      });
-    }
-  }, [userId]);
-
-  if(!quiz) {
-    return <div>Loading...</div>;
-  }
-
+const QuizInfo: React.FC<QuizInfoProps> = ({ quiz }) => {
   return (
     <div>
-      <p>{quiz.quizName}</p>
-      <p>{quiz.host_name}</p>
-      <p>{quiz.category}</p>
+      <h2>{quiz.quizName}</h2>
+      <h3>Hosted by: {quiz.host_name}</h3>
+      <h4>Category: {quiz.category}</h4>
     </div>
   );
 };
 
 export default QuizInfo;
-
