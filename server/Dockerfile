@@ -13,12 +13,12 @@ WORKDIR /app
 ENV NODE_ENV="production"
 
 # Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install -y build-essential pkg-config python-is-python3
+#RUN apt-get update -qq && \
+    #apt-get install -y build-essential pkg-config python-is-python3
 
 # Install node modules
-COPY --link package-lock.json package.json ./
-RUN npm run build
+#COPY --link package-lock.json package.json ./
+#RUN npm run build
 
 # Copy built application
 COPY --link /dist /dist
