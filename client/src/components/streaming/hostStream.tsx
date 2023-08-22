@@ -1,118 +1,83 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/Types/PeerSocketTypes';
-import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import { userApiService } from '@/redux/services/apiService';
-import Question from '../question/question';
+import HostQuestion from '../question/hostQuestion';
 import {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/Types/QuizSocketTypes';
-import { CurrentTime, createCountdownBar } from 'countdownbar'
-import CanvasCircularCountdown from 'canvas-circular-countdown';
-import { useAppSelector } from '@/redux/hooks';
+  quizSocketService,
+  startTimer,
+} from '@/redux/services/quizSocketService';
+import { peersSocketService } from '@/redux/services/peersSocketService';
 
-export default function HostStream() {
+export const QUESTION_TIME = 7000;
 
+export default function HostStream({ quizId }: { quizId: string }) {
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
-  const userParticipationAnswer = useAppSelector(state => state.userParticipationAnswerSlice)
-  const [questionHidden, setQuestionHidden] = useState(false)
-  const [trigger, setTrigger] = useState(0);
-
-  const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
-    'http://localhost:3001/quizspace'
-  );
-
-  // quiz.on('connection_success', ({ socketId }) => {
-  //   console.log(socketId);
-  // })
-
-  useEffect(() => {
-    quiz.on('start_question_timer', () => {
-      startTimer()
-    })
-
-    quiz.on('reveal_answers', () => {
-      console.log('reveal');
-      //@ts-ignore
-      document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = true)
-
-      setTimeout(() => {
-        setQuestionHidden(true);
-        document.getElementById('countdown-canvas')!.hidden = true
-        setTrigger((trigger) => trigger + 1);
-      }, 2000)
-    })
-  })
-
+  const [questionHidden, setQuestionHidden] = useState(false);
+  const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
 
   const localVideo = useRef<HTMLVideoElement>(null);
+  const nextQBtn = useRef<HTMLButtonElement>(null);
+  const startBtn = useRef<HTMLButtonElement>(null);
 
 
-  function startQuiz() {
-    startTimer()
-    setQuizStarted(true);
-    quiz.emit('host_start_quiz')
-  }
-
-  function nextQuestion() {
-    //@ts-ignore
-    document.querySelectorAll('button[name="a"]').forEach((btn, i) => btn.disabled = false)
-    setCurrentQuestionNumber(currentQuestionNumber + 1);
-    console.log(currentQuestionNumber);
-    setQuestionHidden(false)
-    document.getElementById('countdown-canvas')!.hidden = false;
-    quiz.emit('next_question');
-    // startTimer()
-  }
-
-  function startTimer () {
-    const pickColorByPercentage = (percentage: any, time: any) => {
-      switch (true) {
-        case percentage >= 75:
-          return '#28a745'; // green
-        case percentage >= 50 && percentage < 75:
-          return '#17a2b8'; // blue
-        case percentage >= 25 && percentage < 50:
-          return '#ffc107'; // orange
-        default:
-          return '#dc3545'; // red
-      }
-    }
-      new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
-      duration: 7 * 1000,
-      radius: 150,
-      clockwise: true,
-      captionColor: pickColorByPercentage,
-      progressBarWidth: 20,
-      progressBarOffset: 0,
-      circleBackgroundColor: '#f5f5f5',
-      emptyProgressBarBackgroundColor: '#b9c1c7',
-      filledProgressBarBackgroundColor: '#17a2b8',
-      captionFont: '22px serif',
-      showCaption: true
-    }).start();
-  }
-
-  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
-    io('http://localhost:3001/mediasoup');
-
-  peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-    console.log(socketId, producerAlreadyExists);
-  });
-
+  const host = true;
   let device: mediasoupTypes.Device;
-  let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
   let mediaStream: MediaStream;
+
+  useEffect(() => {
+    quizSocketService.successListener();
+    quizSocketService.startTimerListener(setQuestionHidden);
+    quizSocketService.revealListener(
+      setQuestionHidden,
+      setTrigger,
+      setCurrentQuestionNumber,
+      host
+    );
+    peersSocketService.successListener();
+  }, []);
+
+
+
+  function startQuiz() {
+    // TODO nextQBtn is undefined because it is not on screen when startQuiz is clicked
+    // nextQBtn.current!.disabled = true;
+    // setTimeout(() => {
+    //   nextQBtn.current!.disabled = false;
+    // }, 9000);
+
+    startTimer();
+    setQuizStarted(true);
+    quizSocketService.emitHostStartQuiz();
+    quizSocketService.emitNextQ();
+  }
+
+  function nextQuestion() {
+    setQuestionHidden(false)
+    nextQBtn.current!.disabled = true;
+    setTimeout(() => {
+      nextQBtn.current!.disabled = false;
+    }, QUESTION_TIME + 2000);
+    document
+      .querySelectorAll('button[name="a"]')
+      //@ts-ignore
+      .forEach((btn) => (btn.disabled = false));
+    setCurrentQuestionNumber(
+      (currentQuestionNumber) => currentQuestionNumber + 1
+    );
+    document.getElementById('countdown-canvas')!.hidden = false;
+    quizSocketService.emitNextQ();
+    startTimer();
+  }
+
+  const stream = () => {
+    goConnect();
+  };
+
   let params: mediasoupTypes.ProducerOptions = {
     encodings: [
       {
@@ -136,9 +101,6 @@ export default function HostStream() {
     },
   };
 
-  const stream = () => {
-    goConnect();
-  };
   const streamSuccess = (mediaStream: MediaStream) => {
     localVideo.current!.srcObject = mediaStream;
     const track = mediaStream.getVideoTracks()[0];
@@ -174,10 +136,17 @@ export default function HostStream() {
     device === undefined ? getRtpCapabilities() : createSendTransport();
   };
 
-  const createDevice = async () => {
+  const getRtpCapabilities = () => {
+    // get router rtp capabilities from server
+    peersSocketService.emitCreateRoom(createDevice);
+  };
+
+  const createDevice = async (
+    rtpCapabilities: mediasoupTypes.RtpCapabilities
+  ) => {
     try {
       device = new mediasoupClient.Device();
-
+      console.log('RTP Capabilities: ', rtpCapabilities);
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
@@ -192,93 +161,29 @@ export default function HostStream() {
     }
   };
 
-  const getRtpCapabilities = () => {
-    // get router rtp capabilities from server
-    // send to client
-    peers.emit('create_room', (data: any) => {
-      console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
-
-      //assign to local variable
-      rtpCapabilities = data.rtpCapabilities;
-      // create device with rtp capabilities
-      createDevice();
-    });
-  };
-
   const createSendTransport = () => {
-    peers.emit(
-      'createWebRtcTransport',
-      { sender: true },
-      ({ transportParams }) => {
-        // if (sendTransportParams.error) {
-        //   console.log(sendTransportParams.error);
-        //   return;
-        // }
-        console.log(transportParams);
-
-        producerTransport = device.createSendTransport(transportParams);
-
-        producerTransport.on(
-          'connect',
-          async ({ dtlsParameters }, callback, errback) => {
-            try {
-              // Singnal local DTLS parameters to the server side transport
-              peers.emit('transport_connect', {
-                // transportId: producerTransport.id,
-                dtlsParameters: dtlsParameters,
-              });
-
-              // Tell the transport that parameters were transmitted.
-              callback();
-            } catch (error: any) {
-              errback(error);
-            }
-          }
-        );
-
-        producerTransport.on(
-          'produce',
-          async (parameters, callback, errback) => {
-            console.log(parameters);
-
-            try {
-              peers.emit(
-                'transport_produce',
-                {
-                  // transportId: producerTransport.id,
-                  kind: parameters.kind,
-                  rtpParameters: parameters.rtpParameters,
-                  appData: parameters.appData,
-                },
-                ({ id }) => {
-                  // Tell the transport that parameters were transmitted and provide it with the
-                  // server side producers's id
-                  callback({ id });
-                }
-              );
-            } catch (err: any) {
-              errback(err);
-            }
-          }
-        );
-
-        connectSendTransport();
-      }
+    peersSocketService.emitcreateProducerWebRtcTransport(
+      producerTransport,
+      device,
+      connectSendTransport
     );
   };
 
-  const connectSendTransport = async () => {
-    console.log(params);
+  const connectSendTransport = async (
+    producerTransport: mediasoupTypes.Transport
+  ) => {
+    console.log('ConnectSendTransport params: ', params);
+    console.log('ConnectSendTransport producerTransport: ', producerTransport);
     producer = await producerTransport.produce(params);
 
     producer.on('trackended', () => {
       console.log('Track ended');
-      // Close video track
+      mediaStream.getTracks().forEach((track) => track.stop());
     });
 
     producer.on('transportclose', () => {
       console.log('transport ended');
-      // Close video track
+      mediaStream.getTracks().forEach((track) => track.stop());
     });
   };
 
@@ -288,39 +193,48 @@ export default function HostStream() {
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 
-  // const value = {
-  //   currentQuestionNumber,
-  //   setCurrentQuestionNumber
-  // }
   return (
     <>
       <div className="host-unit">
         <div className="video-container">
           <video ref={localVideo} className="video" autoPlay={true}></video>
+          <canvas id="countdown-canvas"></canvas>
           <div className="question-component">
-          {quizStarted && (
-            <Question
-              trigger={trigger}
-              hidden={questionHidden}
-              host={true}
-              currentQuestionNumber={currentQuestionNumber}
-              setCurrentQuestionNumber={setCurrentQuestionNumber}
-            />
-          )}
+            {quizStarted && (
+              <HostQuestion
+                quizId={quizId}
+                trigger={trigger}
+                hidden={questionHidden}
+                currentQuestionNumber={currentQuestionNumber}
+                setCurrentQuestionNumber={setCurrentQuestionNumber}
+              />
+            )}
+          </div>
         </div>
-        </div>
-        <canvas id="countdown-canvas"></canvas>
         <div className="quiz-controls">
           {quizStarted ? (
             currentQuestionNumber === 9 ? (
-              <button className="next-q-btn">Reveal Scores</button>
+              <button
+                className="next-q-btn"
+                onClick={() =>
+                  setCurrentQuestionNumber(
+                    (currentQuestionNumber) => currentQuestionNumber + 1
+                  )
+                }
+              >
+                Reveal Scores
+              </button>
             ) : (
-              <button className="next-q-btn" onClick={nextQuestion}>
+              <button
+                ref={nextQBtn}
+                className="next-q-btn"
+                onClick={nextQuestion}
+              >
                 Next Question
               </button>
             )
           ) : (
-            <button className="next-q-btn" onClick={startQuiz}>
+            <button ref={startBtn} className="next-q-btn" onClick={startQuiz}>
               Start Quiz
             </button>
           )}

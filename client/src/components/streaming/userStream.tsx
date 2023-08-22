@@ -1,82 +1,34 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/Types/PeerSocketTypes';
-import { io, Socket } from 'socket.io-client';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
-import {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/Types/QuizSocketTypes';
-import { CurrentTime, createCountdownBar } from 'countdownbar';
-import Question from '../question/question';
+import PlayerQuestion from '../question/playerQuestion';
+import { quizSocketService } from '@/redux/services/quizSocketService';
+import { peersSocketService } from '@/redux/services/peersSocketService';
+import FinalScore from '../quiz/finalScore';
+import { userApiService } from '@/redux/services/apiService';
+import { useAppSelector } from '@/redux/hooks';
+import { Participation } from '@/Types/Types';
 
-export default function UserStream() {
+export default function UserStream({ partId }: { partId: string }) {
+  const userId = useAppSelector((state) => state.userIdSlice.value);
+
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
-
-  const quiz = useRef<
-    Socket<QuizServerToClientEvents, QuizClientToServerEvents>
-  >(io('http://localhost:3001/quizspace'));
-
-  useEffect(() => {
-    // quiz.current.on('connection_success', ({ socketId }) => {
-    //   console.log(socketId);
-    // });
-
-    quiz.current.on('start_quiz', () => {
-      setQuizStarted(true);
-    });
-
-    quiz.current.on('start_question_timer', () => {
-      console.log('"START QUESTION TIME"');
-      setCurrentQuestionNumber((num) => num + 1);
-      const countdownBar = createCountdownBar({
-        container: '#countdown-bar-container',
-        time: 7000,
-        millisecond: true,
-        color: '#FFFFFF',
-        autoStart: true,
-        template: (current: CurrentTime) =>
-          `${current.seconds}.${current.milliseconds}`,
-        onFinish: () => true
-      });
-    });
-  }, []);
-
-  // quiz.on('set_question', ({ currentQuestionNumber }) => {
-  //   setCurrentQuestionNumber(currentQuestionNumber);
-  // });
+  const [questionHidden, setQuestionHidden] = useState(false);
+  const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
+  const [consumerTransportState, setConsumerTransportState] =
+    useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
+  const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
+    {} as mediasoupTypes.Consumer
+  );
+  const [userParticipation, setUserParticipation] = useState<Participation>(
+    {} as Participation
+  );
 
   const remoteVideo = useRef<HTMLVideoElement>(null);
-
-  interface screenSize {
-    width: number | undefined;
-    height: number | undefined;
-  }
-
-  const [screenSize, setScreenSize] = useState<screenSize>({
-    width: undefined,
-    height: undefined,
-  });
-
-  useEffect(() => {
-    setScreenSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  }, []);
-
-  const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
-    io('http://localhost:3001/mediasoup');
-
-  peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-    console.log(socketId, producerAlreadyExists);
-  });
+  const host = false;
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
@@ -86,15 +38,61 @@ export default function UserStream() {
   let consumer: mediasoupTypes.Consumer;
   // let isProducer = false;
 
+  useEffect(() => {
+    userApiService.getOneParticipation(partId).then((participation) => {
+      setUserParticipation(participation);
+    });
+
+    quizSocketService.successListener();
+    quizSocketService.startQuizListener(setQuizStarted);
+    quizSocketService.startTimerListener(setQuestionHidden);
+    quizSocketService.revealListener(
+      setQuestionHidden,
+      setTrigger,
+      setCurrentQuestionNumber,
+      host
+    );
+    peersSocketService.successListener();
+    peersSocketService.producerClosedListener(
+      consumerTransportState,
+      consumerState
+    );
+  }, []);
+
+  // interface screenSize {
+  //   width: number | undefined;
+  //   height: number | undefined;
+  // }
+
+  // const [screenSize, setScreenSize] = useState<screenSize>({
+  //   width: undefined,
+  //   height: undefined,
+  // });
+
+  // useEffect(() => {
+  //   setScreenSize({
+  //     width: window.innerWidth,
+  //     height: window.innerHeight,
+  //   });
+  // }, []);
+
   // Consume Trigger
   const goConsume = () => {
     device === undefined ? getRtpCapabilities() : createRecvTransport();
+    console.log('goConsume');
   };
 
-  const createDevice = async () => {
+  const getRtpCapabilities = () => {
+    // get router rtp capabilities from server
+    peersSocketService.emitCreateRoom(createDevice);
+  };
+
+  const createDevice = async (
+    rtpCapabilities: mediasoupTypes.RtpCapabilities
+  ) => {
     try {
       device = new mediasoupClient.Device();
-
+      console.log('RTP Capabilities: ', rtpCapabilities);
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
@@ -109,109 +107,57 @@ export default function UserStream() {
     }
   };
 
-  const getRtpCapabilities = () => {
-    // get router rtp capabilities from server
-    // send to client
-    peers.emit('create_room', (data: any) => {
-      console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
-
-      //assign to local variable
-      rtpCapabilities = data.rtpCapabilities;
-      // create device with rtp capabilities
-      createDevice();
-    });
-  };
-
   const createRecvTransport = async () => {
-    peers.emit(
-      'createWebRtcTransport',
-      { sender: false },
-      ({ transportParams }) => {
-        if (transportParams.error) {
-          console.log(transportParams.error);
-          return;
-        }
-
-        console.log(transportParams);
-
-        // Create recv transport
-        consumerTransport = device.createRecvTransport(transportParams);
-
-        consumerTransport.on(
-          'connect',
-          async ({ dtlsParameters }, callback, errback) => {
-            try {
-              // Signal local DTLS parameters to the server side transport
-              peers.emit('transport_recv_connect', {
-                // transportId: consumerTransport.id,
-                dtlsParameters,
-              });
-              // Tell the transport that parameters were transmitted
-              callback();
-            } catch (err: any) {
-              errback(err);
-            }
-          }
-        );
-
-        connectRecvTransport();
-      }
+    peersSocketService.emitcreateConsumerWebRtcTransport(
+      consumerTransport,
+      device,
+      connectRecvTransport
     );
   };
 
-  const connectRecvTransport = async () => {
-    peers.emit(
-      'consume',
-      {
-        rtpCapabilities: device.rtpCapabilities,
-      },
-      async ({ params }) => {
-        if (params.error) {
-          console.log('Cannnot consume');
-          return;
-        }
-
-        console.log(params);
-        consumer = await consumerTransport.consume({
-          id: params.id,
-          producerId: params.producerId,
-          kind: params.kind,
-          rtpParameters: params.rtpParameters,
-        });
-
-        const { track } = consumer;
-
-        remoteVideo.current!.srcObject = new MediaStream([track]);
-
-        peers.emit('consumer_resume');
-      }
+  const connectRecvTransport = async (
+    connConsumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    connDevice: mediasoupTypes.Device
+  ) => {
+    const response = peersSocketService.emitConsume(
+      connConsumerTransport,
+      connDevice,
+      consumer,
+      remoteVideo
     );
+    setConsumerTransportState(response.consumerTransport);
+    setConsumerState(response.consumer);
   };
 
-  peers.on('producer_closed', () => {
-    // Server notified when producer is closed
-    consumerTransport.close();
-    consumer.close();
-  });
   return (
-    <div className="user-unit">
-      <div className="video-container">
-        <video ref={remoteVideo} className="video" autoPlay={true}></video>
-      </div>
-      <button onClick={goConsume}>Join Stream</button>
-      <div className="question-component">
-        <div className="question-component">
-          {quizStarted && (
-            <Question
-              host={false}
-              currentQuestionNumber={currentQuestionNumber}
-              setCurrentQuestionNumber={setCurrentQuestionNumber}
-            />
-          )}
+    <>
+      <div className="user-unit">
+        <div className="video-container">
+          <video ref={remoteVideo} className="video" autoPlay={true}></video>
         </div>
+        {currentQuestionNumber === 10 ? (
+          <FinalScore userParticipation={userParticipation} />
+        ) : (
+          <div className="question-component">
+            <div className="question-component">
+              {quizStarted && (
+                <PlayerQuestion
+                  partId={partId}
+                  trigger={trigger}
+                  hidden={questionHidden}
+                  currentQuestionNumber={currentQuestionNumber}
+                  setCurrentQuestionNumber={setCurrentQuestionNumber}
+                />
+              )}
+            </div>
+          </div>
+        )}
+        <canvas id="countdown-canvas"></canvas>
+        <div className="current-question"></div>
       </div>
-      <div id="countdown-bar-container"></div>
-      <div className="current-question"></div>
-    </div>
+      <button id="join-stream-btn" onClick={goConsume} disabled={false}>
+        Join Stream
+      </button>
+    </>
   );
 }

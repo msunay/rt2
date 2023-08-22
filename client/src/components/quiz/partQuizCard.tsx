@@ -8,6 +8,8 @@ import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
 import { Dispatch, SetStateAction } from 'react';
 import style from '@/app/dashboard/dashboard.module.css';
+import Link from 'next/link';
+
 
 export default function ParticipationQuizCard({
   quiz,
@@ -69,7 +71,7 @@ export default function ParticipationQuizCard({
   }
 
   return (
-    <>
+    <Link href={'/playQuiz/' + participationId}>
       <div className={style.quiz_card_container}>
         <div className={style.quiz_info}>
           <h2>{quiz.quizName}</h2>
@@ -96,6 +98,6 @@ export default function ParticipationQuizCard({
           )}
         </div>
       </div>
-    </>
+    </Link>
   );
 }

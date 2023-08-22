@@ -10,7 +10,10 @@ import {
   ParticipationAnswer,
 } from '../../Types/Types';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001/';
+export const BASE_URL: string =
+  process.env.NODE_ENV === 'production'
+    ? process.env.BASE_URL!
+    : 'http://localhost:3001/';
 
 export const userApiService = {
   // User methods
@@ -128,6 +131,20 @@ export const userApiService = {
     } catch (err) {
       console.log('Error fetching participations from database::', err);
       return [];
+    }
+  },
+
+  getOneParticipation: async (
+    participationId: string
+  ): Promise<Participation> => {
+    try {
+      const response = await axios.get<Participation>(
+        `${BASE_URL}participation/${participationId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log('Error fetching participation::', err);
+      return {} as Participation;
     }
   },
 

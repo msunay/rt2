@@ -3,11 +3,14 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
+import { io } from '../index';
+
+const QUESTION_TIME = 7000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
 ) => {
-  console.log(quiz.id);
+  console.log('quiz ID: ', quiz.id);
 
   quiz.emit('connection_success', {
     socketId: quiz.id,
@@ -17,8 +20,9 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
-      quiz.broadcast.emit('reveal_answers');
-    }, 7000);
+
+      quiz.emit('reveal_answers');
+    }, QUESTION_TIME);
   });
 
   quiz.on('next_question', () => {
@@ -26,7 +30,7 @@ const quizSocketInit = (
 
     setTimeout(() => {
       quiz.broadcast.emit('reveal_answers');
-    }, 7000);
+    }, QUESTION_TIME);
   });
 };
 

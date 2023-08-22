@@ -33,6 +33,8 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
     try {
       const data = await userApiService.loginUser(form.username);
 
+      // BUG
+      //TODO bad security needs to be on backend
       if (compareSync(form.password, data.dataValues.password)) {
         dispatch(setAuthState(data.token))
         localStorage.setItem('jwt_token', data.token)

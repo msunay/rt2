@@ -44,6 +44,20 @@ async function getUserParticipations(req: Request, res: Response) {
   }
 }
 
+async function getOneParticipation(req: Request, res: Response) {
+  try {
+    const response = await models.Participation.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error('Could not get participations::', err);
+    res.status(500).send();
+  }
+}
+
 async function createParticipationAnswer(req: Request, res: Response) {
   console.log('participationAnswer: ', req.body);
   try {
@@ -84,4 +98,5 @@ export default {
   getUserParticipations,
   getParticipationAnswers,
   deleteParticipation,
+  getOneParticipation
 };
