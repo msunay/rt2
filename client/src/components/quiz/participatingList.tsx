@@ -1,5 +1,5 @@
 'use client';
-
+import style from '@/styles/quiz.module.css';
 import { useAppSelector } from '@/redux/hooks';
 import { Participation, Quiz } from '@/Types/Types';
 import ParticipationQuizCard from './partQuizCard';
@@ -27,18 +27,17 @@ export default function ParticipatingList() {
   }, [participationsList]);
 
   return (
-    <div className="quiz-list-container">
+    <div className={style.quiz_list_container}>
       {loading ? (
         <p>Loading...</p>
       ) : (
         quizList.map((quizItem: Quiz) => (
-          <div key={quizItem.id}>
-            <ParticipationQuizCard
-              quiz={quizItem}
-              quizList={quizList}
-              setQuizList={setQuizList}
-            />
-          </div>
+          <ParticipationQuizCard
+            key={quizItem.id}
+            quiz={quizItem}
+            quizList={quizList}
+            setQuizList={setQuizList}
+          />
         ))
       )}
     </div>

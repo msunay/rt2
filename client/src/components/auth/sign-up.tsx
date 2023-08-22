@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import styles from '@/app/auth-styles/signup.module.css';
+import styles from '@/styles/signup.module.css';
 import { useAppDispatch } from "@/redux/hooks";
 import { genSaltSync, hashSync } from "bcrypt-ts"
 import { setAuthState } from '../../redux/features/authSlice'
