@@ -22,7 +22,7 @@ router.put('/password', userController.changePassword);
 router.get('/userId', auth, userController.getUserId);
 
 // Quiz routes
-router.post('/demoQuiz', addDemoQuiz)
+router.post('/demoQuiz', addDemoQuiz);
 router.get(
   '/quizzesQuestionsAnswers',
   quizController.getQuizzesQuestionsAnswers
@@ -30,14 +30,13 @@ router.get(
 router.get('/quizzes', quizController.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quizController.getOneQuizQuestionAnswers);
 router.get('/quiz/:id', quizController.getOneQuiz);
-router.get('/quiz/next-for-user/:userId', quizController.getNextQuizForUser);
 // Reference tables routes
 router.post('/participation', participationController.createParticipation);
 router.post(
   '/participationAnswer',
   participationController.createParticipationAnswer
 );
-router.get('/participation/:id', referenceTablesController.getOneParticipation)
+router.get('/participation/:id', referenceTablesController.getOneParticipation);
 router.get(
   '/participations/:userId',
   participationController.getUserParticipations

@@ -78,13 +78,11 @@ export default function Dashboard() {
             title="Create a Quiz"
           />
         </>
-        <Link href="/testHostStream">HostQuiz</Link>
-        <Link href="/testUserStream">UserQuiz</Link>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>
         <div>
-          <button className={styles.playNextQuizButton}>Play Quiz</button>
+          <button onClick={() => router.push('/quizLoading')} className={styles.playNextQuizButton}>Play Quiz</button>
         </div>
       </div>
     </>
