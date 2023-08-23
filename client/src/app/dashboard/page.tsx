@@ -54,7 +54,6 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <>
       <div className={styles.dashboard_container}>
         <DashboardButton directTo="/discover" title="Discover Quizzes" />
         <DashboardButton directTo="/participant" title="Participating in" />
@@ -78,6 +77,5 @@ export default function Dashboard() {
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>
       </div>
-    </>
   );
 }

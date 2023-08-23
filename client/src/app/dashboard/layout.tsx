@@ -17,14 +17,16 @@ export default function RootLayout({
   const dispatch = useDispatch();
   
   function exitUser () {
+    router.push('/')
     localStorage.clear();
     dispatch(setAuthState(''));
-    router.push('/')
   }
 
   return (
     <div className={styles.auth_container}>
-      <nav onClick={() => router.push('/dashboard')}>
+      <nav 
+      onClick={() => router.push('/dashboard')}
+      >
         <p> Real Time Trivia</p>
         <Image
           className='exit-icon'
