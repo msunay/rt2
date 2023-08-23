@@ -1,15 +1,12 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
-import QuizLoadingLayout from './layout';
-import QuizInfo from '../../components/quizLoading/QuizInfo';
-import CountdownTimer from '../../components/quizLoading/CountdownTimer';
+import QuizInfo from './QuizInfo';
+import CountdownTimer from './CountdownTimer';
 import { userApiService } from '../../redux/services/apiService';
-import styles from './quizLoading.module.css';
 import { Quiz, Participation } from '@/Types/Types';
+import styles from '@/styles/quizLoading.module.css';
 
-export default function QuizLoadingPage() {
+export default function QuizLoading() {
   const participationsList = useAppSelector(
     (state) => state.participatingSlice.value
   );
@@ -49,6 +46,7 @@ export default function QuizLoadingPage() {
     };
     if (participationsList.length && loading) {
       fetchData();
+      console.log('Is this working??? fetch');
     }
   }, [participationsList]);
 
@@ -57,14 +55,14 @@ export default function QuizLoadingPage() {
       {loading ? (
         <p>Loading...</p>
       ) : nextQuiz && nextParticipation ? (
-        <QuizLoadingLayout>
-          <h1 className={styles.pageTitle}>QUIZ LOADING</h1>
+        <>
+          <h1 className="pageTitle">QUIZ LOADING</h1>
           <QuizInfo quiz={nextQuiz} />
           <CountdownTimer
             startTime={nextQuiz?.dateTime}
             participationId={nextParticipation?.id!}
           />
-        </QuizLoadingLayout>
+        </>
       ) : (
         <p>No upcoming quiz found.</p>
       )}

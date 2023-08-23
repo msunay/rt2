@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { setAuthState } from '@/redux/features/authSlice';
 
-export default function RootLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ export default function RootLayout({
 
   return (
     <div className={styles.auth_container}>
-      <nav 
+      <nav
       onClick={() => router.push('/dashboard')}
       >
         <p> Real Time Trivia</p>

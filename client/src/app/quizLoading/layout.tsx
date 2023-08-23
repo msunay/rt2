@@ -19,3 +19,4 @@ const QuizLoadingLayout: React.FC<QuizLoadingLayoutProps> = ({ children }) => {
 
 export default QuizLoadingLayout;
 
+
