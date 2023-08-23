@@ -12,8 +12,9 @@ import {
 
 export const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BASE_URL!
+    ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
+
 
 export const userApiService = {
   // User methods
@@ -66,6 +67,19 @@ export const userApiService = {
   },
 
   // Quiz methods
+
+  addDemoQuiz: async (ownerId: string, startTime: Date): Promise<Quiz> => {
+    try {
+      const response = await axios.post<Quiz>(`${BASE_URL}demoQuiz`, {
+        ownerId: ownerId,
+        startTime: startTime,
+      });
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return {} as Quiz;
+    }
+  },
 
   getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
     try {

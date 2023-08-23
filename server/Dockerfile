@@ -12,9 +12,9 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
+
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -27,7 +27,6 @@ RUN npm ci
 # Copy application code
 COPY --link . .
 
-
 # Final stage for app image
 FROM base
 
@@ -36,4 +35,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3001
-CMD [ "node", "server.ts" ]
+CMD [ "node", "dist/server.js" ]

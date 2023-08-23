@@ -13,7 +13,6 @@ const localConnection = [
     `${env.DB_USERNAME}`,
     `${env.DB_PASSWORD}`,
     {
-        host: "localhost",
         dialect: "postgres",
         logging: false,
     }

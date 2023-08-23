@@ -25,9 +25,10 @@ export default function Dashboard() {
   );
   const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BASE_URL!
+    ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
+  console.log('BASE_URL: ', BASE_URL);
   useEffect(() => {
     axios
       .get(BASE_URL, {
@@ -50,7 +51,7 @@ export default function Dashboard() {
       .getUserParticipations(userId)
       .then((data) => dispatch(setParticipatingList(data)));
     }
-  });
+  }, []);
 
   return (
     <>
