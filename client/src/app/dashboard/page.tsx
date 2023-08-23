@@ -28,7 +28,6 @@ export default function Dashboard() {
     ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
-  useEffect
   useEffect(() => {
     axios
       .get(BASE_URL, {
@@ -39,10 +38,11 @@ export default function Dashboard() {
         router.push('/');
         console.log('failed: ', error.message);
       });
+      userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
+      userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
+  }, [])
 
-    userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
-    userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
-
+  useEffect(() => {
     if (userId) {
       userApiService
       .getUserDetails(userId)
