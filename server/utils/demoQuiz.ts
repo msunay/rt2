@@ -3,7 +3,6 @@ import models from '../models/index';
 
 export async function addDemoQuiz(req: Request, res: Response) {
   try {
-    console.log('REQUEST ::', req);
     const quiz = await models.Quiz.create({
       quizName: 'Demo Quiz',
       quizOwner: req.body.ownerId,

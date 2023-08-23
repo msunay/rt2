@@ -109,6 +109,7 @@ describe('User endpoint tests', () => {
     await sequelize
       .sync()
       .then(() => console.log('Connected to test database'));
+    await models.User.destroy({ where: {} });
   });
   afterEach(async () => {
     await models.User.destroy({ where: {} });
