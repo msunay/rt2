@@ -23,7 +23,9 @@ export default function ParticipatingList() {
       setQuizList(newQuizList);
       setLoading(false);
     };
-    fetchData();
+    if (participationsList.length && loading) {
+      fetchData();
+    }
   }, [participationsList]);
 
   return (
