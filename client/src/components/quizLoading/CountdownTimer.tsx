@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import styles from '../../app/quizLoading/quizLoading.module.css';
+import styles from '@/styles/quizLoading.module.css';
 import { useRouter } from 'next/navigation';
 import moment from 'moment';
 

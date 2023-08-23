@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import styles from '@/styles/dashboard.module.css';
 import { ReactElement } from 'react';
 import DiscoverList from '../../../components/quiz/discoverList';
@@ -6,6 +6,7 @@ import HostingList from '@/components/quiz/hostingList';
 import ParticipatingList from '@/components/quiz/participatingList';
 import PremiumUpgrade from '@/components/quiz/premiumUpgrade';
 import CreateQuiz from '@/components/quiz/createQuiz';
+import QuizLoading from '@/components/quizLoading/quizLoading';
 
 export default function QuizDetails({
   params,
@@ -29,6 +30,8 @@ export default function QuizDetails({
       break;
     case 'create-quiz':
       element = <CreateQuiz />;
+    case 'quizLoading':
+      element = <QuizLoading />;
       break;
     default:
       element = <></>;
