@@ -1,25 +1,14 @@
 import React from 'react';
 import { Quiz } from '../../Types/Types';
-import styles from '../../app/QuizLoading/quizLoading.module.css';
+import styles from '../../app/quizLoading/quizLoading.module.css';
 
-interface QuizInfoProps {
-  quiz: Quiz;
-}
-
-const QuizInfo: React.FC<QuizInfoProps> = ({ quiz }) => {
+export default function QuizInfo({ quiz }: { quiz: Quiz }) {
   return (
     <div className={styles.quizInfoContainer}>
       <h2 className={styles.quizTitle}>{quiz.quizName}</h2>
       <div className={styles.infoGroup}>
-        <span className={styles.label}>Quiz Host:</span>
-        <span className={styles.contentText}>{quiz.host_name}</span>
-      </div>
-      <div className={styles.infoGroup}>
-        <span className={styles.label}>Category:</span>
-        <span className={styles.contentText}>{quiz.category}</span>
+        <span className={styles.contentText}>Category: {quiz.category}</span>
       </div>
     </div>
   );
-};
-
-export default QuizInfo;
+}

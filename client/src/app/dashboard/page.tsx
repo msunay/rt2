@@ -62,6 +62,14 @@ export default function Dashboard() {
   return (
     <>
       <div className={styles.dashboard_container}>
+        <div>
+          <button
+            onClick={() => router.push('/quizLoading')}
+            className={styles.playNextQuizButton}
+          >
+            Play Next Quiz
+          </button>
+        </div>
         <DashboardButton directTo="/discover" title="Discover Quizzes" />
         <DashboardButton directTo="/participant" title="Participating in" />
         <>
@@ -80,9 +88,6 @@ export default function Dashboard() {
         </>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
-        </div>
-        <div>
-          <button onClick={() => router.push('/quizLoading')} className={styles.playNextQuizButton}>Play Quiz</button>
         </div>
       </div>
     </>
