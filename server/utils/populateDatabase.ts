@@ -37,7 +37,7 @@ async function populateDatabase() {
         quizName: `Mock Quiz ${i}`,
         quizOwner: mocks.hosts[0].id,
         category: 'General Knowledge',
-        dateTime: moment().add(5, 'days').toDate(),
+        dateTime: moment().add(i, 'days').toDate(),
       });
 
       // Create questions and answers
@@ -68,3 +68,5 @@ async function populateDatabase() {
 }
 
 populateDatabase();
+
+export default populateDatabase;
