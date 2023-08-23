@@ -59,7 +59,6 @@ export default function Dashboard() {
   }, [userId]);
 
   return (
-    <>
       <div className={styles.dashboard_container}>
         <div>
           <button
@@ -89,6 +88,5 @@ export default function Dashboard() {
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>
       </div>
-    </>
   );
 }

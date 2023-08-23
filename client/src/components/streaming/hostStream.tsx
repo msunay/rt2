@@ -213,7 +213,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
         <div  className={styles.btn_holder}>
           <div className={styles.quiz_controls}>
-          <canvas id="countdown-canvas"></canvas>
+            <canvas id="countdown-canvas" width={80} height={80}></canvas>
             {quizStarted ? (
               currentQuestionNumber === 9 ? (
                 <button
@@ -240,7 +240,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
                 Start Quiz
               </button>
             )}
-        </div>
+          </div>
           <button className={styles.stream_btns} onClick={getLocalStream}>
             Start Video
           </button>

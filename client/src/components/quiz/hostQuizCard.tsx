@@ -62,7 +62,7 @@ export default function HostQuizCard({ quiz }: { quiz: Quiz }) {
         <div className={style.quiz_info}>
           <h2>{quiz.quizName}</h2>
           <h4>{quiz.category}</h4>
-          <h4>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</h4>
+          <p>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</p>
         </div>
       </div>
     </Link>
