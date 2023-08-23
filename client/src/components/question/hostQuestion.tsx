@@ -94,7 +94,7 @@ export default function HostQuestion({
     <>
       {currentQuestion && !hidden && (
         <div className={style.host_question_container}>
-          <p className={style.question_text}>{currentQuestion.questionText + 'dflasdjfkasjdf;lkajsdf;klasjdf;lkasjdf;lkasdjf;lkasjdf;lksadjf;lk'}</p>
+          <p className={style.question_text}>{currentQuestion.questionText}</p>
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <button name="a" key={index} className={`answer${index + 1}`}>
