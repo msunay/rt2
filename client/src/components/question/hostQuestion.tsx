@@ -55,6 +55,7 @@ export default function HostQuestion({
     userApiService
       .getUserParticipations(userId)
       .then((participationArr) => {
+        console.log('participationArr: ', participationArr);
         const currentParticipation = participationArr.filter(
           (elem) => elem.QuizId === quizId
         )[0];

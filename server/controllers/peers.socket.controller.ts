@@ -52,7 +52,7 @@ const createWebRtcTransport = async (callback: any) => {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '127.0.0.1', // TODO .env fly.io server ip
+          ip: '0.0.0.0',
         },
       ],
       enableUdp: true,

@@ -1,6 +1,5 @@
 'use client'
 import '../globals.css';
-import { Providers } from '@/redux/provider';
 import styles from '@/styles/auth.module.css';
 import { useRouter } from 'next/navigation';
 import exit_icon from '@/public/icons-exit.png';
@@ -15,8 +14,9 @@ export default function RootLayout({
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
-  
+
   function exitUser () {
+    //TODO maybe dont completely clear localstorage
     localStorage.clear();
     dispatch(setAuthState(''));
     router.push('/')
@@ -35,7 +35,7 @@ export default function RootLayout({
           onClick={() => exitUser()}
         />
         </nav>
-      <Providers>{children}</Providers>
+      {children}
     </div>
   );
 }
