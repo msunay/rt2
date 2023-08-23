@@ -1,5 +1,3 @@
-'use client';
-
 import styles from '@/styles/dashboard.module.css';
 import { ReactElement } from 'react';
 import DiscoverList from '../../../components/quiz/discoverList';

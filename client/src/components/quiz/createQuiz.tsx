@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';

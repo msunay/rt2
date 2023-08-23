@@ -1,3 +1,16 @@
+.host_question_container {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  height: 40%;
+  width: 100%;
+  flex-wrap: wrap;
+  border-radius: 12px;
+  bottom: 15%;
+  right: 0px;
+  background-color: rgb(211, 211, 211, 0.1);
+}
+
 .question_container {
   position: fixed;
   display: flex;
@@ -11,12 +24,12 @@
   background-color: rgb(211, 211, 211, 0.1);
 }
 
-.question_container p {
+.question_text {
   text-align: center;
   font-family: monospace;
   font-weight: 800;
   text-transform: uppercase;
-  width: 100%;
+  width: 100%
 }
 
 .answer_container {
