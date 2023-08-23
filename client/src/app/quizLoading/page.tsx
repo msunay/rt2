@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
-// import QuizLoadingLayout from './layout';
 import QuizInfo from '../../components/quizLoading/QuizInfo';
 import CountdownTimer from '../../components/quizLoading/CountdownTimer';
 import { userApiService } from '../../redux/services/apiService';
@@ -20,6 +19,7 @@ export default function QuizLoadingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Is this working???');
     const fetchData = async () => {
       const newQuizList: Quiz[] = [];
       console.log('PARTICIPATIONS LIST::', participationsList);

@@ -83,7 +83,11 @@ export default function HostQuestion({
     ) {
       setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
     }
-  }, [quiz, trigger]);
+  }, [quiz, currentQuestionNumber]);
+
+  // useEffect(() => {
+
+  // }, [currentQuestionNumber])
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
