@@ -199,16 +199,16 @@ export default function HostStream({ quizId }: { quizId: string }) {
         <div className={styles.video_container}>
           <video ref={localVideo} className={styles.video} autoPlay={true}></video>
           <div className="question-component">
-          {quizStarted && (
-              <HostQuestion
-                quizId={quizId}
-                trigger={trigger}
-                hidden={questionHidden}
-                currentQuestionNumber={currentQuestionNumber}
-                setCurrentQuestionNumber={setCurrentQuestionNumber}
-              />
-          )}
-        </div>
+            {quizStarted && (
+                <HostQuestion
+                  quizId={quizId}
+                  trigger={trigger}
+                  hidden={questionHidden}
+                  currentQuestionNumber={currentQuestionNumber}
+                  setCurrentQuestionNumber={setCurrentQuestionNumber}
+                />
+            )}
+          </div>
         </div>
 
         <div  className={styles.btn_holder}>
