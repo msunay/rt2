@@ -1,6 +1,6 @@
 import React from 'react';
 import { Quiz } from '../../Types/Types';
-import styles from '../../app/quizLoading/quizLoading.module.css';
+import styles from '@/styles/quizLoading.module.css';
 
 export default function QuizInfo({ quiz }: { quiz: Quiz }) {
   return (

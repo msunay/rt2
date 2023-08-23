@@ -1,14 +1,12 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
-import QuizInfo from '../../components/quizLoading/QuizInfo';
-import CountdownTimer from '../../components/quizLoading/CountdownTimer';
+import QuizInfo from './QuizInfo';
+import CountdownTimer from './CountdownTimer';
 import { userApiService } from '../../redux/services/apiService';
-import styles from './quizLoading.module.css';
 import { Quiz, Participation } from '@/Types/Types';
+import styles from '@/styles/quizLoading.module.css';
 
-export default function QuizLoadingPage() {
+export default function QuizLoading() {
   const participationsList = useAppSelector(
     (state) => state.participatingSlice.value
   );
@@ -19,8 +17,6 @@ export default function QuizLoadingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Is this working???');
-    console.log('PARTICIPATIONS LIST::', participationsList);
     const fetchData = async () => {
       const newQuizList: Quiz[] = [];
       console.log('PARTICIPATIONS LIST::', participationsList);
