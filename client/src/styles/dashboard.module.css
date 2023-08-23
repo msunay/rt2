@@ -103,3 +103,64 @@
   padding-top: 16%;
   width: 100%;
 }
+
+/* Styling the quizList and quizCard components */
+.quiz_card_container {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 1px 3px 3px 4px lightgray;
+  height: 15vh;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  padding: 1em;
+}
+
+.quiz_card_container h2 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.quiz_card_container h4 {
+  color: grey;
+}
+
+.quiz_info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.add_or_remove {
+  margin: auto;
+}
+
+.plus_icon {
+  height: 40px;
+  width: 40px;
+}
+
+.tick_icon {
+  height: 60px;
+  width: 60px;
+}
+
+.btn {
+  background-color: transparent;
+  border: none;
+}
+
+.playNextQuizButton {
+  cursor: pointer;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0070f3;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.playNextQuizButton:hover {
+  background-color: #415b5f;
+  color: white;
+}

@@ -24,37 +24,51 @@ export default function Dashboard() {
     (state: RootState) => state.authSlice.authToken
   );
   const BASE_URL: string =
-  process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_BACKEND_URL!
-    : 'http://localhost:3001/';
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_BACKEND_URL!
+      : 'http://localhost:3001/';
 
-  console.log('BASE_URL: ', BASE_URL);
   useEffect(() => {
     axios
       .get(BASE_URL, {
-        headers: { Authorization: `Bearer ${authToken}` }})
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
       .then((res) => {
-        if (res.status !== 200) {router.push('/')}
-      }).catch(error => {
+        if (res.status !== 200) {
+          router.push('/');
+        }
+      })
+      .catch((error) => {
         router.push('/');
         console.log('failed: ', error.message);
       });
+      userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
+      userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
+  }, [])
 
-    userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
-    userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
-
+  useEffect(() => {
     if (userId) {
       userApiService
-      .getUserDetails(userId)
-      .then((data) => dispatch(setUserDetails(data)));
+        .getUserDetails(userId)
+        .then((data) => dispatch(setUserDetails(data)));
       userApiService
       .getUserParticipations(userId)
-      .then((data) => dispatch(setParticipatingList(data)));
+      .then((data) => {
+        dispatch(setParticipatingList(data))
+      });
     }
-  }, []);
+  }, [userId]);
 
   return (
       <div className={styles.dashboard_container}>
+        <div>
+          <button
+            onClick={() => router.push('/quizLoading')}
+            className={styles.playNextQuizButton}
+          >
+            Play Next Quiz
+          </button>
+        </div>
         <DashboardButton directTo="/discover" title="Discover Quizzes" />
         <DashboardButton directTo="/participant" title="Participating in" />
         <>
@@ -71,8 +85,6 @@ export default function Dashboard() {
             title="Create a Quiz"
           />
         </>
-        <Link href="/testHostStream">HostQuiz</Link>
-        <Link href="/testUserStream">UserQuiz</Link>
         <div className="total-points">
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>

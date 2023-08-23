@@ -190,7 +190,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
   const endStream = () => {
     producer.close();
-    producerTransport.close();
+    // producerTransport.close();
     mediaStream.getTracks().forEach((track) => track.stop());
   };
 

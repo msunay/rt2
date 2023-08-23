@@ -16,6 +16,7 @@ const corsOrigin = process.env.NODE_ENV === 'production'
 const corsOptions = {
   origin: corsOrigin,
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  credentials: true
 };
 app.use(cors(corsOptions));
 app.use(express.json());
