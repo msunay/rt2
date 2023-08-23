@@ -10,7 +10,6 @@ process.env.NODE_ENV === 'production'
   ? process.env.NEXT_PUBLIC_BACKEND_URL
   : 'http://localhost:3001/';
 
-  console.log('BASE_URLpeers: ', BASE_URL);
 
 const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
   `${BASE_URL}mediasoup`

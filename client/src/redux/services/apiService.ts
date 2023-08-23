@@ -15,7 +15,6 @@ export const BASE_URL: string =
     ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
-console.log('BASE_URLapi: ', BASE_URL);
 
 export const userApiService = {
   // User methods
@@ -142,6 +141,7 @@ export const userApiService = {
       const response = await axios.get<Participation[]>(
         `${BASE_URL}participations/${userId}`
       );
+      
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);
