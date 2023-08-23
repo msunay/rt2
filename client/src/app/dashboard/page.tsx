@@ -28,7 +28,6 @@ export default function Dashboard() {
     ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
-  console.log('BASE_URL: ', BASE_URL);
   useEffect(() => {
     axios
       .get(BASE_URL, {
