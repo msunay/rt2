@@ -42,21 +42,22 @@ export default function Dashboard() {
         router.push('/');
         console.log('failed: ', error.message);
       });
+      userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
+      userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
+  }, [])
 
-    userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
-    userApiService
-      .getUserId(authToken)
-      .then((data) => dispatch(setUserId(data)));
-
+  useEffect(() => {
     if (userId) {
       userApiService
         .getUserDetails(userId)
         .then((data) => dispatch(setUserDetails(data)));
       userApiService
-        .getUserParticipations(userId)
-        .then((data) => dispatch(setParticipatingList(data)));
+      .getUserParticipations(userId)
+      .then((data) => {
+        dispatch(setParticipatingList(data))
+      });
     }
-  }, []);
+  }, [userId]);
 
   return (
     <>
