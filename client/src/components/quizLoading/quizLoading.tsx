@@ -56,7 +56,7 @@ export default function QuizLoading() {
         <p>Loading...</p>
       ) : nextQuiz && nextParticipation ? (
         <>
-          <h1 className={styles.pageTitle}>QUIZ LOADING</h1>
+          <h1 className="pageTitle">QUIZ LOADING</h1>
           <QuizInfo quiz={nextQuiz} />
           <CountdownTimer
             startTime={nextQuiz?.dateTime}
