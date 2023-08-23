@@ -20,6 +20,7 @@ export default function QuizLoadingPage() {
 
   useEffect(() => {
     console.log('Is this working???');
+    console.log('PARTICIPATIONS LIST::', participationsList);
     const fetchData = async () => {
       const newQuizList: Quiz[] = [];
       console.log('PARTICIPATIONS LIST::', participationsList);
@@ -49,6 +50,7 @@ export default function QuizLoadingPage() {
     };
     if (participationsList.length && loading) {
       fetchData();
+      console.log('Is this working??? fetch');
     }
   }, [participationsList]);
 
