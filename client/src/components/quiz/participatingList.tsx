@@ -20,7 +20,15 @@ export default function ParticipatingList() {
         const data = await userApiService.getOneQuiz(participation.QuizId!);
         newQuizList.push(...data);
       }
-      setQuizList(newQuizList);
+      setQuizList(
+        newQuizList
+          .sort(
+            (quizA, quizB) =>
+              new Date(quizA.dateTime).getTime() -
+              new Date(quizB.dateTime).getTime()
+          )
+          .filter((quiz) => new Date(quiz.dateTime).getTime() > Date.now())
+      );
       setLoading(false);
     };
     if (participationsList.length && loading) {

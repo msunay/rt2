@@ -9,8 +9,6 @@ import { userApiService } from '../../redux/services/apiService';
 import styles from './quizLoading.module.css';
 import { Quiz, Participation } from '@/Types/Types';
 
-// ... (import statements and other code)
-
 export default function QuizLoadingPage() {
   const participationsList = useAppSelector(
     (state) => state.participatingSlice.value
@@ -21,8 +19,10 @@ export default function QuizLoadingPage() {
   >(undefined);
   const [loading, setLoading] = useState(true);
 
+  let fetchData: () => void;
+
   useEffect(() => {
-    const fetchData = async () => {
+    fetchData = async () => {
       const newQuizList: Quiz[] = [];
       console.log('PARTICIPATIONS LIST::', participationsList);
       for (const participation of participationsList) {
@@ -49,6 +49,9 @@ export default function QuizLoadingPage() {
       }
       setLoading(false);
     };
+  }, []);
+
+  useEffect(() => {
     fetchData();
   }, [participationsList]);
 
