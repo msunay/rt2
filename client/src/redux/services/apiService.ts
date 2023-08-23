@@ -141,6 +141,7 @@ export const userApiService = {
       const response = await axios.get<Participation[]>(
         `${BASE_URL}participations/${userId}`
       );
+      
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);
