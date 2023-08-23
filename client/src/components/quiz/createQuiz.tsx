@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';
+import styles from '@/styles/quiz.module.css';
 
 export default function CreateQuiz() {
   const ownerId = useAppSelector((state) => state.userIdSlice.value);
@@ -19,7 +20,7 @@ export default function CreateQuiz() {
 
   return (
     <>
-      <form className="create-quiz" onSubmit={handleSubmit}>
+      <form className={styles.create_quiz} onSubmit={handleSubmit}>
         <input
           type="datetime-local"
           value={startTime.toISOString().slice(0, -8)}
