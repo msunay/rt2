@@ -19,10 +19,8 @@ export default function QuizLoadingPage() {
   >(undefined);
   const [loading, setLoading] = useState(true);
 
-  let fetchData: () => void;
-
   useEffect(() => {
-    fetchData = async () => {
+    const fetchData = async () => {
       const newQuizList: Quiz[] = [];
       console.log('PARTICIPATIONS LIST::', participationsList);
       for (const participation of participationsList) {
@@ -49,10 +47,9 @@ export default function QuizLoadingPage() {
       }
       setLoading(false);
     };
-  }, []);
-
-  useEffect(() => {
-    fetchData();
+    if (participationsList.length && loading) {
+      fetchData();
+    }
   }, [participationsList]);
 
   return (
