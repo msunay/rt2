@@ -40,7 +40,7 @@ export default function ParticipatingList() {
   return (
     <div className={style.quiz_list_container}>
       {loading ? (
-        <p>You're currently not signed up to any quizzes, checkout the <Link href={'/discover/'}>Discover page</Link> to get started.</p>
+        <p>You are currently not signed up to any quizzes, checkout the <Link href={'/discover/'}>Discover page</Link> to get started.</p>
       ) : (
         quizList.map((quizItem: Quiz) => (
           <ParticipationQuizCard
