@@ -16,8 +16,7 @@ export default function RootLayout({
   const dispatch = useDispatch();
 
   function exitUser () {
-    //TODO maybe dont completely clear localstorage
-    localStorage.clear();
+    localStorage.removeItem('jwt_token');
     dispatch(setAuthState(''));
     router.push('/')
   }
