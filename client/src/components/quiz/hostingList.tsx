@@ -1,3 +1,5 @@
+'use client'
+
 import { useAppSelector } from '@/redux/hooks';
 import { Quiz } from '@/Types/Types';
 import HostQuizCard from './hostQuizCard';
