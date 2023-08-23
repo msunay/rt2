@@ -28,6 +28,7 @@ export default function Dashboard() {
     ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
+  useEffect
   useEffect(() => {
     axios
       .get(BASE_URL, {
@@ -48,9 +49,11 @@ export default function Dashboard() {
       .then((data) => dispatch(setUserDetails(data)));
       userApiService
       .getUserParticipations(userId)
-      .then((data) => dispatch(setParticipatingList(data)));
+      .then((data) => {
+        dispatch(setParticipatingList(data))
+      });
     }
-  }, []);
+  }, [userId]);
 
   return (
     <>
