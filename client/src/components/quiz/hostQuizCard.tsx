@@ -1,3 +1,5 @@
+'use client'
+
 import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
@@ -36,25 +38,6 @@ export default function HostQuizCard({ quiz }: { quiz: Quiz }) {
       }
     }
   }, [participationList]);
-
-  async function handleAdd() {
-    try {
-      await userApiService.addParticipation(quiz.id!, userId);
-      setIsSignedUp(true);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  async function handleRemove() {
-    try {
-      if (participationId) {
-        await userApiService.deleteParticipation(participationId);
-      }
-      setIsSignedUp(false);
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   return (
     <Link href={'/hostQuiz/' + quiz.id}>

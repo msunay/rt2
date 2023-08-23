@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import arrowImage from '@/public/swg-arrow.svg'
 import { useRouter } from "next/navigation";

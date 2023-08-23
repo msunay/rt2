@@ -4,7 +4,6 @@ import { Participation, ParticipationAndAnswers } from '@/Types/Types';
 import { useState, useEffect } from 'react';
 import { userApiService } from '@/redux/services/apiService';
 
-// ... (import statements)
 
 export default function FinalScore({userParticipation}: {userParticipation: Participation}) {
   const [playerScore, setPlayerScore] = useState(0);
