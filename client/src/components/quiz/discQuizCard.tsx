@@ -1,3 +1,4 @@
+'use client';
 import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
 import Image from 'next/image';

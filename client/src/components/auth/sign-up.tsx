@@ -1,3 +1,5 @@
+'use client';
+
 import { FormEvent, useEffect, useState } from "react";
 import styles from '@/styles/signup.module.css';
 import { useAppDispatch } from "@/redux/hooks";

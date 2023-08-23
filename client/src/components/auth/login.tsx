@@ -1,3 +1,5 @@
+'use client'
+
 import styles from "@/styles/login.module.css";
 import { FormEvent, useState } from "react";
 import { compareSync } from "bcrypt-ts"

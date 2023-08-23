@@ -5,6 +5,7 @@ import { Participation, Quiz } from '@/Types/Types';
 import ParticipationQuizCard from './partQuizCard';
 import { userApiService } from '@/redux/services/apiService';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function ParticipatingList() {
   const participationsList = useAppSelector(
@@ -38,8 +39,8 @@ export default function ParticipatingList() {
 
   return (
     <div className={style.quiz_list_container}>
-      {loading ? (
-        <p>Loading...</p>
+      {quizList.length === 0 ? (
+        <p>You are currently not signed up to any quizzes, checkout the <Link href={'discover/'}>Discover page</Link> to get started.</p>
       ) : (
         quizList.map((quizItem: Quiz) => (
           <ParticipationQuizCard

@@ -1,3 +1,4 @@
+'use client';
 import { Quiz, Participation } from '@/Types/Types';
 import moment from 'moment';
 import Image from 'next/image';
@@ -8,7 +9,6 @@ import { useAppSelector } from '@/redux/hooks';
 import { userApiService } from '@/redux/services/apiService';
 import { Dispatch, SetStateAction } from 'react';
 import style from '@/styles/quiz.module.css';
-import Link from 'next/link';
 
 export default function ParticipationQuizCard({
   quiz,

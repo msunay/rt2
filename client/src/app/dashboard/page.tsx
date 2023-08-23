@@ -61,12 +61,7 @@ export default function Dashboard() {
   return (
       <div className={styles.dashboard_container}>
         <div>
-          <button
-            onClick={() => router.push('/quizLoading')}
-            className={styles.playNextQuizButton}
-          >
-            Play Next Quiz
-          </button>
+          <DashboardButton directTo='/quizLoading' title="Play Next Quiz" />
         </div>
         <DashboardButton directTo="/discover" title="Discover Quizzes" />
         <DashboardButton directTo="/participant" title="Participating in" />

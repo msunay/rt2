@@ -29,7 +29,7 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_question_timer');
 
     setTimeout(() => {
-      quiz.broadcast.emit('reveal_answers');
+      quiz.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 };
