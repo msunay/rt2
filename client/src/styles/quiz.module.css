@@ -4,6 +4,8 @@
   height: 100%;
   flex-direction: column;
   row-gap: 30px;
+  overflow: scroll;
+  padding: 10px;
 }
 
 .quiz_card_container {
@@ -21,9 +23,9 @@
 .quiz_info {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   text-align: left;
-  height: 100%;
+  height: 12vh;
 }
 
 .quiz_info h2 {
@@ -57,4 +59,28 @@
 .btn {
   background-color: transparent;
   border: unset;
+}
+
+.create_quiz {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  row-gap: 20px;
+  align-items: center;
+}
+
+.create_quiz > input {
+  width: 80%;
+}
+
+.create_quiz > button {
+  width: 50%;
+  padding: 10px;
+  border: unset;
+  border-radius: 6px;
+  color: white;
+  background-color: var(--primary-color);
 }

@@ -30,7 +30,7 @@ nav {
   justify-content: center;
   align-items: center;
   height: 80px;
-  background-color: var(--primary-color);
+  width: 100%;
   color: white;
   text-align: center;
   font-family: Jockey One;
@@ -38,6 +38,9 @@ nav {
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  background-color: var(--primary-color);
+  position: absolute;
+  top: 0;
 }
 
 .exit-icon {
@@ -53,6 +56,10 @@ nav {
 a {
   all: unset;
   text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-color-scheme: dark) {

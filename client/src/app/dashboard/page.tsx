@@ -13,7 +13,6 @@ import { setParticipatingList } from '@/redux/features/participatingSlice';
 import { setUserId } from '@/redux/features/userIdSlice';
 import { setUserDetails } from '@/redux/features/userDetailsSlice';
 import axios from 'axios';
-import Link from 'next/link';
 
 export default function Dashboard() {
   const userDetails = useAppSelector((state) => state.userDetailsSlice.value);
@@ -42,25 +41,24 @@ export default function Dashboard() {
         router.push('/');
         console.log('failed: ', error.message);
       });
-      userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
-      userApiService.getUserId(authToken).then((data) => dispatch(setUserId(data)));
-  }, [])
+    userApiService.getAllQuizzes().then((data) => dispatch(setQuizList(data)));
+    userApiService
+      .getUserId(authToken)
+      .then((data) => dispatch(setUserId(data)));
+  }, []);
 
   useEffect(() => {
     if (userId) {
       userApiService
         .getUserDetails(userId)
         .then((data) => dispatch(setUserDetails(data)));
-      userApiService
-      .getUserParticipations(userId)
-      .then((data) => {
-        dispatch(setParticipatingList(data))
+      userApiService.getUserParticipations(userId).then((data) => {
+        dispatch(setParticipatingList(data));
       });
     }
   }, [userId]);
 
   return (
-    <>
       <div className={styles.dashboard_container}>
         <div>
           <button
@@ -90,6 +88,5 @@ export default function Dashboard() {
           POINTS EARNED: {userDetails.pointsWon ? userDetails.pointsWon : 0}
         </div>
       </div>
-    </>
   );
 }

@@ -9,8 +9,6 @@ import { userApiService } from '../../redux/services/apiService';
 import styles from './quizLoading.module.css';
 import { Quiz, Participation } from '@/Types/Types';
 
-// ... (import statements and other code)
-
 export default function QuizLoadingPage() {
   const participationsList = useAppSelector(
     (state) => state.participatingSlice.value
@@ -49,7 +47,9 @@ export default function QuizLoadingPage() {
       }
       setLoading(false);
     };
-    fetchData();
+    if (participationsList.length && loading) {
+      fetchData();
+    }
   }, [participationsList]);
 
   return (

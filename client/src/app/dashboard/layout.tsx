@@ -16,15 +16,16 @@ export default function RootLayout({
   const dispatch = useDispatch();
 
   function exitUser () {
-    //TODO maybe dont completely clear localstorage
-    localStorage.clear();
+    localStorage.removeItem('jwt_token');
     dispatch(setAuthState(''));
     router.push('/')
   }
 
   return (
     <div className={styles.auth_container}>
-      <nav onClick={() => router.push('/dashboard')}>
+      <nav 
+      onClick={() => router.push('/dashboard')}
+      >
         <p> Real Time Trivia</p>
         <Image
           className='exit-icon'
