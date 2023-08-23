@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
-import QuizLoadingLayout from './layout';
+// import QuizLoadingLayout from './layout';
 import QuizInfo from '../../components/quizLoading/QuizInfo';
 import CountdownTimer from '../../components/quizLoading/CountdownTimer';
 import { userApiService } from '../../redux/services/apiService';
@@ -57,14 +57,14 @@ export default function QuizLoadingPage() {
       {loading ? (
         <p>Loading...</p>
       ) : nextQuiz && nextParticipation ? (
-        <QuizLoadingLayout>
+        <>
           <h1 className={styles.pageTitle}>QUIZ LOADING</h1>
           <QuizInfo quiz={nextQuiz} />
           <CountdownTimer
             startTime={nextQuiz?.dateTime}
             participationId={nextParticipation?.id!}
           />
-        </QuizLoadingLayout>
+        </>
       ) : (
         <p>No upcoming quiz found.</p>
       )}
