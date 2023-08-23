@@ -93,7 +93,7 @@ export default function HostQuestion({
   return (
     <>
       {currentQuestion && !hidden && (
-        <div className={style.question_container}>
+        <div className={style.host_question_container}>
           <p className={style.question_text}>{currentQuestion.questionText}</p>
           <div className={style.answer_container}>
             {currentAnswers?.map((answer, index) => (
