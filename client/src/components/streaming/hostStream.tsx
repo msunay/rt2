@@ -10,12 +10,17 @@ import {
   startTimer,
 } from '@/redux/services/quizSocketService';
 import { peersSocketService } from '@/redux/services/peersSocketService';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { incrementQuestionNumber } from '@/redux/features/questionSlice';
 
-export const QUESTION_TIME = 7000;
+export const QUESTION_TIME = 2000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
+  const dispatch = useAppDispatch();
+
   const [quizStarted, setQuizStarted] = useState(false);
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
+  // const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
 
@@ -23,8 +28,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
   const nextQBtn = useRef<HTMLButtonElement>(null);
   const startBtn = useRef<HTMLButtonElement>(null);
 
-
-  const host = true;
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupTypes.Transport;
   let producer: mediasoupTypes.Producer;
@@ -33,46 +36,38 @@ export default function HostStream({ quizId }: { quizId: string }) {
   useEffect(() => {
     quizSocketService.successListener();
     quizSocketService.startTimerListener(setQuestionHidden);
-    quizSocketService.revealListener(
-      setQuestionHidden,
-      setTrigger,
-      setCurrentQuestionNumber,
-      host
-    );
+    // quizSocketService.revealListener(
+    //   setQuestionHidden
+    // );
+    quizSocketService.revealAnswerHostListener(setQuestionHidden)
     peersSocketService.successListener();
   }, []);
 
-
-
   function startQuiz() {
-    // TODO nextQBtn is undefined because it is not on screen when startQuiz is clicked
-    // nextQBtn.current!.disabled = true;
-    // setTimeout(() => {
-    //   nextQBtn.current!.disabled = false;
-    // }, 9000);
-
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
-    quizSocketService.emitNextQ();
+    // quizSocketService.emitNextQ();
+    dispatch(incrementQuestionNumber())
   }
 
   function nextQuestion() {
-    setQuestionHidden(false)
-    nextQBtn.current!.disabled = true;
-    setTimeout(() => {
-      nextQBtn.current!.disabled = false;
-    }, QUESTION_TIME + 2000);
+    setQuestionHidden(false);
+    if (currentQuestionNumber < 9) {
+      nextQBtn.current!.disabled = true;
+      setTimeout(() => {
+        nextQBtn.current!.disabled = false;
+      }, QUESTION_TIME + 2000);
+    }
     document
       .querySelectorAll('button[name="a"]')
       //@ts-ignore
       .forEach((btn) => (btn.disabled = false));
-    setCurrentQuestionNumber(
-      (currentQuestionNumber) => currentQuestionNumber + 1
-    );
+    dispatch(incrementQuestionNumber())
     document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
     startTimer();
+    setTrigger((trigger) => trigger + 1);
   }
 
   const stream = () => {
@@ -195,62 +190,66 @@ export default function HostStream({ quizId }: { quizId: string }) {
   };
 
   return (
-      <div className={styles.unit}>
-        <div className={styles.video_container}>
-          <video ref={localVideo} className={styles.video} autoPlay={true}></video>
-          <div className="question-component">
-            {quizStarted && (
-                <HostQuestion
-                  quizId={quizId}
-                  trigger={trigger}
-                  hidden={questionHidden}
-                  currentQuestionNumber={currentQuestionNumber}
-                  setCurrentQuestionNumber={setCurrentQuestionNumber}
-                />
-            )}
-          </div>
-        </div>
-
-        <div  className={styles.btn_holder}>
-          <div className={styles.quiz_controls}>
-            <canvas id="countdown-canvas" width={80} height={80}></canvas>
-            {quizStarted ? (
-              currentQuestionNumber === 9 ? (
-                <button
-                  className={styles.next_q_btn}
-                  onClick={() =>
-                    setCurrentQuestionNumber(
-                      (currentQuestionNumber) => currentQuestionNumber + 1
-                    )
-                  }
-                >
-                  Reveal Scores
-                </button>
-              ) : (
-                <button
-                  ref={nextQBtn}
-                  className={styles.next_q_btn}
-                  onClick={nextQuestion}
-                >
-                  Next Question
-                </button>
-              )
-            ) : (
-              <button ref={startBtn} className={styles.next_q_btn} onClick={startQuiz}>
-                Start Quiz
-              </button>
-            )}
-          </div>
-          <button className={styles.stream_btns} onClick={getLocalStream}>
-            Start Video
-          </button>
-          <button className={styles.stream_btns} onClick={stream}>
-            Stream
-          </button>
-          <button className={styles.stream_btns} onClick={endStream}>
-            End Stream
-          </button>
+    <div className={styles.unit}>
+      <div className={styles.video_container}>
+        <video
+          ref={localVideo}
+          className={styles.video}
+          autoPlay={true}
+        ></video>
+        <div className="question-component">
+          {quizStarted && (
+            <HostQuestion
+              quizId={quizId}
+              trigger={trigger}
+              hidden={questionHidden}
+            />
+          )}
         </div>
       </div>
+
+      <div className={styles.btn_holder}>
+        <div className={styles.quiz_controls}>
+          <canvas id="countdown-canvas" width={80} height={80}></canvas>
+          {quizStarted ? (
+            currentQuestionNumber === 10 ? (
+              <button
+                className={styles.next_q_btn}
+                onClick={() =>
+                  dispatch(incrementQuestionNumber())
+                }
+              >
+                Reveal Winners
+              </button>
+            ) : (
+              <button
+                ref={nextQBtn}
+                className={styles.next_q_btn}
+                onClick={nextQuestion}
+              >
+                Next Question
+              </button>
+            )
+          ) : (
+            <button
+              ref={startBtn}
+              className={styles.next_q_btn}
+              onClick={startQuiz}
+            >
+              Start Quiz
+            </button>
+          )}
+        </div>
+        <button className={styles.stream_btns} onClick={getLocalStream}>
+          Start Video
+        </button>
+        <button className={styles.stream_btns} onClick={stream}>
+          Stream
+        </button>
+        <button className={styles.stream_btns} onClick={endStream}>
+          End Stream
+        </button>
+      </div>
+    </div>
   );
 }

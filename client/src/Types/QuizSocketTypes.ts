@@ -9,6 +9,7 @@ export interface QuizServerToClientEvents {
   set_question: ({ currentQuestionNumber }: { currentQuestionNumber: number }) => void;
   start_quiz: () => void;
   reveal_answers: () => void;
+  reveal_answers_host: () => void;
 }
 
 

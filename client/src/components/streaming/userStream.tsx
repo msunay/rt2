@@ -11,12 +11,12 @@ import FinalScore from '../quiz/finalScore';
 import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';
 import { Participation } from '@/Types/Types';
+import Winners from '../quiz/winners';
 
 export default function UserStream({ partId }: { partId: string }) {
-  const userId = useAppSelector((state) => state.userIdSlice.value);
-
+  // const userId = useAppSelector((state) => state.userIdSlice.value);
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
   const [quizStarted, setQuizStarted] = useState(false);
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
   const [consumerTransportState, setConsumerTransportState] =
@@ -29,7 +29,6 @@ export default function UserStream({ partId }: { partId: string }) {
   );
 
   const remoteVideo = useRef<HTMLVideoElement>(null);
-  const host = false;
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
@@ -49,9 +48,7 @@ export default function UserStream({ partId }: { partId: string }) {
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealListener(
       setQuestionHidden,
-      setTrigger,
-      setCurrentQuestionNumber,
-      host
+      setTrigger
     );
     peersSocketService.successListener();
     peersSocketService.producerClosedListener(
@@ -137,22 +134,24 @@ export default function UserStream({ partId }: { partId: string }) {
         <div className={styles.video_container}>
           <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
         </div>
-        {currentQuestionNumber === 10 ? (
-          <FinalScore userParticipation={userParticipation} />
-        ) : (
-            <div className="question-component">
-              {quizStarted && (
-                <PlayerQuestion
-                  partId={partId}
-                  trigger={trigger}
-                  hidden={questionHidden}
-                  currentQuestionNumber={currentQuestionNumber}
-                  setCurrentQuestionNumber={setCurrentQuestionNumber}
-                />
-              )}
-            </div>
-        )}
-       
+        {trigger < 12 ? (
+          trigger < 11 ? (
+            <FinalScore userParticipation={userParticipation} />
+          ) : (
+              <div className="question-component">
+                {quizStarted && (
+                  <PlayerQuestion
+                    partId={partId}
+                    trigger={trigger}
+                    hidden={questionHidden}
+                  />
+                )}
+              </div>
+          )) : (
+            <Winners quizId={userParticipation.QuizId!}/>
+          )
+        }
+
         <div className="current-question"></div>
       </div>
       <button className={styles.btn_join} id="join-stream-btn" onClick={goConsume} disabled={false}>

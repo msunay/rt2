@@ -5,7 +5,7 @@ import {
 import { Socket } from 'socket.io';
 import { io } from '../index';
 
-const QUESTION_TIME = 7000;
+const QUESTION_TIME = 2000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
@@ -20,8 +20,8 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
-
-      quiz.emit('reveal_answers');
+      quiz.emit('reveal_answers_host');
+      quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 
@@ -29,7 +29,8 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_question_timer');
 
     setTimeout(() => {
-      quiz.emit('reveal_answers');
+      quiz.emit('reveal_answers_host');
+      quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 };

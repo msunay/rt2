@@ -12,21 +12,20 @@ import {
 } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
 import style from '@/styles/question.module.css';
+import { useAppSelector } from '@/redux/hooks';
 
 
 export default function PlayerQuestion({
-  currentQuestionNumber,
-  setCurrentQuestionNumber,
   hidden,
   trigger,
   partId,
 }: {
-  currentQuestionNumber: number;
-  setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
   hidden: boolean;
   trigger: number;
   partId: string;
 }) {
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice)
+
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
 
@@ -35,7 +34,7 @@ export default function PlayerQuestion({
     {} as QuizQuestionAnswer
   );
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
-    null
+    {} as QuestionAnswer
   );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
   const [userParticipation, setUserParticipation] = useState<Participation>(
@@ -43,8 +42,8 @@ export default function PlayerQuestion({
   );
   useEffect(() => {
     console.log('currentQuestion: ', currentQuestion);
-    console.log('currentQuestionNumber: ', currentQuestionNumber);
-  }, [currentQuestionNumber])
+    console.log('currentQuestionNumber: ', currentQuestionNumber.value);
+  }, [currentQuestionNumber.value])
 
   useEffect(() => {
     if (trigger > 0) createHandle();
@@ -66,11 +65,10 @@ export default function PlayerQuestion({
 
   useEffect(() => {
     if (
-      quiz.Questions &&
-      quiz.Questions.length > 0 &&
-      quiz.Questions[currentQuestionNumber].Answers
+      quiz.Questions
     ) {
-      setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
+      setCurrentQuestion(quiz.Questions[trigger]);
+      console.log('jkfdkljdfkjdkj: ', trigger);
     }
   }, [quiz, trigger]);
 
