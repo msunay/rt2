@@ -11,6 +11,9 @@ import FinalScore from '../quiz/finalScore';
 import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';
 import { Participation } from '@/Types/Types';
+import Link from 'next/link';
+import Image from 'next/image';
+import CloseLine from '@/public/close-line.svg';
 
 export default function UserStream({ partId }: { partId: string }) {
   const userId = useAppSelector((state) => state.userIdSlice.value);
@@ -133,6 +136,14 @@ export default function UserStream({ partId }: { partId: string }) {
   return (
     <>
       <div className={styles.unit}>
+        <Link href='/dashboard' className={styles.close_btn}>
+          <Image 
+            src={CloseLine}
+            height={40}
+            width={40}
+            alt='close image'
+          />
+        </Link>
       <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
           <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
