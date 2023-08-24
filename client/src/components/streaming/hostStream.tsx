@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 
 
 
-export const QUESTION_TIME = 2000;
+export const QUESTION_TIME = 7000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)

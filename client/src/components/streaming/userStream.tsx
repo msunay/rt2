@@ -146,7 +146,7 @@ export default function UserStream({ partId }: { partId: string }) {
           <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
         </div>
         {trigger < 12 ? (
-          trigger < 11 ? (
+          trigger >= 10 ? (
             <FinalScore userParticipation={userParticipation} />
           ) : (
               <div className="question-component">
