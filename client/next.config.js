@@ -1,10 +1,8 @@
-import withPWAInit from "@ducanh2912/next-pwa";
-
-const withPWA = withPWAInit({
+const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
 });
 
-export default withPWA({
+module.exports = withPWA({
   redirects: [
     {
       source: '/auth',
