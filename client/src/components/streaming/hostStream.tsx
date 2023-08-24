@@ -12,6 +12,9 @@ import {
 import { peersSocketService } from '@/redux/services/peersSocketService';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { incrementQuestionNumber } from '@/redux/features/questionSlice';
+import { useRouter } from 'next/navigation';
+
+
 
 export const QUESTION_TIME = 2000;
 
@@ -27,6 +30,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   const localVideo = useRef<HTMLVideoElement>(null);
   const nextQBtn = useRef<HTMLButtonElement>(null);
   const startBtn = useRef<HTMLButtonElement>(null);
+  const { push } = useRouter();
 
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupTypes.Transport;
@@ -184,6 +188,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   };
 
   const endStream = () => {
+    push('/dashboard');
     producer.close();
     // producerTransport.close();
     mediaStream.getTracks().forEach((track) => track.stop());
