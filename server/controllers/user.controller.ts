@@ -2,6 +2,7 @@ import models from '../models/index';
 import { Request, response, Response } from 'express';
 import { tokenGenerator } from '../utils/token';
 import { CustomRequest } from '../middleware/auth';
+import { compareSync } from 'bcrypt';
 
 async function addUser(req: Request, res: Response) {
   try {
@@ -85,6 +86,22 @@ async function getUserId(req: Request, res: Response) {
   }
 }
 
+async function userLogin(req: Request, res: Response) {
+  try {
+    const { username, password } = req.body;
+    const response = await models.User.findOne({ where: { username: username } });
+    const data = response?.dataValues;
+    const token = tokenGenerator(response?.dataValues.id || '', response?.dataValues.username || '');
+    if (data && compareSync(password, data?.password)) {
+      res.status(200).send({ username: response.username, id: response.id, token: token });
+    } else {
+      res.status(404).send('Please provide correct credentials!');
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
 export default {
   addUser,
   getOneUser,
@@ -93,4 +110,5 @@ export default {
   changePassword,
   getUserId,
   getUserDetails,
+  userLogin
 };

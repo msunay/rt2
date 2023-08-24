@@ -32,9 +32,10 @@ export const userApiService = {
     }
   },
 
-  loginUser: async (username: string): Promise<ResponseUser> => {
-    const response = await axios.get<ResponseUser>(
-      `${BASE_URL}user/${username}`
+  loginUser: async (username: string, password: string): Promise<ResponseUser> => {
+    // ---------------------------------------------
+    const response = await axios.post<ResponseUser>(
+      `${BASE_URL}login`, { username, password }
     );
     return response.data;
   },
