@@ -33,6 +33,11 @@ const quizSocketInit = (
       quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
+
+  quiz.on('show_winners', () => {
+    quiz.emit('host_winners');
+    quiz.broadcast.emit('player_winners');
+  });
 };
 
 export default quizSocketInit;
