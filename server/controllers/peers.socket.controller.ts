@@ -52,7 +52,7 @@ const createWebRtcTransport = async (callback: any) => {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '0.0.0.0',
+          ip: '66.241.125.174',
         },
       ],
       enableUdp: true,
