@@ -213,7 +213,7 @@ export const peersSocketService = {
     consumer: mediasoupTypes.Consumer
   ) => peers.on('producer_closed', () => {
     // Server notified when producer is closed
-    consumerTransport.close();
-    consumer.close();
+    // consumerTransport.close();
+    // consumer.close();
   })
 };
