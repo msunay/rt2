@@ -42,7 +42,7 @@ router.get(
   '/participations/:userId',
   participationController.getUserParticipations
 );
-router.get('/quizParticipationAnswers/:id', referenceTablesController.getQuizParticipationAnswers);
+router.get('/quizParticipations/:quizId', referenceTablesController.getQuizParticipations);
 router.get(
   '/participationAnswers/:id',
   participationController.getParticipationAnswers

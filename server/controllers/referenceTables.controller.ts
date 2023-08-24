@@ -45,13 +45,16 @@ async function getUserParticipations(req: Request, res: Response) {
   }
 }
 
-async function getQuizParticipationAnswers(req: Request, res: Response) {
+async function getParticipationAnswers(req: Request, res: Response) {
   try {
     const response = await models.Participation.findAll({
-      where : {
-        QuizId: req.params.id,
+      where: {
+        id: req.params.id,
       },
-      include: ParticipationAnswer
+      include: {
+        model: models.Answer,
+        as: 'answers',
+      },
     });
     res.status(200).send(response);
   } catch (err) {
@@ -90,15 +93,11 @@ async function createParticipationAnswer(req: Request, res: Response) {
   }
 }
 
-async function getParticipationAnswers(req: Request, res: Response) {
+async function getQuizParticipations(req: Request, res: Response) {
   try {
     const response = await models.Participation.findAll({
       where: {
-        id: req.params.id,
-      },
-      include: {
-        model: models.Answer,
-        as: 'answers',
+        QuizId: req.params.quizId,
       },
     });
     res.status(200).send(response);
@@ -115,5 +114,5 @@ export default {
   getParticipationAnswers,
   deleteParticipation,
   getOneParticipation,
-  getQuizParticipationAnswers
+  getQuizParticipations,
 };

@@ -49,8 +49,7 @@ export const quizSocketService = {
         //@ts-ignore
         .forEach((btn, i) => (btn.disabled = true));
 
-
-        setTimeout(() => {
+      setTimeout(() => {
         setTrigger((trigger) => trigger + 1);
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true;
@@ -62,6 +61,8 @@ export const quizSocketService = {
 
   emitHostStartQuiz: () => quiz.emit('host_start_quiz'),
 
+  emitShowWinners: () => quiz.emit('show_winners'),
+
   revealAnswerHostListener: (
     setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
@@ -72,6 +73,22 @@ export const quizSocketService = {
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
+    });
+  },
+
+  hostWinnersListener: (
+    setTrigger: React.Dispatch<React.SetStateAction<number>>
+  ) => {
+    quiz.on('host_winners', () => {
+      setTrigger((num) => num + 1);
+    });
+  },
+
+  playerWinnersListener: (
+    setTrigger: React.Dispatch<React.SetStateAction<number>>
+  ) => {
+    quiz.on('player_winners', () => {
+      setTrigger((num) => num + 1);
     });
   },
 };
