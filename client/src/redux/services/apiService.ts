@@ -15,7 +15,6 @@ export const BASE_URL: string =
     ? process.env.NEXT_PUBLIC_BACKEND_URL!
     : 'http://localhost:3001/';
 
-
 export const userApiService = {
   // User methods
 
@@ -136,12 +135,24 @@ export const userApiService = {
     }
   },
 
+  getAllParticipationAnswers: async (quizId: string): Promise<ParticipationAnswer[]> => {
+    try {
+      const response = await axios.get<ParticipationAnswer[]>(
+        `${BASE_URL}quizParticipationAnswers/${quizId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  },
+
   getUserParticipations: async (userId: string): Promise<Participation[]> => {
     try {
       const response = await axios.get<Participation[]>(
         `${BASE_URL}participations/${userId}`
       );
-      
+
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);

@@ -41,6 +41,7 @@ router.get(
   '/participations/:userId',
   participationController.getUserParticipations
 );
+router.get('/quizParticipationAnswers/:id', referenceTablesController.getQuizParticipationAnswers);
 router.get(
   '/participationAnswers/:id',
   participationController.getParticipationAnswers

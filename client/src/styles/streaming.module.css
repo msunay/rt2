@@ -93,4 +93,10 @@
   position: absolute;
   z-index: 9999;
   margin: 3px;
+  right: 3px;
+}
+
+.close_btn {
+  z-index: 9999;
+  width: 60px;
 }

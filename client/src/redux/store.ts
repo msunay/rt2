@@ -5,6 +5,7 @@ import participatingSlice from "./features/participatingSlice";
 import userIdSlice from "./features/userIdSlice";
 import userParticipationAnswerSlice from "./features/userParticipationAnswerSlice";
 import userDetailsSlice from "./features/userDetailsSlice";
+import questionSlice from "./features/questionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
     participatingSlice,
     userIdSlice,
     userDetailsSlice,
-    userParticipationAnswerSlice
+    userParticipationAnswerSlice,
+    questionSlice
   },
   devTools: process.env.NODE_ENV !== 'production',
 });

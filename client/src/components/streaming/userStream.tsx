@@ -11,12 +11,15 @@ import FinalScore from '../quiz/finalScore';
 import { userApiService } from '@/redux/services/apiService';
 import { useAppSelector } from '@/redux/hooks';
 import { Participation } from '@/Types/Types';
+import Winners from '../quiz/winners';
+import Link from 'next/link';
+import Image from 'next/image';
+import CloseLine from '@/public/close-line.svg';
 
 export default function UserStream({ partId }: { partId: string }) {
-  const userId = useAppSelector((state) => state.userIdSlice.value);
-
+  // const userId = useAppSelector((state) => state.userIdSlice.value);
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
   const [quizStarted, setQuizStarted] = useState(false);
-  const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
   const [consumerTransportState, setConsumerTransportState] =
@@ -29,7 +32,6 @@ export default function UserStream({ partId }: { partId: string }) {
   );
 
   const remoteVideo = useRef<HTMLVideoElement>(null);
-  const host = false;
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
@@ -49,9 +51,7 @@ export default function UserStream({ partId }: { partId: string }) {
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealListener(
       setQuestionHidden,
-      setTrigger,
-      setCurrentQuestionNumber,
-      host
+      setTrigger
     );
     peersSocketService.successListener();
     peersSocketService.producerClosedListener(
@@ -133,26 +133,36 @@ export default function UserStream({ partId }: { partId: string }) {
   return (
     <>
       <div className={styles.unit}>
+        <Link href='/dashboard' className={styles.close_btn}>
+          <Image
+            src={CloseLine}
+            height={40}
+            width={40}
+            alt='close image'
+          />
+        </Link>
       <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
           <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
         </div>
-        {currentQuestionNumber === 10 ? (
-          <FinalScore userParticipation={userParticipation} />
-        ) : (
-            <div className="question-component">
-              {quizStarted && (
-                <PlayerQuestion
-                  partId={partId}
-                  trigger={trigger}
-                  hidden={questionHidden}
-                  currentQuestionNumber={currentQuestionNumber}
-                  setCurrentQuestionNumber={setCurrentQuestionNumber}
-                />
-              )}
-            </div>
-        )}
-       
+        {trigger < 12 ? (
+          trigger >= 10 ? (
+            <FinalScore userParticipation={userParticipation} />
+          ) : (
+              <div className="question-component">
+                {quizStarted && (
+                  <PlayerQuestion
+                    partId={partId}
+                    trigger={trigger}
+                    hidden={questionHidden}
+                  />
+                )}
+              </div>
+          )) : (
+            <Winners quizId={userParticipation.QuizId!}/>
+          )
+        }
+
         <div className="current-question"></div>
       </div>
       <button className={styles.btn_join} id="join-stream-btn" onClick={goConsume} disabled={false}>

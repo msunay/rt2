@@ -1,6 +1,7 @@
 import models from '../models/index';
 import { Request, Response } from 'express';
 import { CustomRequest } from '../middleware/auth';
+import { Participation, ParticipationAnswer } from '../models/associations';
 
 async function createParticipation(req: Request, res: Response) {
   try {
@@ -36,6 +37,21 @@ async function getUserParticipations(req: Request, res: Response) {
       where: {
         UserId: req.params.userId,
       },
+    });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error('Could not get participations::', err);
+    res.status(500).send();
+  }
+}
+
+async function getQuizParticipationAnswers(req: Request, res: Response) {
+  try {
+    const response = await models.Participation.findAll({
+      where : {
+        QuizId: req.params.id,
+      },
+      include: ParticipationAnswer
     });
     res.status(200).send(response);
   } catch (err) {
@@ -98,5 +114,6 @@ export default {
   getUserParticipations,
   getParticipationAnswers,
   deleteParticipation,
-  getOneParticipation
+  getOneParticipation,
+  getQuizParticipationAnswers
 };

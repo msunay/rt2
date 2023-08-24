@@ -16,18 +16,16 @@ import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/redux/hooks';
 
 export default function HostQuestion({
-  currentQuestionNumber,
-  setCurrentQuestionNumber,
   hidden,
   trigger,
   quizId,
 }: {
-  currentQuestionNumber: number;
-  setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>;
   hidden: boolean;
   trigger: number;
   quizId: string;
 }) {
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
+
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
 
@@ -77,13 +75,15 @@ export default function HostQuestion({
 
   useEffect(() => {
     if (
-      quiz.Questions &&
-      quiz.Questions.length > 0 &&
-      quiz.Questions[currentQuestionNumber].Answers
+      quiz.Questions 
     ) {
-      setCurrentQuestion(quiz.Questions[currentQuestionNumber]);
+      setCurrentQuestion(quiz.Questions[currentQuestionNumber -1]);
     }
   }, [quiz, trigger]);
+
+  // useEffect(() => {
+
+  // }, [currentQuestionNumber])
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
