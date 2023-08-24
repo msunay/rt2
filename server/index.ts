@@ -10,7 +10,7 @@ import quizSocketInit from './controllers/quiz.socket.controller'
 const app = express();
 
 const corsOrigin = process.env.NODE_ENV === 'production'
-? process.env.CORS_ORIGIN + ':3000'
+? process.env.CORS_ORIGIN
 : 'http://localhost:3000';
 
 const corsOptions = {
