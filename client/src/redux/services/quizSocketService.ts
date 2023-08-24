@@ -7,10 +7,9 @@ import CanvasCircularCountdown from 'canvas-circular-countdown';
 import { QUESTION_TIME } from '@/components/streaming/hostStream';
 
 const BASE_URL =
-process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BACKEND_URL
-  : 'http://localhost:3001/';
-
+  process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_BACKEND_URL
+    : 'http://localhost:3001/';
 
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
   `${BASE_URL}quizspace`
@@ -41,9 +40,7 @@ export const quizSocketService = {
 
   revealListener: (
     setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
-    setTrigger: React.Dispatch<React.SetStateAction<number>>,
-    setCurrentQuestionNumber: React.Dispatch<React.SetStateAction<number>>,
-    host: boolean
+    setTrigger: React.Dispatch<React.SetStateAction<number>>
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
@@ -52,13 +49,11 @@ export const quizSocketService = {
         //@ts-ignore
         .forEach((btn, i) => (btn.disabled = true));
 
-      setTimeout(() => {
+
+        setTimeout(() => {
+        setTrigger((trigger) => trigger + 1);
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true;
-        setTrigger((trigger) => trigger + 1);
-        setCurrentQuestionNumber(
-          (currentQuestionNumber) => currentQuestionNumber + 1
-        );
       }, 2000);
     });
   },
@@ -66,6 +61,19 @@ export const quizSocketService = {
   emitNextQ: () => quiz.emit('next_question'),
 
   emitHostStartQuiz: () => quiz.emit('host_start_quiz'),
+
+  revealAnswerHostListener: (
+    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    quiz.on('reveal_answers_host', () => {
+      console.log('reveal');
+
+      setTimeout(() => {
+        setQuestionHidden(true);
+        document.getElementById('countdown-canvas')!.hidden = true;
+      }, 2000);
+    });
+  },
 };
 
 export function startTimer() {

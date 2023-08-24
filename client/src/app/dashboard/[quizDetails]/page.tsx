@@ -30,6 +30,7 @@ export default function QuizDetails({
       break;
     case 'create-quiz':
       element = <CreateQuiz />;
+      break;
     case 'quizLoading':
       element = <QuizLoading />;
       break;

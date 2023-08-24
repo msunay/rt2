@@ -102,3 +102,15 @@
   color: #333;
   padding-bottom: 15px;
 }
+
+.btn_back {
+  padding: 12px;
+  width: 80%;
+  text-align: center;
+  background-color: #ffffff99;
+  color: black;
+  position: absolute;
+  bottom: 20px;
+  text-transform: uppercase;
+  border-radius: 16px;
+}

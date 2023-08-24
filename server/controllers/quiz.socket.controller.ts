@@ -20,8 +20,8 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
-
-      quiz.emit('reveal_answers');
+      quiz.emit('reveal_answers_host');
+      quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 
@@ -29,7 +29,8 @@ const quizSocketInit = (
     quiz.broadcast.emit('start_question_timer');
 
     setTimeout(() => {
-      quiz.emit('reveal_answers');
+      quiz.emit('reveal_answers_host');
+      quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 };
