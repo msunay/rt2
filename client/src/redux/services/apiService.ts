@@ -135,10 +135,12 @@ export const userApiService = {
     }
   },
 
-  getAllParticipationAnswers: async (quizId: string): Promise<ParticipationAnswer[]> => {
+  getQuizParticipations: async (
+    quizId: string
+  ): Promise<Participation[]> => {
     try {
-      const response = await axios.get<ParticipationAnswer[]>(
-        `${BASE_URL}quizParticipationAnswers/${quizId}`
+      const response = await axios.get<Participation[]>(
+        `${BASE_URL}quizParticipations/${quizId}`
       );
       return response.data;
     } catch (err) {
@@ -152,7 +154,6 @@ export const userApiService = {
       const response = await axios.get<Participation[]>(
         `${BASE_URL}participations/${userId}`
       );
-
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);
