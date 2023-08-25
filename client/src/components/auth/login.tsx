@@ -55,12 +55,13 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
 
   return (
     <div className={styles.login_wrapper}>
-      <form onSubmit={event => onSubmitClick(event)} className={styles.form}>
+      <form onSubmit={event => onSubmitClick(event)} className={styles.form} data-cy="login-form">
         <input
           required
           name="username"
           type="text"
           placeholder="User name"
+          data-cy="username-input"
           value={form?.username || ''}
           onChange={(event) => setForm({ ...form, username: event.target.value })}
         />
@@ -69,6 +70,7 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
           name="password"
           type="password"
           placeholder="Password"
+          data-cy="password-input"
           value={form?.password || ''}
           autoComplete="on"
           onChange={(event) => setForm({ ...form, password: event.target.value })}
