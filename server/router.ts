@@ -20,6 +20,7 @@ router.get('/users', userController.getAllUsers);
 router.put('/username', userController.changeUsername);
 router.put('/password', userController.changePassword);
 router.get('/userId', auth, userController.getUserId);
+router.post('/login', userController.userLogin);
 
 // Quiz routes
 router.post('/demoQuiz', addDemoQuiz);

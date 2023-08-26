@@ -2,7 +2,6 @@
 
 import styles from "@/styles/login.module.css";
 import { FormEvent, useState } from "react";
-import { compareSync } from "bcrypt-ts"
 import { useRouter } from "next/navigation"
 import { useAppDispatch } from "@/redux/hooks";
 import { setAuthState } from '@/redux/features/authSlice';
@@ -33,11 +32,8 @@ export default function Login({ setSignupVisible, setLoginVisible }: PageProps) 
     e.preventDefault();
     if (typeof form?.username === 'undefined' || typeof form?.password === 'undefined') return;
     try {
-      const data = await userApiService.loginUser(form.username);
-
-      // BUG
-      //TODO bad security needs to be on backend
-      if (compareSync(form.password, data.dataValues.password)) {
+      const data = await userApiService.loginUser(form.username, form.password);
+      if (data) {
         dispatch(setAuthState(data.token))
         localStorage.setItem('jwt_token', data.token)
         router.push('/dashboard');
