@@ -8,7 +8,7 @@ import { QUESTION_TIME } from '@/components/streaming/hostStream';
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_BACKEND_URL
+    ? process.env.NEXT_PUBLIC_BACKEND_URL! + ':3001'
     : 'http://localhost:3001/';
 
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(

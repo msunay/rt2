@@ -27,7 +27,7 @@ export const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production'
-    ? process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN + ':3001'
     : 'http://localhost:3000',
     methods: ['GET', 'POST'],
   },
