@@ -57,19 +57,19 @@ To begin using Real Time Trivia, follow these steps:
   ```
   git clone https://github.com/msunay/rt2.git
   ```
-2. Set up the frontend by navigating to the `/frontend` directory and running `npm install`.
+2. Set up the frontend by navigating to the frontend directory and running `npm install`.
   ```
   cd rt2/client
   npm install
   ```
-3. Similarly, set up the backend by going to the `/backend` directory and running `npm install`.
+3. Similarly, set up the backend by going to the backend directory and running `npm install`.
   ```
   cd rt2/server
   npm install
   ```
 4. Create a PostgreSQL database for the application and update the connection configuration in the backend's `.env` file.
 5. Obtain and set up JWT secret and other environment variables in the backend's `.env` file.
-6. Start the backend server using `npm run dev` in the `/backend` directory.
+6. Start the backend server using `npm run dev` in the backend directory.
   ```
   cd rt2/server
   npm run dev
@@ -78,6 +78,11 @@ To begin using Real Time Trivia, follow these steps:
   ```
   cd rt2/client
   npm run dev
+  ```
+8. Populate the database with mock data.
+  ```
+  cd server
+  npm run populate
   ```
 
 ## Deployment
