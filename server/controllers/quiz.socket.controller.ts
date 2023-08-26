@@ -3,7 +3,6 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
-import { io } from '../index';
 
 const QUESTION_TIME = 7000;
 

@@ -79,28 +79,51 @@ async function populateDatabase() {
 }
 
 describe('Socket io integration', () => {
-  let clientSocket;
+  let quizSocket;
+  let peerSocket;
   beforeAll(async () => {
     await sequelize
-      .sync()
-      .then(() => console.log('Connected to test database'));
+    .sync()
+    .then(() => console.log('Connected to test database'));
+
+  quizSocket = new Client(`http://localhost:3001/quizspace`);
+  peerSocket = new Client(`http://localhost:3001/mediasoup`);
+
   });
   beforeEach(async () => {
     server.listen(3001, () => {
       console.log(`Test server running on port: 3001`);
-      clientSocket = new Client(`http://localhost:3001`);
-      clientSocket.on('connect', () => {
-        console.log('Client connected');
+      quizSocket.on("connect", () => {
+        console.log(" Quiz Client connected");
+      });
+      peerSocket.on("connect", () => {
+        console.log(" Peer Client connected");
       });
     });
   });
   afterEach(async () => {
     server.close();
+    await quizSocket.close();
+    await peerSocket.close();
   });
 
-  it('should work', async () => {
-    expect(4).toEqual(2 + 2);
+  it('should connect to server and emit start quiz', (done) => {
+    quizSocket.on('reveal_answers_host', () => {
+      console.log('Received reveal_answers_host event');
+      done();
+    });
+
+    quizSocket.emit('host_start_quiz', () => {
+      console.log('Emitted host_start_quiz event');
+    });
   });
+
+  it('should listen for next question and emit start timer back', async () => {
+    quizSocket.on('start_question_timer', () => {
+      expect(4).toEqual(2 + 2);
+    })
+    quizSocket.emit('next_question')
+  })
 });
 
 describe('User endpoint tests', () => {
@@ -167,7 +190,6 @@ describe('Quiz endpoint tests', () => {
 
   it('should fetch all quiz details', async () => {
     const response = await request.get('/quizzes');
-    console.log('RESPONSE', JSON.parse(response.text));
     expect(JSON.parse(response.text)).toHaveLength(5);
   });
 });

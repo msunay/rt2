@@ -8,7 +8,7 @@ import { QUESTION_TIME } from '@/components/streaming/hostStream';
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_BACKEND_URL! + ':3001'
+    ? process.env.NEXT_PUBLIC_BACKEND_URL
     : 'http://localhost:3001/';
 
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
@@ -49,8 +49,7 @@ export const quizSocketService = {
         //@ts-ignore
         .forEach((btn, i) => (btn.disabled = true));
 
-
-        setTimeout(() => {
+      setTimeout(() => {
         setTrigger((trigger) => trigger + 1);
         setQuestionHidden(true);
         document.getElementById('countdown-canvas')!.hidden = true;
