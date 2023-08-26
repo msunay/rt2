@@ -54,16 +54,35 @@ Real Time Trivia is an interactive platform designed to facilitate engaging live
 To begin using Real Time Trivia, follow these steps:
 
 1. Clone this repository.
+  ```
+  git clone https://github.com/msunay/rt2.git
+  ```
 2. Set up the frontend by navigating to the `/frontend` directory and running `npm install`.
+  ```
+  cd rt2/client
+  npm install
+  ```
 3. Similarly, set up the backend by going to the `/backend` directory and running `npm install`.
+  ```
+  cd rt2/server
+  npm install
+  ```
 4. Create a PostgreSQL database for the application and update the connection configuration in the backend's `.env` file.
 5. Obtain and set up JWT secret and other environment variables in the backend's `.env` file.
 6. Start the backend server using `npm run dev` in the `/backend` directory.
+  ```
+  cd rt2/server
+  npm run dev
+  ```
 7. Start the frontend development server using `npm run dev` in the `/frontend` directory.
+  ```
+  cd rt2/client
+  npm run dev
+  ```
 
 ## Deployment
 
-The Real Time Trivia application is deployed at [real-time-trivia.app](https://real-time-trivia.app). Visit the deployment to experience the quizzes firsthand.
+The Real Time Trivia application is deployed at [real-time-trivia.app](https://www.real-time-trivia.app). Visit the deployment to experience the quizzes firsthand.
 
 ## Team Members
 
