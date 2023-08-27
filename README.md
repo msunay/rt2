@@ -93,6 +93,6 @@ The Real Time Trivia application is deployed at [real-time-trivia.app](https://w
 
 Real Time Trivia was developed by a dedicated team of developers:
 - Thiago Los [LinkedIn](https://www.linkedin.com/in/thiagolos/)
-- Alex Eze [LinkedIn](https://www.linkedin.com/in/alex-eze-822255a7/)
+- Alex Eze [LinkedIn](https://www.linkedin.com/in/alex-eze-dev/)
 - Atai Ismaiilov [LinkedIn](https://www.linkedin.com/in/atai-ismaiilov-185a0b1a8/)
 - Carlos Bárcena Bescansa [LinkedIn](https://www.linkedin.com/in/carlos-b%C3%A1rcena-bescansa-b0768ab3/)
