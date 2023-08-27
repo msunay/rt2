@@ -17,6 +17,7 @@
     "httpolyglot": "^0.1.2",
     "jsonwebtoken": "^9.0.1",
     "mediasoup": "^3.12.10",
+    "mediasoup-client": "^3.6.98",
     "moment": "^2.29.4",
     "pg": "^8.11.2",
     "sequelize": "^6.32.1",

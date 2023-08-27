@@ -1,31 +1,26 @@
-import { Socket, io } from 'socket.io-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
+import Client from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
-} from '@/Types/PeerSocketTypes';
+} from './mockClientTypes';
 
-const BASE_URL =
-process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BACKEND_URL
-  : 'http://localhost:3001/';
-
-
-const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
-  `${BASE_URL}mediasoup`
-);
+export const peerSocket: Socket<PeersServerToClientEvents, PeersClientToServerEvents> =
+//@ts-ignore
+  new Client(`http://localhost:3001/mediasoup`);
 
 interface parameters {
   kind: mediasoupTypes.MediaKind;
   rtpParameters: mediasoupTypes.RtpParameters;
   appData: mediasoupTypes.AppData;
 }
-type callback = ({ id }: { id: string }) => void;
 
-export const peersSocketService = {
+type callback = ({ id }: { id: string }) => void;
+export const mockPeersSocketService = {
   successListener: () =>
-    peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-      console.log('peers socket connected :', socketId, producerAlreadyExists);
+    peerSocket.on('connection_success', ({ socketId, producerAlreadyExists }) => {
+      console.log('peerSocket socket connected :', socketId, producerAlreadyExists);
     }),
 
   emitCreateRoom: (
@@ -33,7 +28,7 @@ export const peersSocketService = {
       rtpCapabilities: mediasoupTypes.RtpCapabilities
     ) => Promise<void>
   ) => {
-    peers.emit(
+    peerSocket.emit(
       'create_room',
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
         console.log('Router RTP Capabilities: ', data.rtpCapabilities);
@@ -50,7 +45,7 @@ export const peersSocketService = {
       producerTransport: mediasoupTypes.Transport
     ) => Promise<void>
   ) => {
-    peers.emit(
+    peerSocket.emit(
       'createWebRtcTransport',
       { sender: true },
       ({ transportParams }) => {
@@ -78,7 +73,7 @@ export const peersSocketService = {
           ) => {
             try {
               // Singnal local DTLS parameters to the server side transport
-              peers.emit('transport_connect', {
+              peerSocket.emit('transport_connect', {
                 dtlsParameters: dtlsParameters,
               });
 
@@ -100,7 +95,7 @@ export const peersSocketService = {
             console.log('producer.on produce params: ', parameters);
 
             try {
-              peers.emit(
+              peerSocket.emit(
                 'transport_produce',
                 {
                   kind: parameters.kind,
@@ -131,7 +126,7 @@ export const peersSocketService = {
       device: mediasoupTypes.Device
     ) => Promise<void>
   ) => {
-    peers.emit(
+    peerSocket.emit(
       'createWebRtcTransport',
       { sender: false },
       ({ transportParams }) => {
@@ -153,7 +148,7 @@ export const peersSocketService = {
           async ({ dtlsParameters }, callback, errback) => {
             try {
               // Signal local DTLS parameters to the server side transport
-              peers.emit('transport_recv_connect', {
+              peerSocket.emit('transport_recv_connect', {
                 // transportId: consumerTransport.id,
                 dtlsParameters,
               });
@@ -174,9 +169,9 @@ export const peersSocketService = {
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
     consumer: mediasoupTypes.Consumer,
-    remoteVideo: React.RefObject<HTMLVideoElement>
+    remoteVideo: any
   ) => {
-    peers.emit(
+    peerSocket.emit(
       'consume',
       {
         rtpCapabilities: device.rtpCapabilities,
@@ -199,21 +194,24 @@ export const peersSocketService = {
 
         remoteVideo.current!.srcObject = new MediaStream([track]);
 
-        peers.emit('consumer_resume');
+        peerSocket.emit('consumer_resume');
       }
     );
     return {
       consumerTransport,
-      consumer
-    }
+      consumer,
+    };
   },
 
   producerClosedListener: (
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     consumer: mediasoupTypes.Consumer
-  ) => peers.on('producer_closed', () => {
-    // Server notified when producer is closed
-    // consumerTransport.close();
-    // consumer.close();
-  })
+  ) =>
+    peerSocket.on('producer_closed', () => {
+      // Server notified when producer is closed
+      // consumerTransport.close();
+      // consumer.close();
+    }),
 };
+
+

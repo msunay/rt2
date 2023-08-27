@@ -7,6 +7,7 @@ import mocks from '../utils/mocks';
 import supertest from 'supertest';
 import dotenv from 'dotenv';
 import moment from 'moment';
+// import { peerSocket } from '../utils/mockPeersSocketService.ts'
 
 dotenv.config();
 const env = process.env;
@@ -78,51 +79,81 @@ async function populateDatabase() {
   }
 }
 
-describe('Socket io integration', () => {
+describe('Socket io (Quiz Namespace)', () => {
   let quizSocket;
-  let peerSocket;
+
   beforeAll(async () => {
     await sequelize
     .sync()
     .then(() => console.log('Connected to test database'));
 
   quizSocket = new Client(`http://localhost:3001/quizspace`);
-  peerSocket = new Client(`http://localhost:3001/mediasoup`);
+
+  await quizSocket.on("connect", () => {
+    console.log(" Quiz Client connected");
+  });
 
   });
   beforeEach(async () => {
     server.listen(3001, () => {
       console.log(`Test server running on port: 3001`);
-      quizSocket.on("connect", () => {
-        console.log(" Quiz Client connected");
-      });
-      peerSocket.on("connect", () => {
-        console.log(" Peer Client connected");
-      });
     });
   });
   afterEach(async () => {
     server.close();
+  });
+  afterAll(async () => {
     await quizSocket.close();
+  });
+
+  it('server should listen for host start quiz event and emit reveal_answers_host', (done) => {
+    quizSocket.on('reveal_answers_host', () => {
+      done()
+    });
+    quizSocket.emit('host_start_quiz');
+  });
+
+  it('server should listen for next_question and emit reveal_answers_host back', (done) => {
+    quizSocket.on('reveal_answers_host', () => {
+      done()
+    })
+    quizSocket.emit('next_question')
+  })
+});
+
+describe('Socket io (Peers Namespace)', () => {
+  let peerSocket;
+
+  beforeAll(async () => {
+    await sequelize
+    .sync()
+    .then(() => console.log('Connected to test database'));
+
+  peerSocket = new Client(`http://localhost:3001/mediasoup`);
+
+  await peerSocket.on("connect", () => {
+    console.log(" Peer Client connected");
+  });
+
+  });
+  beforeEach(async () => {
+    server.listen(3001, () => {
+      console.log(`Test server running on port: 3001`);
+    });
+  });
+  afterEach(async () => {
+    server.close();
+  });
+  afterAll(async () => {
     await peerSocket.close();
   });
 
-  it('should connect to server and emit start quiz', (done) => {
-    quizSocket.on('reveal_answers_host', () => {
-      console.log('Received reveal_answers_host event');
+  it('server should listen for connection_success and send back success data', (done) => {
+    peerSocket.on('connection_success', (success) => {
+      expect(success.producerAlreadyExists).toBe(false);
+      expect(success.socketId.length).toBe(20);
       done();
-    });
-
-    quizSocket.emit('host_start_quiz', () => {
-      console.log('Emitted host_start_quiz event');
-    });
-  });
-
-  it('should listen for next question and emit start timer back', async () => {
-    quizSocket.on('start_question_timer', () => {
-      expect(4).toEqual(2 + 2);
     })
-    quizSocket.emit('next_question')
   })
 });
 
