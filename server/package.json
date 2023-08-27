@@ -7,7 +7,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --force-exit",
     "build": "tsc",
     "dev": "nodemon server.ts",
-    "populate": "ts-node controllers/populateDatabase.ts"
+    "populate": "ts-node utils/populateDatabase.ts"
   },
   "author": "",
   "license": "ISC",
