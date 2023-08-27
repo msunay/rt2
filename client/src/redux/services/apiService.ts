@@ -32,9 +32,10 @@ export const userApiService = {
     }
   },
 
-  loginUser: async (username: string): Promise<ResponseUser> => {
-    const response = await axios.get<ResponseUser>(
-      `${BASE_URL}user/${username}`
+  loginUser: async (username: string, password: string): Promise<ResponseUser> => {
+    // ---------------------------------------------
+    const response = await axios.post<ResponseUser>(
+      `${BASE_URL}login`, { username, password }
     );
     return response.data;
   },
@@ -135,10 +136,12 @@ export const userApiService = {
     }
   },
 
-  getAllParticipationAnswers: async (quizId: string): Promise<ParticipationAnswer[]> => {
+  getQuizParticipations: async (
+    quizId: string
+  ): Promise<Participation[]> => {
     try {
-      const response = await axios.get<ParticipationAnswer[]>(
-        `${BASE_URL}quizParticipationAnswers/${quizId}`
+      const response = await axios.get<Participation[]>(
+        `${BASE_URL}quizParticipations/${quizId}`
       );
       return response.data;
     } catch (err) {
@@ -152,7 +155,6 @@ export const userApiService = {
       const response = await axios.get<Participation[]>(
         `${BASE_URL}participations/${userId}`
       );
-
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);

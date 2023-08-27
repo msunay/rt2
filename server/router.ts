@@ -20,6 +20,7 @@ router.get('/users', userController.getAllUsers);
 router.put('/username', userController.changeUsername);
 router.put('/password', userController.changePassword);
 router.get('/userId', auth, userController.getUserId);
+router.post('/login', userController.userLogin);
 
 // Quiz routes
 router.post('/demoQuiz', addDemoQuiz);
@@ -41,7 +42,7 @@ router.get(
   '/participations/:userId',
   participationController.getUserParticipations
 );
-router.get('/quizParticipationAnswers/:id', referenceTablesController.getQuizParticipationAnswers);
+router.get('/quizParticipations/:quizId', referenceTablesController.getQuizParticipations);
 router.get(
   '/participationAnswers/:id',
   participationController.getParticipationAnswers
