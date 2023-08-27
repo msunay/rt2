@@ -42,15 +42,11 @@ export const io = new Server(server, {
   },
 });
 
-export const peers: Namespace<
-  PeersServerToClientEvents,
-  PeersClientToServerEvents
-> = io.of('/mediasoup');
+export const peers: Namespace<PeersServerToClientEvents, PeersClientToServerEvents> =
+  io.of('/mediasoup');
 
-export const quiz: Namespace<
-  QuizServerToClientEvents,
-  QuizClientToServerEvents
-> = io.of('/quizspace');
+export const quiz: Namespace<QuizServerToClientEvents, QuizClientToServerEvents> =
+  io.of('/quizspace');
 
 peers.on('connection', peersSocketInit);
 
