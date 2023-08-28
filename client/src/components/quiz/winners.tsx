@@ -43,13 +43,13 @@ export default function Winners({ quizId }: { quizId: string }) {
   const usersWithHighestScore = Object.keys(resultsTable).filter(
     (userId) => resultsTable[userId] === highestScore
   );
-  
+
   useEffect(() => {
     usersWithHighestScore.forEach((userId) => {
-      userApiService.getUserDetails(userId).then((data) => 
-        setWinnerList([...winnerList, data.username])
-      );
-    })
+      userApiService
+        .getUserDetails(userId)
+        .then((data) => setWinnerList([...winnerList, data.username]));
+    });
   }, [resultsTable]);
 
   return (
@@ -59,7 +59,7 @@ export default function Winners({ quizId }: { quizId: string }) {
         <thead>
           <tr>
             <th>Username</th>
-            <th>Correct Answers</th>
+            <th>Score</th>
           </tr>
         </thead>
         <tbody>

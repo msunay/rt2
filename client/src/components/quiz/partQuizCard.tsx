@@ -1,5 +1,5 @@
 'use client';
-import { Quiz, Participation } from '@/Types/Types';
+import { Quiz } from '@/Types/Types';
 import moment from 'moment';
 import Image from 'next/image';
 import plus from '@/public/add_icon.svg';
@@ -20,32 +20,21 @@ export default function ParticipationQuizCard({
   setQuizList: Dispatch<SetStateAction<Quiz[]>>;
 }) {
   const [isSignedUp, setIsSignedUp] = useState(false);
-  const [participationId, setParticipationId] = useState('');
-  const [participationList, setParticipationList] = useState<Participation[]>(
-    []
-  );
+  const [participationList, setParticipationList] = useState<Quiz[]>([]);
 
   const userId = useAppSelector((state) => state.userIdSlice.value);
 
   useEffect(() => {
     userApiService.getUserParticipations(userId).then((data) => {
-      setParticipationList(data);
+      setParticipationList(data.quizzes);
     });
   }, [isSignedUp]);
 
   useEffect(() => {
-    if (participationList.some((element) => element.QuizId === quiz.id)) {
+    if (participationList.some((element) => element.id === quiz.id)) {
       setIsSignedUp(true);
     } else {
       setIsSignedUp(false);
-    }
-    if (participationList.length > 0 && participationList[0].id) {
-      const newParticipationId = participationList.find(
-        (participation) => participation.QuizId === quiz.id
-      )?.id;
-      if (newParticipationId) {
-        setParticipationId(newParticipationId);
-      }
     }
   }, [participationList]);
 
@@ -59,9 +48,7 @@ export default function ParticipationQuizCard({
   }
   async function handleRemove() {
     try {
-      if (participationId) {
-        await userApiService.deleteParticipation(participationId);
-      }
+      await userApiService.deleteParticipation(userId, quiz.id!);
       setIsSignedUp(false);
       setQuizList(quizList.filter((quizItem) => quizItem.id != quiz.id));
     } catch (err) {

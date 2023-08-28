@@ -8,6 +8,8 @@ import {
   Participation,
   ParticipationAndAnswers,
   ParticipationAnswer,
+  UserParticipations,
+  QuizParticipations,
 } from '../../Types/Types';
 
 export const BASE_URL: string =
@@ -80,13 +82,13 @@ export const userApiService = {
     }
   },
 
-  getOneQuiz: async (quizId: string): Promise<Quiz[]> => {
+  getOneQuiz: async (quizId: string): Promise<Quiz> => {
     try {
-      const response = await axios.get<Quiz[]>(`${BASE_URL}quiz/${quizId}`);
+      const response = await axios.get<Quiz>(`${BASE_URL}quiz/${quizId}`);
       return response.data;
     } catch (err) {
       console.log('Error fetching quizzes from database::', err);
-      return [];
+      return {} as Quiz;
     }
   },
 
@@ -107,7 +109,7 @@ export const userApiService = {
       const response = await axios.get(
         `${BASE_URL}quizQuestionAnswer/${quizId}`
       );
-      return response.data[0]; //TODO
+      return response.data;
     } catch (err) {
       console.log(err);
       return {} as QuizQuestionAnswer;
@@ -137,36 +139,39 @@ export const userApiService = {
 
   getQuizParticipations: async (
     quizId: string
-  ): Promise<Participation[]> => {
+  ): Promise<QuizParticipations> => {
     try {
-      const response = await axios.get<Participation[]>(
+      const response = await axios.get<QuizParticipations>(
         `${BASE_URL}quizParticipations/${quizId}`
       );
       return response.data;
     } catch (err) {
       console.log(err);
-      return [];
+      return {} as QuizParticipations;
     }
   },
 
-  getUserParticipations: async (userId: string): Promise<Participation[]> => {
+  getUserParticipations: async (
+    userId: string
+  ): Promise<UserParticipations> => {
     try {
-      const response = await axios.get<Participation[]>(
+      const response = await axios.get<UserParticipations>(
         `${BASE_URL}participations/${userId}`
       );
       return response.data;
     } catch (err) {
       console.log('Error fetching participations from database::', err);
-      return [];
+      return {} as UserParticipations;
     }
   },
 
   getOneParticipation: async (
-    participationId: string
+    userId: string,
+    quizId: string
   ): Promise<Participation> => {
     try {
       const response = await axios.get<Participation>(
-        `${BASE_URL}participation/${participationId}`
+        `${BASE_URL}participation/${userId}/${quizId}`
       );
       return response.data;
     } catch (err) {
@@ -176,11 +181,12 @@ export const userApiService = {
   },
 
   deleteParticipation: async (
-    participationId: string
+    userId: string,
+    quizId: string
   ): Promise<Participation> => {
     try {
       const response = await axios.delete<Participation>(
-        `${BASE_URL}participation/${participationId}`
+        `${BASE_URL}participation/${userId}/${quizId}`
       );
       return response.data;
     } catch (err) {
@@ -211,7 +217,7 @@ export const userApiService = {
       return {} as ParticipationAnswer;
     }
   },
-  getParticipationAnswers: async (
+  cipationAnswers: async (
     participationId: string
   ): Promise<ParticipationAndAnswers[]> => {
     try {

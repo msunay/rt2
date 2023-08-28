@@ -5,7 +5,7 @@ import {
 import { Socket } from 'socket.io';
 import { io } from '../index';
 
-const QUESTION_TIME = 7000;
+const QUESTION_TIME = 1000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
