@@ -55,7 +55,7 @@ export const peersSocketService = {
       { sender: true },
       ({ transportParams }) => {
         if (transportParams.error) {
-          console.log(transportParams.error);
+          console.log('transportParams.error: ', transportParams.error);
           return;
         }
         console.log('transportParams: ', transportParams);

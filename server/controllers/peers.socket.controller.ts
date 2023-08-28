@@ -52,7 +52,7 @@ const createWebRtcTransport = async (callback: any) => {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '66.241.125.174',
+          ip: '0.0.0.0',
         },
       ],
       enableUdp: true,
@@ -144,7 +144,7 @@ const peersSocketInit = async (
 
   peers.on('createWebRtcTransport', async ({ sender }, callback) => {
     try {
-      console.log(`Is this a sender request? ${sender}`);
+      console.log(`Is this a sender request? ${sender ? 'Yes': 'No'}`);
       if (sender) producerTransport = await createWebRtcTransport(callback);
       else consumerTransport = await createWebRtcTransport(callback);
     } catch (error) {
