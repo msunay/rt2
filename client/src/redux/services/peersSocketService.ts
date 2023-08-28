@@ -7,7 +7,7 @@ import {
 
 const BASE_URL =
 process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BACKEND_URL!
+  ? process.env.NEXT_PUBLIC_BACKEND_URL
   : 'http://localhost:3001/';
 
 
@@ -36,7 +36,7 @@ export const peersSocketService = {
     peers.emit(
       'create_room',
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
+        console.log('Router RTP Capabilities: ', data.rtpCapabilities);
         //assign to local variable
         createDevice(data.rtpCapabilities);
       }
@@ -55,7 +55,7 @@ export const peersSocketService = {
       { sender: true },
       ({ transportParams }) => {
         if (transportParams.error) {
-          console.log(transportParams.error);
+          console.log('transportParams.error: ', transportParams.error);
           return;
         }
         console.log('transportParams: ', transportParams);

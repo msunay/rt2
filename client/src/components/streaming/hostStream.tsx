@@ -14,12 +14,12 @@ import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { incrementQuestionNumber } from '@/redux/features/questionSlice';
 import { useRouter } from 'next/navigation';
 
-
-
 export const QUESTION_TIME = 7000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
-  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
+  const currentQuestionNumber = useAppSelector(
+    (state) => state.questionSlice.value
+  );
   const dispatch = useAppDispatch();
 
   const [quizStarted, setQuizStarted] = useState(false);
@@ -43,7 +43,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
     // quizSocketService.revealListener(
     //   setQuestionHidden
     // );
-    quizSocketService.revealAnswerHostListener(setQuestionHidden)
+    quizSocketService.revealAnswerHostListener(setQuestionHidden);
     peersSocketService.successListener();
   }, []);
 
@@ -52,7 +52,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
     // quizSocketService.emitNextQ();
-    dispatch(incrementQuestionNumber())
+    dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
@@ -67,11 +67,15 @@ export default function HostStream({ quizId }: { quizId: string }) {
       .querySelectorAll('button[name="a"]')
       //@ts-ignore
       .forEach((btn) => (btn.disabled = false));
-    dispatch(incrementQuestionNumber())
+    dispatch(incrementQuestionNumber());
     document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
     startTimer();
     setTrigger((trigger) => trigger + 1);
+  }
+
+  function handleWinners() {
+    quizSocketService.emitShowWinners();
   }
 
   const stream = () => {
@@ -220,9 +224,10 @@ export default function HostStream({ quizId }: { quizId: string }) {
             currentQuestionNumber === 10 ? (
               <button
                 className={styles.next_q_btn}
-                onClick={() =>
-                  dispatch(incrementQuestionNumber())
-                }
+                onClick={() => {
+                  dispatch(incrementQuestionNumber());
+                  handleWinners();
+                }}
               >
                 Reveal Winners
               </button>

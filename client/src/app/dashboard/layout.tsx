@@ -33,6 +33,7 @@ export default function DashboardLayout({
           width={35}
           height={30}
           alt='exit image'
+          data-cy="logout-button"
           onClick={() => exitUser()}
         />
         </nav>
