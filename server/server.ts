@@ -8,7 +8,7 @@ const PORT = 3001;
   console.log(
     `Server running on ${
       process.env.NODE_ENV === 'production'
-        ? 'https://patient-star-685.fly.dev'
+        ? `https://patient-star-685.fly.dev`
         : `http://localhost:${PORT}`
     }`
   );

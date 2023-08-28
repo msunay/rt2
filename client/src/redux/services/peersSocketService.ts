@@ -36,7 +36,7 @@ export const peersSocketService = {
     peers.emit(
       'create_room',
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        console.log(`Router RTP Capabilities: ${data.rtpCapabilities}`);
+        console.log('Router RTP Capabilities: ', data.rtpCapabilities);
         //assign to local variable
         createDevice(data.rtpCapabilities);
       }
@@ -55,7 +55,7 @@ export const peersSocketService = {
       { sender: true },
       ({ transportParams }) => {
         if (transportParams.error) {
-          console.log(transportParams.error);
+          console.log('transportParams.error: ', transportParams.error);
           return;
         }
         console.log('transportParams: ', transportParams);
@@ -213,7 +213,7 @@ export const peersSocketService = {
     consumer: mediasoupTypes.Consumer
   ) => peers.on('producer_closed', () => {
     // Server notified when producer is closed
-    consumerTransport.close();
-    consumer.close();
+    // consumerTransport.close();
+    // consumer.close();
   })
 };

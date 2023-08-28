@@ -21,6 +21,7 @@ export default function DashboardButton({ title, directTo }: PageProps) {
         width={45}
         height={45}
         className={styles.arrow_next}
+        data-cy={title}
       />
     </button>
   )

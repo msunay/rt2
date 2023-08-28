@@ -19,7 +19,7 @@ const createWorker = async () => {
   console.log(`worker pid: ${msWorker.pid}`);
 
   msWorker.on('died', (err) => {
-    console.error('mediasoup worker has died');
+    console.error('mediasoup worker has died', err);
     setTimeout(() => process.exit(1), 2000);
   });
 
@@ -52,7 +52,7 @@ const createWebRtcTransport = async (callback: any) => {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip: '66.241.125.174',
+          ip: '0.0.0.0',
         },
       ],
       enableUdp: true,
@@ -114,10 +114,10 @@ const peersSocketInit = async (
 
   peers.on('disconnect', () => {
     console.log('peer disconnected');
-    consumer?.close();
-    producer?.close();
-    consumerTransport?.close();
-    producerTransport?.close();
+    // consumer?.close();
+    // producer?.close();
+    // consumerTransport?.close();
+    // producerTransport?.close();
   });
 
   const getRtpCapabilities = (callback: any) => {
@@ -144,7 +144,7 @@ const peersSocketInit = async (
 
   peers.on('createWebRtcTransport', async ({ sender }, callback) => {
     try {
-      console.log(`Is this a sender request? ${sender}`);
+      console.log(`Is this a sender request? ${sender ? 'Yes': 'No'}`);
       if (sender) producerTransport = await createWebRtcTransport(callback);
       else consumerTransport = await createWebRtcTransport(callback);
     } catch (error) {
@@ -170,7 +170,7 @@ const peersSocketInit = async (
 
       producer.on('transportclose', () => {
         console.log('transport for producer closed');
-        producer.close();
+        // producer.close();
       });
 
       sendServerTransportId({
@@ -205,7 +205,7 @@ const peersSocketInit = async (
           console.log('Producer of consumer closed');
           peers.emit('producer_closed');
 
-          consumerTransport?.close();
+          // consumerTransport?.close();
         });
 
         const params = {
