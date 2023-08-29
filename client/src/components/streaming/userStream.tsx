@@ -18,7 +18,9 @@ import CloseLine from '@/public/close-line.svg';
 
 export default function UserStream({ partId }: { partId: string }) {
   // const userId = useAppSelector((state) => state.userIdSlice.value);
-  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
+  const currentQuestionNumber = useAppSelector(
+    (state) => state.questionSlice.value
+  );
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
@@ -49,10 +51,7 @@ export default function UserStream({ partId }: { partId: string }) {
     quizSocketService.successListener();
     quizSocketService.startQuizListener(setQuizStarted);
     quizSocketService.startTimerListener(setQuestionHidden);
-    quizSocketService.revealListener(
-      setQuestionHidden,
-      setTrigger
-    );
+    quizSocketService.revealListener(setQuestionHidden, setTrigger);
     peersSocketService.successListener();
     peersSocketService.producerClosedListener(
       consumerTransportState,
@@ -133,39 +132,43 @@ export default function UserStream({ partId }: { partId: string }) {
   return (
     <>
       <div className={styles.unit}>
-        <Link href='/dashboard' className={styles.close_btn}>
-          <Image
-            src={CloseLine}
-            height={40}
-            width={40}
-            alt='close image'
-          />
+        <Link href="/dashboard" className={styles.close_btn}>
+          <Image src={CloseLine} height={40} width={40} alt="close image" />
         </Link>
-      <canvas className={styles.count_down} id="countdown-canvas"></canvas>
+        <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
-          <video ref={remoteVideo} className={styles.video} autoPlay={true}></video>
+          <video
+            ref={remoteVideo}
+            className={styles.video}
+            autoPlay={true}
+          ></video>
         </div>
-        {trigger < 12 ? (
-          trigger >= 10 ? (
+        {trigger < 11 ? (
+          trigger === 10 ? (
             <FinalScore userParticipation={userParticipation} />
           ) : (
-              <div className="question-component">
-                {quizStarted && (
-                  <PlayerQuestion
-                    partId={partId}
-                    trigger={trigger}
-                    hidden={questionHidden}
-                  />
-                )}
-              </div>
-          )) : (
-            <Winners quizId={userParticipation.QuizId!}/>
+            <div className="question-component">
+              {quizStarted && (
+                <PlayerQuestion
+                  partId={partId}
+                  trigger={trigger}
+                  hidden={questionHidden}
+                />
+              )}
+            </div>
           )
-        }
+        ) : (
+          <Winners quizId={userParticipation.QuizId!} />
+        )}
 
         <div className="current-question"></div>
       </div>
-      <button className={styles.btn_join} id="join-stream-btn" onClick={goConsume} disabled={false}>
+      <button
+        className={styles.btn_join}
+        id="join-stream-btn"
+        onClick={goConsume}
+        disabled={false}
+      >
         Join Stream
       </button>
     </>

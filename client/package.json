@@ -33,6 +33,7 @@
     "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
+    "cypress": "^12.17.4",
     "prettier": "3.0.1"
   }
 }

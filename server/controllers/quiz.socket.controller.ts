@@ -3,9 +3,8 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
-import { io } from '../index';
 
-const QUESTION_TIME = 7000;
+const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
@@ -17,6 +16,7 @@ const quizSocketInit = (
   });
 
   quiz.on('host_start_quiz', () => {
+    console.log('Emitted host_start_quiz event');
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
@@ -32,6 +32,11 @@ const quizSocketInit = (
       quiz.emit('reveal_answers_host');
       quiz.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
+  });
+
+  quiz.on('show_winners', () => {
+    quiz.emit('host_winners');
+    quiz.broadcast.emit('player_winners');
   });
 };
 
