@@ -196,10 +196,14 @@ export const peersSocketService = {
         });
 
         console.log('consumer: ', consumer);
-        
+
         const { track } = consumer;
 
-        remoteVideo.current!.srcObject = new MediaStream([track]);
+        const producerTrack = new MediaStream([track]);
+        // producerTrack.getTracks()[0]
+        console.log('remote vid ref: ', remoteVideo.current);
+        console.log('producerTrack: ', producerTrack);
+        remoteVideo.current!.srcObject = producerTrack;
 
         peers.emit('consumer_resume');
       }
