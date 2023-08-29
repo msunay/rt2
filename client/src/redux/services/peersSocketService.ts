@@ -195,6 +195,8 @@ export const peersSocketService = {
           rtpParameters: params.rtpParameters,
         });
 
+        console.log('consumer: ', consumer);
+        
         const { track } = consumer;
 
         remoteVideo.current!.srcObject = new MediaStream([track]);
