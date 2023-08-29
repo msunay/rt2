@@ -48,13 +48,13 @@ const mediaCodecs: RtpCodecCapability[] = [
 ];
 
 const createWebRtcTransport = async (callback: any) => {
-  const ip = process.env.NODE_ENV === 'production' ? process.env.FLY_IP! : '127.0.0.1'
+  const announcedIp = process.env.NODE_ENV === 'production' ? process.env.FLY_IP : '127.0.0.1'
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
-          ip,
-          announcedIp: '0.0.0.0'
+          ip: '0.0.0.0',
+          announcedIp
         },
       ],
       enableUdp: true,
