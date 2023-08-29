@@ -48,6 +48,7 @@ const mediaCodecs: RtpCodecCapability[] = [
 ];
 
 const createWebRtcTransport = async (callback: any) => {
+  console.log('fly ip: ', process.env.FLY_IP);
   const announcedIp = process.env.NODE_ENV === 'production' ? process.env.FLY_IP : '127.0.0.1'
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
