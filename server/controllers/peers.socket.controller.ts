@@ -6,6 +6,7 @@ import { Socket } from 'socket.io';
 import { types as mediasoupTypes } from 'mediasoup';
 import * as mediasoup from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
+import util from 'util'
 
 let msWorker: mediasoupTypes.Worker;
 let msRouter: mediasoupTypes.Router;
@@ -77,6 +78,7 @@ const createWebRtcTransport = async (callback: any) => {
       console.log('Transport closed');
     });
 
+    console.log(util.inspect(Object, {showHidden: false, depth: null, colors: true}))
     console.log('Transport Params: ', {
       transportParams: {
         id: transport.id,
