@@ -6,6 +6,7 @@ import { Socket } from 'socket.io';
 import { types as mediasoupTypes } from 'mediasoup';
 import * as mediasoup from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
+import util from 'util'
 
 let msWorker: mediasoupTypes.Worker;
 let msRouter: mediasoupTypes.Router;
@@ -48,11 +49,13 @@ const mediaCodecs: RtpCodecCapability[] = [
 ];
 
 const createWebRtcTransport = async (callback: any) => {
+  const announcedIp = process.env.NODE_ENV === 'production' ? process.env.FLY_IP : '127.0.0.1'
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       listenIps: [
         {
           ip: '0.0.0.0',
+          announcedIp
         },
       ],
       enableUdp: true,
@@ -75,14 +78,15 @@ const createWebRtcTransport = async (callback: any) => {
       console.log('Transport closed');
     });
 
-    console.log('Transport Params: ', {
+    console.log('Transport Params:!!!!!!!!!!!!!!!!!!!!!!');
+    console.log(util.inspect({
       transportParams: {
         id: transport.id,
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
       },
-    });
+    }, {showHidden: false, depth: null, colors: true}))
     callback({
       transportParams: {
         id: transport.id,
