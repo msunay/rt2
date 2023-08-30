@@ -43,6 +43,10 @@ router.get(
   referenceTablesController.getOneParticipation
 );
 router.get(
+  '/participationByPartId/:partId',
+  referenceTablesController.getOneParticipationByPartId
+);
+router.get(
   '/participations/:userId',
   participationController.getUserParticipations
 );

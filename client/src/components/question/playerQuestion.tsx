@@ -51,7 +51,7 @@ export default function PlayerQuestion({
 
   useEffect(() => {
     userApiService
-      .getOneParticipation(partId)
+      .getOneParticipationByPartId(partId)
       .then((newParticipation) => {
         setUserParticipation(newParticipation);
         return newParticipation;
@@ -68,7 +68,6 @@ export default function PlayerQuestion({
       quiz.Questions
     ) {
       setCurrentQuestion(quiz.Questions[trigger]);
-      console.log('jkfdkljdfkjdkj: ', trigger);
     }
   }, [quiz, trigger]);
 

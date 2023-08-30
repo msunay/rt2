@@ -4,8 +4,11 @@ import { Participation, ParticipationAndAnswers } from '@/Types/Types';
 import { useState, useEffect } from 'react';
 import { userApiService } from '@/redux/services/apiService';
 
-
-export default function FinalScore({userParticipation}: {userParticipation: Participation}) {
+export default function FinalScore({
+  userParticipation,
+}: {
+  userParticipation: Participation;
+}) {
   const [playerScore, setPlayerScore] = useState(0);
   const [playerAnswerSheet, setPlayerAnswerSheet] =
     useState<ParticipationAndAnswers | null>(null);
@@ -14,11 +17,11 @@ export default function FinalScore({userParticipation}: {userParticipation: Part
     userApiService
       .getParticipationAnswers(userParticipation.id!)
       .then((data) => {
-        setPlayerAnswerSheet(data[0]);
+        setPlayerAnswerSheet(data);
 
         let count = 0;
-
-        data[0].answers.forEach((answer, i) => {
+        
+        data.answers.forEach((answer, i) => {
           console.log(`Answer${i}: `, answer);
           if (answer.isCorrect) count++;
           console.log(count);

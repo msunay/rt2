@@ -34,11 +34,15 @@ export const userApiService = {
     }
   },
 
-  loginUser: async (username: string, password: string): Promise<ResponseUser> => {
+  loginUser: async (
+    username: string,
+    password: string
+  ): Promise<ResponseUser> => {
     // ---------------------------------------------
-    const response = await axios.post<ResponseUser>(
-      `${BASE_URL}login`, { username, password }
-    );
+    const response = await axios.post<ResponseUser>(`${BASE_URL}login`, {
+      username,
+      password,
+    });
     return response.data;
   },
 
@@ -181,6 +185,20 @@ export const userApiService = {
     }
   },
 
+  getOneParticipationByPartId: async (
+    partId: string
+  ): Promise<Participation> => {
+    try {
+      const response = await axios.get<Participation>(
+        `${BASE_URL}participationByPartId/${partId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log('Error fetching participation::', err);
+      return {} as Participation;
+    }
+  },
+
   deleteParticipation: async (
     userId: string,
     quizId: string
@@ -218,17 +236,17 @@ export const userApiService = {
       return {} as ParticipationAnswer;
     }
   },
-  cipationAnswers: async (
+  getParticipationAnswers: async (
     participationId: string
-  ): Promise<ParticipationAndAnswers[]> => {
+  ): Promise<ParticipationAndAnswers> => {
     try {
-      const response = await axios.get<ParticipationAndAnswers[]>(
+      const response = await axios.get<ParticipationAndAnswers>(
         `${BASE_URL}participationAnswers/${participationId}`
       );
       return response.data;
     } catch (err) {
       console.log(err);
-      return [];
+      return {} as ParticipationAndAnswers;
     }
   },
 };

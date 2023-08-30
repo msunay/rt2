@@ -41,7 +41,7 @@ export default function UserStream({ partId }: { partId: string }) {
   let consumer: mediasoupTypes.Consumer;
 
   useEffect(() => {
-    userApiService.getOneParticipation(partId).then((participation) => {
+    userApiService.getOneParticipationByPartId(partId).then((participation) => {
       setUserParticipation(participation);
     });
 
