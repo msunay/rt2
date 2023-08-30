@@ -16,7 +16,19 @@ let producer: mediasoupTypes.Producer;
 let consumer: mediasoupTypes.Consumer;
 
 const createWorker = async () => {
-  msWorker = await mediasoup.createWorker();
+  msWorker = await mediasoup.createWorker({
+    // rtcMinPort: ,
+    // rtcMaxPort: ,
+    logLevel: 'debug',
+    logTags: [
+      'info',
+      'ice',
+      'dtls',
+      'rtp',
+      'srtp',
+      'rtcp'
+    ]
+  });
   console.log(`worker pid: ${msWorker.pid}`);
 
   msWorker.on('died', (err) => {
