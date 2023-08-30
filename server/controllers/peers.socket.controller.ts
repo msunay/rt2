@@ -78,15 +78,15 @@ const createWebRtcTransport = async (callback: any) => {
       console.log('Transport closed');
     });
 
-    console.log(util.inspect(Object, {showHidden: false, depth: null, colors: true}))
-    console.log('Transport Params: ', {
+    console.log('Transport Params:!!!!!!!!!!!!!!!!!!!!!!');
+    console.log(util.inspect({
       transportParams: {
         id: transport.id,
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
       },
-    });
+    }, {showHidden: false, depth: null, colors: true}))
     callback({
       transportParams: {
         id: transport.id,
