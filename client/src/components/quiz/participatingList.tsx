@@ -17,22 +17,19 @@ export default function ParticipatingList() {
   useEffect(() => {
     const fetchData = async () => {
       const newQuizList: Quiz[] = [];
-      for (const participation of participationsList) {
-        const data = await userApiService.getOneQuiz(participation.QuizId!);
-        newQuizList.push(...data);
+      for (const quiz of participationsList.quizzes) {
+        newQuizList.push(quiz);
       }
       setQuizList(
-        newQuizList
-          .sort(
-            (quizA, quizB) =>
-              new Date(quizA.dateTime).getTime() -
-              new Date(quizB.dateTime).getTime()
-          )
-          .filter((quiz) => new Date(quiz.dateTime).getTime() > Date.now())
+        newQuizList.sort(
+          (quizA, quizB) =>
+            new Date(quizA.dateTime).getTime() -
+            new Date(quizB.dateTime).getTime()
+        )
       );
       setLoading(false);
     };
-    if (participationsList.length && loading) {
+    if (participationsList.quizzes && loading) {
       fetchData();
     }
   }, [participationsList]);
@@ -40,7 +37,10 @@ export default function ParticipatingList() {
   return (
     <div className={style.quiz_list_container}>
       {quizList.length === 0 ? (
-        <p>You are currently not signed up to any quizzes, checkout the <Link href={'discover/'}>Discover page</Link> to get started.</p>
+        <p>
+          You are currently not signed up to any quizzes, checkout the{' '}
+          <Link href={'discover/'}>Discover page</Link> to get started.
+        </p>
       ) : (
         quizList.map((quizItem: Quiz) => (
           <ParticipationQuizCard

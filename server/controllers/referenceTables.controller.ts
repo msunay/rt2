@@ -2,6 +2,7 @@ import models from '../models/index';
 import { Request, Response } from 'express';
 import { CustomRequest } from '../middleware/auth';
 import { Participation, ParticipationAnswer } from '../models/associations';
+import { Op } from 'sequelize';
 
 async function createParticipation(req: Request, res: Response) {
   try {
@@ -21,7 +22,10 @@ async function deleteParticipation(req: Request, res: Response) {
   try {
     const response = await models.Participation.destroy({
       where: {
-        id: req.params.id,
+        [Op.and]: [
+          { UserId: req.params.userId },
+          { QuizId: req.params.quizId },
+        ],
       },
     });
     res.status(200).send('Successfully deleted participation');
@@ -33,9 +37,18 @@ async function deleteParticipation(req: Request, res: Response) {
 
 async function getUserParticipations(req: Request, res: Response) {
   try {
-    const response = await models.Participation.findAll({
+    const response = await models.User.findOne({
       where: {
-        UserId: req.params.userId,
+        id: req.params.userId,
+      },
+      include: {
+        model: models.Quiz,
+        where: {
+          dateTime: {
+            [Op.gte]: Date.now(),
+          },
+        },
+        as: 'quizzes',
       },
     });
     res.status(200).send(response);
@@ -47,7 +60,7 @@ async function getUserParticipations(req: Request, res: Response) {
 
 async function getParticipationAnswers(req: Request, res: Response) {
   try {
-    const response = await models.Participation.findAll({
+    const response = await models.Participation.findOne({
       where: {
         id: req.params.id,
       },
@@ -67,7 +80,24 @@ async function getOneParticipation(req: Request, res: Response) {
   try {
     const response = await models.Participation.findOne({
       where: {
-        id: req.params.id,
+        [Op.and]: [
+          { UserId: req.params.userId },
+          { QuizId: req.params.quizId },
+        ],
+      },
+    });
+    res.status(200).send(response);
+  } catch (err) {
+    console.error('Could not get participations::', err);
+    res.status(500).send();
+  }
+}
+
+async function getOneParticipationByPartId(req: Request, res: Response) {
+  try {
+    const response = await models.Participation.findOne({
+      where: {
+        id: req.params.partId
       },
     });
     res.status(200).send(response);
@@ -95,9 +125,13 @@ async function createParticipationAnswer(req: Request, res: Response) {
 
 async function getQuizParticipations(req: Request, res: Response) {
   try {
-    const response = await models.Participation.findAll({
+    const response = await models.Quiz.findOne({
       where: {
-        QuizId: req.params.quizId,
+        id: req.params.quizId,
+      },
+      include: {
+        model: models.User,
+        as: 'users',
       },
     });
     res.status(200).send(response);
@@ -115,4 +149,5 @@ export default {
   deleteParticipation,
   getOneParticipation,
   getQuizParticipations,
+  getOneParticipationByPartId
 };

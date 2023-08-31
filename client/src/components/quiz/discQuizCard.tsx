@@ -11,31 +11,21 @@ import style from '@/styles/quiz.module.css';
 
 export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const [isSignedUp, setIsSignedUp] = useState(false);
-  const [participationId, setParticipationId] = useState('');
-  const [participationList, setParticipationList] = useState<Participation[]>(
-    []
-  );
-
+  const [participationList, setParticipationList] = useState<Quiz[]>([]);
   const userId = useAppSelector((state) => state.userIdSlice.value);
 
   useEffect(() => {
     userApiService.getUserParticipations(userId).then((data) => {
-      setParticipationList(data);
+      setParticipationList(data.quizzes);
     });
   }, [isSignedUp]);
 
   useEffect(() => {
-    if (participationList.some((element) => element.QuizId === quiz.id)) {
-      setIsSignedUp(true);
-    } else {
-      setIsSignedUp(false);
-    }
-    if (participationList.length > 0 && participationList[0].id) {
-      const newParticipationId = participationList.find(
-        (participation) => participation.QuizId === quiz.id
-      )?.id;
-      if (newParticipationId) {
-        setParticipationId(newParticipationId);
+    if (participationList && participationList.length) {
+      if (participationList.some((element) => element.id === quiz.id)) {
+        setIsSignedUp(true);
+      } else {
+        setIsSignedUp(false);
       }
     }
   }, [participationList]);
@@ -50,9 +40,8 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   }
   async function handleRemove() {
     try {
-      if (participationId) {
-        await userApiService.deleteParticipation(participationId);
-      }
+      const quizId = quiz.id;
+      await userApiService.deleteParticipation(userId, quizId!);
       setIsSignedUp(false);
     } catch (err) {
       console.log(err);
@@ -60,31 +49,31 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   }
 
   return (
-      <div className={style.quiz_card_container}>
-        <div className={style.quiz_info}>
-          <h2>{quiz.quizName}</h2>
-          <h4>{quiz.category}</h4>
-          <p>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</p>
-        </div>
-        {isSignedUp === true ? (
-              <Image
-                onClick={handleRemove}
-                className={style.btn_icon}
-                src={tick}
-                alt="tick icon"
-                width={60}
-                height={60}
-              />
-          ) : (
-              <Image
-                onClick={handleAdd}
-                className={style.btn_icon}
-                src={plus}
-                alt="plus icon"
-                width={60}
-                height={60}
-              />
-          )}
+    <div className={style.quiz_card_container}>
+      <div className={style.quiz_info}>
+        <h2>{quiz.quizName}</h2>
+        <h4>{quiz.category}</h4>
+        <p>{moment(quiz.dateTime).format('dddd D MMM H:mm')}</p>
       </div>
+      {isSignedUp === true ? (
+        <Image
+          onClick={handleRemove}
+          className={style.btn_icon}
+          src={tick}
+          alt="tick icon"
+          width={60}
+          height={60}
+        />
+      ) : (
+        <Image
+          onClick={handleAdd}
+          className={style.btn_icon}
+          src={plus}
+          alt="plus icon"
+          width={60}
+          height={60}
+        />
+      )}
+    </div>
   );
 }

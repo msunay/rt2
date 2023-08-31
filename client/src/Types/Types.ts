@@ -1,5 +1,7 @@
 // Database model types
 
+import { NumberLiteralType } from "typescript";
+
 export interface User {
   id?: string;
   email: string;
@@ -86,6 +88,28 @@ export interface QuestionAnswer {
     updatedAt: Date;
     QuestionId: string;
   }[];
+}
+
+export interface UserParticipations {
+  id: string;
+  email: string;
+  password: string;
+  isPremiumMember: boolean;
+  pointsWon: number;
+  createdAt: Date;
+  updatedAt: Date;
+  quizzes: Quiz[] 
+}
+
+export interface QuizParticipations {
+  id: string;
+  quizName: string;
+  quizOwner: string;
+  category: string;
+  dateTime: string;
+  createdAt: Date;
+  updatedAt: Date;
+  users: User[];
 }
 
 export interface QuizQuestionAnswer {

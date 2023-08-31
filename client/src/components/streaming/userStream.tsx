@@ -37,14 +37,11 @@ export default function UserStream({ partId }: { partId: string }) {
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
-  // let producerTransport: mediasoupTypes.Transport;
   let consumerTransport: mediasoupTypes.Transport;
-  // let producer: mediasoupTypes.Producer;
   let consumer: mediasoupTypes.Consumer;
-  // let isProducer = false;
 
   useEffect(() => {
-    userApiService.getOneParticipation(partId).then((participation) => {
+    userApiService.getOneParticipationByPartId(partId).then((participation) => {
       setUserParticipation(participation);
     });
 
@@ -58,23 +55,6 @@ export default function UserStream({ partId }: { partId: string }) {
       consumerState
     );
   }, []);
-
-  // interface screenSize {
-  //   width: number | undefined;
-  //   height: number | undefined;
-  // }
-
-  // const [screenSize, setScreenSize] = useState<screenSize>({
-  //   width: undefined,
-  //   height: undefined,
-  // });
-
-  // useEffect(() => {
-  //   setScreenSize({
-  //     width: window.innerWidth,
-  //     height: window.innerHeight,
-  //   });
-  // }, []);
 
   // Consume Trigger
   const goConsume = () => {

@@ -2,10 +2,11 @@
 
 import { userApiService } from '@/redux/services/apiService';
 import { useEffect, useState } from 'react';
-import { Participation } from '@/Types/Types';
+import { Participation, QuizParticipations } from '@/Types/Types';
 
 export default function Winners({ quizId }: { quizId: string }) {
-  const [quizParticipations, setParticipations] = useState<Participation[]>([]);
+  const [quizParticipations, setQuizParticipations] =
+    useState<QuizParticipations>({} as QuizParticipations);
   const [winnerList, setWinnerList] = useState<string[]>([]);
   const [resultsTable, setResultsTable] = useState<{ [key: string]: number }>(
     {}
@@ -13,24 +14,24 @@ export default function Winners({ quizId }: { quizId: string }) {
 
   useEffect(() => {
     userApiService.getQuizParticipations(quizId).then((data) => {
-      setParticipations(data);
+      setQuizParticipations(data);
     });
   }, []);
 
   useEffect(() => {
-    quizParticipations.forEach((participation) => {
-      userApiService.getParticipationAnswers(participation.id!).then((data) => {
-        const correctAnswersCount = data[0].answers.reduce(
+    quizParticipations.users.forEach((user) => {
+      userApiService.getParticipationAnswers(user.id!).then((data) => {
+        const correctAnswersCount = data.answers.reduce(
           (count, answer) => count + (answer.isCorrect ? 1 : 0),
           0
         );
 
         setResultsTable((prevResults) => {
           const updatedResults = { ...prevResults };
-          if (updatedResults[data[0].UserId]) {
-            updatedResults[data[0].UserId] += correctAnswersCount;
+          if (updatedResults[data.UserId]) {
+            updatedResults[data.UserId] += correctAnswersCount;
           } else {
-            updatedResults[data[0].UserId] = correctAnswersCount;
+            updatedResults[data.UserId] = correctAnswersCount;
           }
           return updatedResults;
         });
@@ -43,13 +44,13 @@ export default function Winners({ quizId }: { quizId: string }) {
   const usersWithHighestScore = Object.keys(resultsTable).filter(
     (userId) => resultsTable[userId] === highestScore
   );
-  
+
   useEffect(() => {
     usersWithHighestScore.forEach((userId) => {
-      userApiService.getUserDetails(userId).then((data) => 
-        setWinnerList([...winnerList, data.username])
-      );
-    })
+      userApiService
+        .getUserDetails(userId)
+        .then((data) => setWinnerList([...winnerList, data.username]));
+    });
   }, [resultsTable]);
 
   return (
@@ -59,7 +60,7 @@ export default function Winners({ quizId }: { quizId: string }) {
         <thead>
           <tr>
             <th>Username</th>
-            <th>Correct Answers</th>
+            <th>Score</th>
           </tr>
         </thead>
         <tbody>

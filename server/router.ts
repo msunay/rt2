@@ -31,24 +31,35 @@ router.get(
 router.get('/quizzes', quizController.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quizController.getOneQuizQuestionAnswers);
 router.get('/quiz/:id', quizController.getOneQuiz);
+
 // Reference tables routes
 router.post('/participation', participationController.createParticipation);
 router.post(
   '/participationAnswer',
   participationController.createParticipationAnswer
 );
-router.get('/participation/:id', referenceTablesController.getOneParticipation);
+router.get(
+  '/participation/:userId/:quizId',
+  referenceTablesController.getOneParticipation
+);
+router.get(
+  '/participationByPartId/:partId',
+  referenceTablesController.getOneParticipationByPartId
+);
 router.get(
   '/participations/:userId',
   participationController.getUserParticipations
 );
-router.get('/quizParticipations/:quizId', referenceTablesController.getQuizParticipations);
+router.get(
+  '/quizParticipations/:quizId',
+  referenceTablesController.getQuizParticipations
+);
 router.get(
   '/participationAnswers/:id',
   participationController.getParticipationAnswers
 );
 router.delete(
-  '/participation/:id',
+  '/participation/:userId/:quizId',
   participationController.deleteParticipation
 );
 

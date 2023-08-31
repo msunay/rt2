@@ -5,16 +5,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
 import HostQuestion from '../question/hostQuestion';
-import {
-  quizSocketService,
-  startTimer,
-} from '@/redux/services/quizSocketService';
 import { peersSocketService } from '@/redux/services/peersSocketService';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { incrementQuestionNumber } from '@/redux/features/questionSlice';
 import { useRouter } from 'next/navigation';
+import {
+  quizSocketService,
+  startTimer,
+} from '@/redux/services/quizSocketService';
 
-export const QUESTION_TIME = 7000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(
@@ -23,7 +23,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
   const dispatch = useAppDispatch();
 
   const [quizStarted, setQuizStarted] = useState(false);
-  // const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
 
@@ -40,9 +39,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
   useEffect(() => {
     quizSocketService.successListener();
     quizSocketService.startTimerListener(setQuestionHidden);
-    // quizSocketService.revealListener(
-    //   setQuestionHidden
-    // );
     quizSocketService.revealAnswerHostListener(setQuestionHidden);
     peersSocketService.successListener();
   }, []);
@@ -51,7 +47,6 @@ export default function HostStream({ quizId }: { quizId: string }) {
     startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
-    // quizSocketService.emitNextQ();
     dispatch(incrementQuestionNumber());
   }
 
@@ -225,8 +220,8 @@ export default function HostStream({ quizId }: { quizId: string }) {
               <button
                 className={styles.next_q_btn}
                 onClick={() => {
-                  dispatch(incrementQuestionNumber());
                   handleWinners();
+                  dispatch(incrementQuestionNumber());
                 }}
               >
                 Reveal Winners
