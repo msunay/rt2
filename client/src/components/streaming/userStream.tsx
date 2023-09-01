@@ -117,11 +117,11 @@ export default function UserStream({ partId }: { partId: string }) {
         </Link>
         <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
-          <video
+          {/* <video
             ref={remoteVideo}
             className={styles.video}
             autoPlay={true}
-          ></video>
+          ></video> */}
         </div>
         {trigger < 11 ? (
           trigger === 10 ? (
@@ -143,14 +143,14 @@ export default function UserStream({ partId }: { partId: string }) {
 
         <div className="current-question"></div>
       </div>
-      <button
+      {/* <button
         className={styles.btn_join}
         id="join-stream-btn"
         onClick={goConsume}
         disabled={false}
       >
         Join Stream
-      </button>
+      </button> */}
     </>
   );
 }
