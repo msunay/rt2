@@ -1,5 +1,5 @@
-import { Options, Sequelize } from "sequelize";
-import dotenv from "dotenv";
+import { Options, Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -12,15 +12,15 @@ const localConnection = [
   `${env.DB_USERNAME}`,
   `${env.DB_PASSWORD}`,
   {
-
-    dialect: "postgres",
+    dialect: 'postgres',
 
     logging: false,
-  }
+  },
 ] as Options[];
 
-const connection = env.NODE_ENV === "production" ? cloudConnection : localConnection;
+const connection =
+  env.NODE_ENV === 'production' ? cloudConnection : localConnection;
 
-export const sequelize = new Sequelize(...connection)
+export const sequelize = new Sequelize(...connection);
 
 export default sequelize;

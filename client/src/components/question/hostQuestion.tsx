@@ -1,16 +1,7 @@
 'use client';
 
-import {
-  useState,
-  useEffect,
-} from 'react';
-import {
-  QuestionAnswer,
-  QuizQuestionAnswer,
-  Answer,
-  Participation,
-  ParticipationAnswer,
-} from '@/Types/Types';
+import { useState, useEffect } from 'react';
+import { QuestionAnswer, QuizQuestionAnswer, Answer } from '@/Types/Types';
 import { userApiService } from '@/redux/services/apiService';
 import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/redux/hooks';
@@ -24,14 +15,9 @@ export default function HostQuestion({
   trigger: number;
   quizId: string;
 }) {
-  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value)
-
-  const [userParticipationAnswer, setUserParticipationAnswer] =
-    useState<ParticipationAnswer>({} as ParticipationAnswer);
-
-  const userId = useAppSelector((state) => state.userIdSlice.value);
-
-  // LOGIC FOR HOSTING THE QUIZ
+  const currentQuestionNumber = useAppSelector(
+    (state) => state.questionSlice.value
+  );
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
@@ -39,58 +25,24 @@ export default function HostQuestion({
     null
   );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
-  const [userParticipation, setUserParticipation] = useState<Participation>(
-    {} as Participation
-  );
-
-  // useEffect(() => {
-  //   if (trigger > 0) createHandle();
-  // }, [trigger]);
 
   useEffect(() => {
-    console.log('UserID: ', userId);
-  }, [userId]);
-
-  useEffect(() => {
-    userApiService
-      .getUserParticipations(userId)
-      .then((participationArr) => {
-        console.log('participationArr: ', participationArr);
-        const currentParticipation = participationArr.filter(
-          (elem) => elem.QuizId === quizId
-        )[0];
-        setUserParticipation(currentParticipation);
-        return currentParticipation;
-      })
-      .then((currentParticipation) => {
-        console.log('CURRENT PARTICIPATION::', currentParticipation);
-        userApiService
-          .getOneQuizQuestionAnswer(currentParticipation.QuizId!)
-          .then((data) => {
-            setQuiz(data);
-          })
-          .catch((e) => console.error(e));
-      });
+    userApiService.getOneQuizQuestionAnswer(quizId).then((data) => {
+      setQuiz(data);
+    });
   }, []);
 
   useEffect(() => {
-    if (
-      quiz.Questions 
-    ) {
-      setCurrentQuestion(quiz.Questions[currentQuestionNumber -1]);
+    if (quiz.Questions) {
+      setCurrentQuestion(quiz.Questions[currentQuestionNumber - 1]);
     }
   }, [quiz, trigger]);
-
-  // useEffect(() => {
-
-  // }, [currentQuestionNumber])
 
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
       setCurrentAnswers(currentQuestion.Answers);
     }
   }, [currentQuestion]);
-
 
   return (
     <>
