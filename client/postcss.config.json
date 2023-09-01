@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "postcss-mixins",
     "postcss-flexbugs-fixes",
     [
       "postcss-preset-env",
@@ -12,7 +13,6 @@
           "custom-properties": false
         }
       }
-    ],
-    "postcss-sass", {}
+    ]
   ]
 }

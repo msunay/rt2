@@ -67,7 +67,7 @@ a {
   }
 }
 
-.final-score {
+.animate__bounceIn {
   display: flex;
   width: 100vw;
   justify-content: center;
@@ -183,4 +183,9 @@ a {
   100% {
     background-position: 100% 50%;
   }
+}
+
+.active {
+  background-color: black;
+
 }
