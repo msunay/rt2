@@ -14,7 +14,7 @@ import {
   startTimer,
 } from '@/redux/services/quizSocketService';
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(
@@ -201,7 +201,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
           className={styles.video}
           autoPlay={true}
         ></video>
-        <div className="question-component">
+        <div className={styles.question_component_container}>
           {quizStarted && (
             <HostQuestion
               quizId={quizId}

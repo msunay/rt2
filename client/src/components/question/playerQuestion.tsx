@@ -1,8 +1,5 @@
 'use client';
-import {
-  useState,
-  useEffect,
-} from 'react';
+import { useState, useEffect } from 'react';
 import {
   QuestionAnswer,
   QuizQuestionAnswer,
@@ -14,7 +11,6 @@ import { userApiService } from '@/redux/services/apiService';
 import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/redux/hooks';
 
-
 export default function PlayerQuestion({
   hidden,
   trigger,
@@ -24,7 +20,7 @@ export default function PlayerQuestion({
   trigger: number;
   partId: string;
 }) {
-  const currentQuestionNumber = useAppSelector(state => state.questionSlice)
+  const currentQuestionNumber = useAppSelector((state) => state.questionSlice);
 
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
@@ -43,7 +39,7 @@ export default function PlayerQuestion({
   useEffect(() => {
     console.log('currentQuestion: ', currentQuestion);
     console.log('currentQuestionNumber: ', currentQuestionNumber.value);
-  }, [currentQuestionNumber.value])
+  }, [currentQuestionNumber.value]);
 
   useEffect(() => {
     if (trigger > 0) createHandle();
@@ -64,9 +60,7 @@ export default function PlayerQuestion({
   }, []);
 
   useEffect(() => {
-    if (
-      quiz.Questions
-    ) {
+    if (quiz.Questions) {
       setCurrentQuestion(quiz.Questions[trigger]);
     }
   }, [quiz, trigger]);
@@ -78,6 +72,11 @@ export default function PlayerQuestion({
   }, [currentQuestion]);
 
   async function handleAnswerClick(e: any) {
+    document
+      .querySelectorAll('button[name="a"]')
+      //@ts-ignore
+      .forEach((btn) => btn.classList.remove('active'));
+    e.target.classList.add('active');
     const match: number = e.target.className.match(/\w+(\d)/)[1];
     if (match) {
       setUserParticipationAnswer({
@@ -90,11 +89,11 @@ export default function PlayerQuestion({
   function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
     userApiService.createParticipationAnswer(userParticipationAnswer);
-    setUserParticipationAnswer({} as ParticipationAnswer)
+    setUserParticipationAnswer({} as ParticipationAnswer);
   }
 
   return (
-    <>
+    <div className={style.question_component}>
       {currentQuestion && !hidden && (
         <div className={style.question_container}>
           <p className={style.question_text}>{currentQuestion.questionText}</p>
@@ -112,6 +111,6 @@ export default function PlayerQuestion({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
