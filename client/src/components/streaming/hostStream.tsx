@@ -203,7 +203,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
           className={styles.video}
           autoPlay={true}
         ></video>
-        <div className="question-component">
+        <div className={styles.question_component_container}>
           {quizStarted && (
             <HostQuestion
               quizId={quizId}

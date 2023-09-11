@@ -128,7 +128,7 @@ export default function UserStream({ partId }: { partId: string }) {
           trigger === 10 ? (
             <FinalScore userParticipation={userParticipation} />
           ) : (
-            <div className="question-component">
+            <div className={styles.question_component_container}>
               {quizStarted && (
                 <PlayerQuestion
                   partId={partId}

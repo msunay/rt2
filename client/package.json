@@ -9,15 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/material": "^5.14.7",
     "@netlify/plugin-nextjs": "^4.40.1",
     "@reduxjs/toolkit": "^1.9.5",
     "@types/node": "20.4.9",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
+    "animate.css": "^4.1.1",
     "axios": "^1.4.0",
     "bcrypt-ts": "^4.0.0",
     "bufferutil": "^4.0.7",
     "canvas-circular-countdown": "^1.8.0",
+    "canvas-confetti": "^1.6.0",
     "countdownbar": "^1.5.3",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",
@@ -25,6 +31,9 @@
     "moment": "^2.29.4",
     "next": "13.4.13",
     "next-redux-wrapper": "^8.1.0",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^9.1.2",
+    "postcss-sass": "^0.5.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-redux": "^8.1.2",
@@ -33,7 +42,12 @@
     "utf-8-validate": "^5.0.10"
   },
   "devDependencies": {
-    "cypress": "^12.17.4",
+    "cypress": "^13.0.0",
+    "postcss-mixins": "^9.0.4",
     "prettier": "3.0.1"
-  }
+  },
+  "browserslist": [
+    "defaults and supports es6-module",
+    "maintained node versions"
+  ]
 }

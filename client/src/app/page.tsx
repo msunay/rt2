@@ -9,6 +9,10 @@ import facebook from '@/public/facebook.svg';
 import Login from '@/components/auth/login';
 import SignUp from '@/components/auth/sign-up';
 import styles from '@/styles/auth.module.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 export default function Page() {
 

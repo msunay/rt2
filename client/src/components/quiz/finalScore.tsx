@@ -3,6 +3,8 @@
 import { Participation, ParticipationAndAnswers } from '@/Types/Types';
 import { useState, useEffect } from 'react';
 import { userApiService } from '@/redux/services/apiService';
+import 'animate.css';
+
 
 export default function FinalScore({
   userParticipation,
@@ -20,7 +22,7 @@ export default function FinalScore({
         setPlayerAnswerSheet(data);
 
         let count = 0;
-        
+
         data.answers.forEach((answer, i) => {
           console.log(`Answer${i}: `, answer);
           if (answer.isCorrect) count++;
@@ -32,7 +34,7 @@ export default function FinalScore({
   }, []);
 
   return (
-    <div className="final-score">
+    <div className="animate__bounceIn">
       <span>You scored: {playerScore} / 10 </span>
     </div>
   );

@@ -49,7 +49,7 @@ export default function HostQuestion({
   }, [currentQuestion]);
 
   return (
-    <>
+    <div className={style.question_component}>
       {currentQuestion && !hidden && (
         <div className={style.host_question_container}>
           <p className={style.question_text}>{currentQuestion.questionText}</p>
@@ -62,6 +62,6 @@ export default function HostQuestion({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

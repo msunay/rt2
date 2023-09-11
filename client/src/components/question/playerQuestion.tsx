@@ -70,6 +70,11 @@ export default function PlayerQuestion({
   }, [currentQuestion]);
 
   async function handleAnswerClick(e: any) {
+    document
+      .querySelectorAll('button[name="a"]')
+      //@ts-ignore
+      .forEach((btn) => btn.classList.remove('active'));
+    e.target.classList.add('active');
     const match: number = e.target.className.match(/\w+(\d)/)[1];
     if (match) {
       setUserParticipationAnswer({
@@ -86,7 +91,7 @@ export default function PlayerQuestion({
   }
 
   return (
-    <>
+    <div className={style.question_component}>
       {currentQuestion && !hidden && (
         <div className={style.question_container}>
           <p className={style.question_text}>{currentQuestion.questionText}</p>
@@ -104,6 +109,6 @@ export default function PlayerQuestion({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
