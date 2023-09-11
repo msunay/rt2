@@ -236,6 +236,7 @@ export const userApiService = {
       return {} as ParticipationAnswer;
     }
   },
+
   getParticipationAnswers: async (
     participationId: string
   ): Promise<ParticipationAndAnswers> => {

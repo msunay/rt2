@@ -46,6 +46,7 @@ export default function UserStream({ partId }: { partId: string }) {
     });
 
     quizSocketService.successListener();
+    quizSocketService.playerWinnersListener(setTrigger);
     quizSocketService.startQuizListener(setQuizStarted);
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealListener(setQuestionHidden, setTrigger);
@@ -138,7 +139,10 @@ export default function UserStream({ partId }: { partId: string }) {
             </div>
           )
         ) : (
-          <Winners quizId={userParticipation.QuizId!} />
+          <>
+            <p>HEY</p>
+            <Winners quizId={userParticipation.QuizId!} partId={partId}/>
+          </>
         )}
 
         <div className="current-question"></div>

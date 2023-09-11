@@ -14,7 +14,7 @@ import {
   startTimer,
 } from '@/redux/services/quizSocketService';
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 100;
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(
@@ -40,6 +40,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
     quizSocketService.successListener();
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealAnswerHostListener(setQuestionHidden);
+    quizSocketService.hostWinnersListener(setTrigger);
     peersSocketService.successListener();
   }, []);
 
@@ -70,6 +71,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   }
 
   function handleWinners() {
+    console.log('HANDLE WINNERS TRIGGER');
     quizSocketService.emitShowWinners();
   }
 

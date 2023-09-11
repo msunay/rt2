@@ -4,7 +4,13 @@ import { userApiService } from '@/redux/services/apiService';
 import { useEffect, useState } from 'react';
 import { Participation, QuizParticipations } from '@/Types/Types';
 
-export default function Winners({ quizId }: { quizId: string }) {
+export default function Winners({
+  quizId,
+  partId,
+}: {
+  quizId: string;
+  partId: string;
+}) {
   const [quizParticipations, setQuizParticipations] =
     useState<QuizParticipations>({} as QuizParticipations);
   const [winnerList, setWinnerList] = useState<string[]>([]);
@@ -19,24 +25,26 @@ export default function Winners({ quizId }: { quizId: string }) {
   }, []);
 
   useEffect(() => {
-    quizParticipations.users.forEach((user) => {
-      userApiService.getParticipationAnswers(user.id!).then((data) => {
-        const correctAnswersCount = data.answers.reduce(
-          (count, answer) => count + (answer.isCorrect ? 1 : 0),
-          0
-        );
+    if (quizParticipations.users) {
+      quizParticipations.users.forEach((user) => {
+        userApiService.getParticipationAnswers(partId).then((data) => {
+          const correctAnswersCount = data.answers.reduce(
+            (count, answer) => count + (answer.isCorrect ? 1 : 0),
+            0
+          );
 
-        setResultsTable((prevResults) => {
-          const updatedResults = { ...prevResults };
-          if (updatedResults[data.UserId]) {
-            updatedResults[data.UserId] += correctAnswersCount;
-          } else {
-            updatedResults[data.UserId] = correctAnswersCount;
-          }
-          return updatedResults;
+          setResultsTable((prevResults) => {
+            const updatedResults = { ...prevResults };
+            if (updatedResults[data.UserId]) {
+              updatedResults[data.UserId] += correctAnswersCount;
+            } else {
+              updatedResults[data.UserId] = correctAnswersCount;
+            }
+            return updatedResults;
+          });
         });
       });
-    });
+    }
   }, [quizParticipations]);
 
   const highestScore = Math.max(...Object.values(resultsTable), 0);

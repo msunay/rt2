@@ -21,8 +21,8 @@ export default function HostQuestion({
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
-    null
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
+    {} as QuestionAnswer
   );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
 
@@ -34,7 +34,11 @@ export default function HostQuestion({
 
   useEffect(() => {
     if (quiz.Questions) {
-      setCurrentQuestion(quiz.Questions[currentQuestionNumber - 1]);
+      setCurrentQuestion(
+        quiz.Questions.find(
+          (question) => question.positionInQuiz === currentQuestionNumber
+        )!
+      );
     }
   }, [quiz, trigger]);
 

@@ -4,7 +4,7 @@ import {
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
 
-const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
+const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 100;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
@@ -35,6 +35,7 @@ const quizSocketInit = (
   });
 
   quiz.on('show_winners', () => {
+    console.log("I MADE IT TO THE BACK!");
     quiz.emit('host_winners');
     quiz.broadcast.emit('player_winners');
   });
