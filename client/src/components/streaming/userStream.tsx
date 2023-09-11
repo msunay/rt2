@@ -143,14 +143,14 @@ export default function UserStream({ partId }: { partId: string }) {
 
         <div className="current-question"></div>
       </div>
-      {/* <button
+      <button
         className={styles.btn_join}
         id="join-stream-btn"
         onClick={goConsume}
         disabled={false}
       >
         Join Stream
-      </button> */}
+      </button>
     </>
   );
 }

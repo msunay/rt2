@@ -17,8 +17,8 @@ let consumer: mediasoupTypes.Consumer;
 
 const createWorker = async () => {
   msWorker = await mediasoup.createWorker({
-    // rtcMinPort: ,
-    // rtcMaxPort: ,
+    rtcMinPort: 10000,
+    rtcMaxPort: 12000,
     logLevel: 'debug',
     logTags: [
       'info',
@@ -71,7 +71,7 @@ const createWebRtcTransport = async (callback: any) => {
         },
       ],
       enableUdp: true,
-      enableTcp: true,
+      // enableTcp: true,
       preferUdp: true,
     };
 

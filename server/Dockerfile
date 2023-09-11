@@ -33,7 +33,10 @@ FROM base
 # Copy built application
 COPY --from=build /app /app
 
-# Start the server by default, this can be overwritten at runtime
+# Expose the ports
+EXPOSE 8080
+EXPOSE 10000-12000/udp
 
+# Start the server by default, this can be overwritten at runtime
 ENV PORT=8080
 CMD [ "node", "dist/server.js" ]
