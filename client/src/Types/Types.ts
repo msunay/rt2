@@ -1,6 +1,6 @@
 // Database model types
 
-import { NumberLiteralType } from "typescript";
+import { NumberLiteralType } from 'typescript';
 
 export interface User {
   id?: string;
@@ -39,6 +39,7 @@ export interface Quiz {
 export interface Question {
   id?: string;
   questionText: string;
+  positionInQuiz: number;
   createdAt?: Date;
   updatedAt?: Date;
   QuizId?: string;
@@ -74,9 +75,15 @@ export interface ParticipationAnswer {
 
 // Compound data structure types
 
+export interface Winner {
+  username: string;
+  userScore: number;
+}
+
 export interface QuestionAnswer {
   id: string;
   questionText: string;
+  positionInQuiz: number;
   createdAt: Date;
   updatedAt: Date;
   QuizId?: string;
@@ -98,7 +105,7 @@ export interface UserParticipations {
   pointsWon: number;
   createdAt: Date;
   updatedAt: Date;
-  quizzes: Quiz[] 
+  quizzes: Quiz[];
 }
 
 export interface QuizParticipations {
@@ -123,6 +130,7 @@ export interface QuizQuestionAnswer {
   Questions: {
     id: string;
     questionText: string;
+    positionInQuiz: number;
     createdAt: Date;
     updatedAt: Date;
     QuizId?: string;

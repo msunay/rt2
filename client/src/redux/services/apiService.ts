@@ -10,6 +10,7 @@ import {
   ParticipationAnswer,
   UserParticipations,
   QuizParticipations,
+  Winner,
 } from '../../Types/Types';
 
 export const BASE_URL: string =
@@ -118,6 +119,18 @@ export const userApiService = {
     } catch (err) {
       console.log(err);
       return {} as QuizQuestionAnswer;
+    }
+  },
+
+  getWinners: async (quizId: string): Promise<Winner[]> => {
+    try {
+      const response = await axios.get<Winner[]>(
+        `${BASE_URL}winners/${quizId}`
+      );
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      return [];
     }
   },
 
@@ -236,6 +249,7 @@ export const userApiService = {
       return {} as ParticipationAnswer;
     }
   },
+
   getParticipationAnswers: async (
     participationId: string
   ): Promise<ParticipationAndAnswers> => {

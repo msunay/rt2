@@ -46,6 +46,7 @@ export default function UserStream({ partId }: { partId: string }) {
     });
 
     quizSocketService.successListener();
+    quizSocketService.playerWinnersListener(setTrigger);
     quizSocketService.startQuizListener(setQuizStarted);
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealListener(setQuestionHidden, setTrigger);
@@ -117,11 +118,11 @@ export default function UserStream({ partId }: { partId: string }) {
         </Link>
         <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
-          {/* <video
+          <video
             ref={remoteVideo}
             className={styles.video}
             autoPlay={true}
-          ></video> */}
+          ></video>
         </div>
         {trigger < 11 ? (
           trigger === 10 ? (
@@ -138,7 +139,9 @@ export default function UserStream({ partId }: { partId: string }) {
             </div>
           )
         ) : (
-          <Winners quizId={userParticipation.QuizId!} />
+          <>
+            <Winners quizId={userParticipation.QuizId!} partId={partId} />
+          </>
         )}
 
         <div className="current-question"></div>

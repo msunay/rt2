@@ -35,6 +35,7 @@ const quizSocketInit = (
   });
 
   quiz.on('show_winners', () => {
+    console.log('I MADE IT TO THE BACK!');
     quiz.emit('host_winners');
     quiz.broadcast.emit('player_winners');
   });
