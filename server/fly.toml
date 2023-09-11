@@ -28,3 +28,13 @@ primary_region = "lhr"
   [[services.tcp_checks]]
     interval = 10000
     timeout = 2000
+
+# mediasoup UDP service
+[[services]]
+  internal_port = 10000
+  protocol = "udp"
+  processes = ["app"]
+
+  [[services.ports]]
+    start_port = 10000
+    end_port = 12000
