@@ -118,11 +118,11 @@ export default function UserStream({ partId }: { partId: string }) {
         </Link>
         <canvas className={styles.count_down} id="countdown-canvas"></canvas>
         <div className={styles.video_container}>
-          {/* <video
+          <video
             ref={remoteVideo}
             className={styles.video}
             autoPlay={true}
-          ></video> */}
+          ></video>
         </div>
         {trigger < 11 ? (
           trigger === 10 ? (
