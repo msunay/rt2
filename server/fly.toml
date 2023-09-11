@@ -36,4 +36,5 @@ primary_region = "lhr"
   processes = ["app"]
 
   [[services.ports]]
-    port = "10000-12000"
+    start_port = 10000
+    end_port = 12000
