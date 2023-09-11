@@ -140,8 +140,7 @@ export default function UserStream({ partId }: { partId: string }) {
           )
         ) : (
           <>
-            <p>HEY</p>
-            <Winners quizId={userParticipation.QuizId!} partId={partId}/>
+            <Winners quizId={userParticipation.QuizId!} partId={partId} />
           </>
         )}
 

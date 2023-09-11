@@ -14,7 +14,7 @@ import {
   startTimer,
 } from '@/redux/services/quizSocketService';
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 100;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(

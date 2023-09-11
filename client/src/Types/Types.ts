@@ -75,6 +75,11 @@ export interface ParticipationAnswer {
 
 // Compound data structure types
 
+export interface Winner {
+  username: string;
+  userScore: number;
+}
+
 export interface QuestionAnswer {
   id: string;
   questionText: string;
