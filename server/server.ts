@@ -8,7 +8,7 @@ var PORT = process.env.PORT || 3001;
   console.log(
     `Server running on ${
       process.env.NODE_ENV === 'production'
-        ? `Fly.io port: ${PORT}`
+        ? `server port: ${PORT}`
         : `http://localhost:${PORT}`
     }`
   );
