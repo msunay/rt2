@@ -2,42 +2,49 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.6.1
+
+# Base Image
 FROM node:${NODE_VERSION}-slim as base
 
 LABEL launch_runtime="Node.js"
-
-# Node.js app lives here
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Set production environment
-ENV NODE_ENV="production"
+# Build Node Modules Stage
+FROM base as deps
 
-# Throw-away build stage to reduce size of final image
-FROM base as build
-
-# Install packages needed to build node modules
+# Install necessary packages for building native extensions
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3
 
-# Install node modules
+# Copy and install dependencies
 COPY --link package-lock.json package.json ./
 RUN npm ci
 
-# Copy application code
-COPY --link . .
+# Build stage
+FROM base as build
 
-# Final stage for app image
+# Set to development for building with dev deps
+ENV NODE_ENV=development
+
+# Copy source and install dev deps
+COPY --link . .
+RUN npm ci
+
+# Compile typescript
+RUN npm run build
+
+# Production Image
 FROM base
 
-# Copy built application
-COPY --from=build /app /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist .
 
-# Expose the ports
-
+# Expose the required ports
 EXPOSE 8080
 EXPOSE 40000-49000/tcp
 EXPOSE 40000-49000/udp
 
-# Start the server by default, this can be overwritten at runtime
+# Define the default command
 ENV PORT=8080
 CMD [ "node", "server.js" ]
