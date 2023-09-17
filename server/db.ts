@@ -13,13 +13,14 @@ const localConnection = [
   `${env.DB_PASSWORD}`,
   {
     dialect: 'postgres',
-
+    host: 'host.docker.internal',
     logging: false,
   },
 ] as Options[];
 
 const connection =
-  env.NODE_ENV === 'production' ? cloudConnection : localConnection;
+  localConnection;
+  // env.NODE_ENV === 'production' ? cloudConnection : localConnection;
 
 export const sequelize = new Sequelize(...connection);
 
