@@ -10,18 +10,16 @@ const cloudConnection = [env.DATABASE_URL] as Options[];
 const localConnection = [
   `${env.DB_NAME}`,
   `${env.DB_USERNAME}`,
-  `${env.DB_PASSWORD}`,
-  {
-    dialect: 'postgres',
-    host: 'host.docker.internal',
-    logging: false,
-  },
+  `${env.DB_PASSWORD}`
 ] as Options[];
 
 const connection =
-  localConnection;
-  // env.NODE_ENV === 'production' ? cloudConnection : localConnection;
+  env.NODE_ENV === 'production' ? cloudConnection : localConnection;
 
-export const sequelize = new Sequelize(...connection);
+export const sequelize = new Sequelize(...connection, {
+  dialect: 'postgres',
+  host: 'host.docker.internal',
+  logging: false,
+});
 
 export default sequelize;
