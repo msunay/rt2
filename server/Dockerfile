@@ -35,7 +35,8 @@ COPY --from=build /app /app
 
 # Expose the ports
 EXPOSE 8080
-EXPOSE 10000-12000/udp
+EXPOSE 40000-49000/tcp
+EXPOSE 40000-49000/udp
 
 # Start the server by default, this can be overwritten at runtime
 ENV PORT=8080
