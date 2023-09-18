@@ -66,9 +66,47 @@ async function getOneQuiz(req: Request, res: Response) {
   }
 }
 
+async function getWinners(req: Request, res: Response) {
+  try {
+    const participationsAndAnswers = await models.Participation.findAll({
+      where: {
+        QuizId: req.params.quizId,
+      },
+      include: {
+        model: models.Answer,
+        as: 'answers',
+      },
+    });
+
+    const userScores = await Promise.all(
+      participationsAndAnswers.map(async (answerSheet) => {
+        const user = await models.User.findOne({
+          where: {
+            id: answerSheet.UserId,
+          },
+        });
+        const score = answerSheet.answers!.reduce(
+          (count, answer) => count + (answer.isCorrect ? 1 : 0),
+          0
+        );
+        return { username: user!.username, userScore: score };
+      })
+    );
+    const maxUserScore = Math.max(...userScores.map((item) => item.userScore));
+    const winners = userScores.filter(
+      (element) => element.userScore === maxUserScore
+    );
+    res.status(200).send(winners);
+  } catch (err) {
+    console.error('Could not get winners::', err);
+    res.status(500).send();
+  }
+}
+
 export default {
   getAllQuizzes,
   getQuizzesQuestionsAnswers,
   getOneQuizQuestionAnswers,
   getOneQuiz,
+  getWinners,
 };

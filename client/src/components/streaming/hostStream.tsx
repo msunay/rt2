@@ -40,6 +40,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
     quizSocketService.successListener();
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealAnswerHostListener(setQuestionHidden);
+    quizSocketService.hostWinnersListener(setTrigger);
     peersSocketService.successListener();
   }, []);
 
@@ -70,6 +71,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   }
 
   function handleWinners() {
+    console.log('HANDLE WINNERS TRIGGER');
     quizSocketService.emitShowWinners();
   }
 

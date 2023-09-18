@@ -20,8 +20,6 @@ export default function PlayerQuestion({
   trigger: number;
   partId: string;
 }) {
-  const currentQuestionNumber = useAppSelector((state) => state.questionSlice);
-
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
 
@@ -29,17 +27,13 @@ export default function PlayerQuestion({
   const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
     {} as QuizQuestionAnswer
   );
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer | null>(
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
     {} as QuestionAnswer
   );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
   const [userParticipation, setUserParticipation] = useState<Participation>(
     {} as Participation
   );
-  useEffect(() => {
-    console.log('currentQuestion: ', currentQuestion);
-    console.log('currentQuestionNumber: ', currentQuestionNumber.value);
-  }, [currentQuestionNumber.value]);
 
   useEffect(() => {
     if (trigger > 0) createHandle();
@@ -61,7 +55,11 @@ export default function PlayerQuestion({
 
   useEffect(() => {
     if (quiz.Questions) {
-      setCurrentQuestion(quiz.Questions[trigger]);
+      setCurrentQuestion(
+        quiz.Questions.find(
+          (question) => question.positionInQuiz === trigger + 1
+        )!
+      );
     }
   }, [quiz, trigger]);
 

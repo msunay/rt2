@@ -80,6 +80,7 @@ export const quizSocketService = {
     setTrigger: React.Dispatch<React.SetStateAction<number>>
   ) => {
     quiz.on('host_winners', () => {
+      console.log('HOST WINNERS RECEIVED');
       setTrigger((num) => num + 1);
     });
   },
@@ -88,6 +89,7 @@ export const quizSocketService = {
     setTrigger: React.Dispatch<React.SetStateAction<number>>
   ) => {
     quiz.on('player_winners', () => {
+      console.log('PLAYER WINNERS RECEIVED');
       setTrigger((num) => {
         console.log('TRIGGER BEFORE +1::', num);
         return num + 1;

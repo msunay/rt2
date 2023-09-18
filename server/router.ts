@@ -31,6 +31,7 @@ router.get(
 router.get('/quizzes', quizController.getAllQuizzes);
 router.get('/quizQuestionAnswer/:id', quizController.getOneQuizQuestionAnswers);
 router.get('/quiz/:id', quizController.getOneQuiz);
+router.get('/winners/:quizId', quizController.getWinners);
 
 // Reference tables routes
 router.post('/participation', participationController.createParticipation);
