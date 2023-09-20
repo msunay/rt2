@@ -1,6 +1,7 @@
 services:
-  rt2_backend:
-    build: .
+  server:
+    image: msunay/rt2-backend
+    build: server
     ports:
       - "80:8080"
       - "40000-49000:40000-49000/udp"
