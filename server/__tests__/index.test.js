@@ -90,7 +90,7 @@ describe('Socket io (Quiz Namespace)', () => {
   quizSocket = new Client(`http://localhost:3001/quizspace`);
 
   await quizSocket.on("connect", () => {
-    console.log(" Quiz client connected");
+    console.log(" Quiz Client connected");
   });
 
   });
