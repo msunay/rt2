@@ -1,8 +1,0 @@
-services:
-  server:
-    image: msunay/rt2-backend
-    build: server
-    ports:
-      - '8080:80'
-      - '40000-49000:40000-49000/udp'
-      - '40000-49000:40000-49000'
