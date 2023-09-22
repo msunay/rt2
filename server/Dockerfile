@@ -1,0 +1,44 @@
+# syntax = docker/dockerfile:1
+
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=18.13.0
+
+# Base Image
+FROM node:${NODE_VERSION}-slim as base
+
+LABEL launch_runtime="Node.js"
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Build Node Modules Stage
+FROM base as deps
+
+# Install necessary packages for building native extensions
+RUN apt-get update -qq && \
+    apt-get install -y build-essential pkg-config python-is-python3 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy and install dependencies
+COPY --link package-lock.json package.json ./
+RUN npm ci
+
+# Source stage
+FROM base as source
+
+# Copy source code
+COPY --link . .
+
+# Production Image
+FROM base
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=source /app .
+
+# Expose the required ports
+EXPOSE 8080
+EXPOSE 40000-49000/tcp
+EXPOSE 40000-49000/udp
+
+# Define the default command
+ENV PORT=8080
+CMD [ "node", "server.js" ]
