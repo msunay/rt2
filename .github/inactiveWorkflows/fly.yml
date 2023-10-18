@@ -1,0 +1,28 @@
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    name: Build and Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Server Deps
+        run: cd server && npm ci
+
+      - name: Build Server
+        run: cd server && npm run build
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: cd server && flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
