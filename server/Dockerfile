@@ -2,42 +2,54 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=18.13.0
+
+# Base Image
 FROM node:${NODE_VERSION}-slim as base
 
-LABEL fly_launch_runtime="Node.js"
-
-# Node.js app lives here
+LABEL launch_runtime="Node.js"
 WORKDIR /app
+ENV NODE_ENV=development
 
-# Set production environment
-ENV NODE_ENV="production"
+# Install necessary packages for building native extensions
+FROM base as update
 
-# Throw-away build stage to reduce size of final image
-FROM base as build
-
-
-# Install packages needed to build node modules
 RUN apt-get update -qq && \
-    apt-get install -y build-essential pkg-config python-is-python3
+    apt-get install -y build-essential pkg-config python-is-python3 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install node modules
+# Install dev dependencies
+FROM update as devdeps
+
+# Copy and install dev dependencies
 COPY --link package-lock.json package.json ./
 RUN npm ci
 
-# Copy application code
+# Compile typescript
+FROM devdeps as build
+
 COPY --link . .
+RUN npm run build
 
-# Final stage for app image
+# Install prod dependencies
+FROM update as proddeps
+ENV NODE_ENV=production
+
+# Copy and install prod dependencies
+COPY --link package-lock.json package.json ./
+RUN npm ci
+
+# Production Image
 FROM base
+ENV NODE_ENV=production
 
-# Copy built application
-COPY --from=build /app /app
+COPY --from=proddeps /app/node_modules ./node_modules
+COPY --from=build /app/dist .
 
-# Expose the ports
+# Expose the required ports
 EXPOSE 8080
 EXPOSE 40000-49000/tcp
 EXPOSE 40000-49000/udp
 
-# Start the server by default, this can be overwritten at runtime
+# Define the default command
 ENV PORT=8080
-CMD [ "node", "dist/server.js" ]
+CMD [ "node", "server.js" ]
