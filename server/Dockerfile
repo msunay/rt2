@@ -8,31 +8,42 @@ FROM node:${NODE_VERSION}-slim as base
 
 LABEL launch_runtime="Node.js"
 WORKDIR /app
-ENV NODE_ENV=production
-
-# Build Node Modules Stage
-FROM base as deps
+ENV NODE_ENV=development
 
 # Install necessary packages for building native extensions
+FROM base as update
+
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy and install dependencies
+# Install dev dependencies
+FROM update as devdeps
+
+# Copy and install dev dependencies
 COPY --link package-lock.json package.json ./
 RUN npm ci
 
-# Source stage
-FROM base as source
+# Compile typescript
+FROM devdeps as build
 
-# Copy source code
 COPY --link . .
+RUN npm run build
+
+# Install prod dependencies
+FROM update as proddeps
+ENV NODE_ENV=production
+
+# Copy and install prod dependencies
+COPY --link package-lock.json package.json ./
+RUN npm ci
 
 # Production Image
 FROM base
+ENV NODE_ENV=production
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=source /app .
+COPY --from=proddeps /app/node_modules ./node_modules
+COPY --from=build /app/dist .
 
 # Expose the required ports
 EXPOSE 8080
