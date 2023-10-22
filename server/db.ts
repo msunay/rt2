@@ -2,18 +2,22 @@ import { Options, Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const env = process.env;
-
-const cloudConnection = [env.DATABASE_URL] as Options[];
+const cloudConnection = [
+  `${process.env.RDS_DB_NAME}`,
+  `${process.env.RDS_USERNAME}`,
+  `${process.env.RDS_PASSWORD}`
+] as Options[];
 
 const localConnection = [
-  `${env.DB_NAME}`,
-  `${env.DB_USERNAME}`,
-  `${env.DB_PASSWORD}`
+  `${process.env.DB_NAME}`,
+  `${process.env.DB_USERNAME}`,
+  `${process.env.DB_PASSWORD}`
 ] as Options[];
 
 const connection =
-  env.NODE_ENV === 'production' ? cloudConnection : localConnection;
+  process.env.NODE_ENV === 'production' ? cloudConnection : localConnection;
+
+const HOST = process.env.NODE_ENV === 'production' ? process.env.RDS_HOSTNAME : 'host.docker.internal';
 
 export const sequelize = new Sequelize(...connection, {
   dialect: 'postgres',
@@ -23,8 +27,8 @@ export const sequelize = new Sequelize(...connection, {
       rejectUnauthorized: false
     }
   },
-  host: 'host.docker.internal',
-  logging: false,
+  host: HOST,
+  logging: console.log,
 });
 
 export default sequelize;

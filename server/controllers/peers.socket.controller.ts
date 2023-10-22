@@ -7,8 +7,9 @@ import { types as mediasoupTypes } from 'mediasoup';
 import * as mediasoup from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
 import util from 'util'
+import { AppData, WebRtcServer, WebRtcServerOptions } from 'mediasoup/node/lib/types';
 
-let msWorker: mediasoupTypes.Worker;
+let msWorker: mediasoupTypes.Worker<mediasoupTypes.AppData>;
 let msRouter: mediasoupTypes.Router;
 let producerTransport: mediasoupTypes.Transport | undefined;
 let consumerTransport: mediasoupTypes.Transport | undefined;
@@ -36,42 +37,95 @@ const createWorker = async () => {
     setTimeout(() => process.exit(1), 2000);
   });
 
+  const webRtcServer = await msWorker.createWebRtcServer(webRtcServerOptions);
+
+  msWorker.appData.webRtcServer = webRtcServer;
+
   return msWorker;
 };
 
+const announcedIp = process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP! : '127.0.0.1'
+const ip = process.env.NODE_ENV === 'production' ? process.env.PRIVATE_IP! : '0.0.0.0'
+
+const webRtcServerOptions = {
+  listenInfos :
+  [
+    {
+      protocol: 'udp',
+      ip,
+      announcedIp,
+      port: 40000
+    },
+    {
+      protocol: 'tcp',
+      ip,
+      announcedIp,
+      port: 40000
+    }
+  ]
+} as WebRtcServerOptions
+
 createWorker().then((w) => (msWorker = w));
+
 
 const mediaCodecs: RtpCodecCapability[] = [
   {
-    kind: 'audio',
-    mimeType: 'audio/opus',
-    clockRate: 48000,
-    channels: 2,
+    kind      : 'audio',
+    mimeType  : 'audio/opus',
+    clockRate : 48000,
+    channels  : 2
   },
   {
-    kind: 'video',
-    mimeType: 'video/H264',
-    clockRate: 90000,
-    parameters: {
-      'x-google-start-bitrate': 1000,
-      'packetization-mode': 1,
-      'profile-level-id': '640033',
-    },
+    kind       : 'video',
+    mimeType   : 'video/VP8',
+    clockRate  : 90000,
+    parameters :
+    {
+      'x-google-start-bitrate' : 1000
+    }
+  },
+  {
+    kind       : 'video',
+    mimeType   : 'video/VP9',
+    clockRate  : 90000,
+    parameters :
+    {
+      'profile-id'             : 2,
+      'x-google-start-bitrate' : 1000
+    }
+  },
+  {
+    kind       : 'video',
+    mimeType   : 'video/h264',
+    clockRate  : 90000,
+    parameters :
+    {
+      'packetization-mode'      : 1,
+      'profile-level-id'        : '4d0032',
+      'level-asymmetry-allowed' : 1,
+      'x-google-start-bitrate'  : 1000
+    }
+  },
+  {
+    kind       : 'video',
+    mimeType   : 'video/h264',
+    clockRate  : 90000,
+    parameters :
+    {
+      'packetization-mode'      : 1,
+      'profile-level-id'        : '42e01f',
+      'level-asymmetry-allowed' : 1,
+      'x-google-start-bitrate'  : 1000
+    }
   },
 ];
 
 const createWebRtcTransport = async (callback: any) => {
-  const announcedIp = process.env.NODE_ENV === 'production' ? process.env.FLY_IP : '127.0.0.1'
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
-      listenIps: [
-        {
-          ip: '0.0.0.0',
-          announcedIp
-        },
-      ],
+      webRtcServer: msWorker.appData.webRtcServer as WebRtcServer<AppData>,
       enableUdp: true,
-      // enableTcp: true,
+      enableTcp: true,
       preferUdp: true,
     };
 

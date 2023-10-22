@@ -1,10 +1,10 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION as desired
-ARG NODE_VERSION=18.13.0
+# ARG NODE_VERSION=18.13.0
 
 # Base Image
-FROM node:${NODE_VERSION}-slim as base
+FROM node:18 as base
 
 LABEL launch_runtime="Node.js"
 WORKDIR /app
@@ -21,13 +21,13 @@ RUN apt-get update -qq && \
 FROM update as devdeps
 
 # Copy and install dev dependencies
-COPY --link package-lock.json package.json ./
+COPY package-lock.json package.json ./
 RUN npm ci
 
 # Compile typescript
 FROM devdeps as build
 
-COPY --link . .
+COPY . .
 RUN npm run build
 
 # Install prod dependencies
@@ -35,7 +35,7 @@ FROM update as proddeps
 ENV NODE_ENV=production
 
 # Copy and install prod dependencies
-COPY --link package-lock.json package.json ./
+COPY package-lock.json package.json ./
 RUN npm ci
 
 # Production Image
