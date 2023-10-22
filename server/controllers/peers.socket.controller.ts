@@ -17,7 +17,7 @@ let producer: mediasoupTypes.Producer;
 let consumer: mediasoupTypes.Consumer;
 
 const createWorker = async () => {
-  msWorker = await mediasoup.createWorker({
+  const worker = await mediasoup.createWorker({
     rtcMinPort: 40000,
     rtcMaxPort: 49000,
     logLevel: 'debug',
@@ -30,18 +30,18 @@ const createWorker = async () => {
       'rtcp'
     ]
   });
-  console.log(`worker pid: ${msWorker.pid}`);
+  console.log(`worker pid: ${worker.pid}`);
 
-  msWorker.on('died', (err) => {
+  worker.on('died', (err) => {
     console.error('mediasoup worker has died', err);
     setTimeout(() => process.exit(1), 2000);
   });
 
-  const webRtcServer = await msWorker.createWebRtcServer(webRtcServerOptions);
+  const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions);
 
-  msWorker.appData.webRtcServer = webRtcServer;
+  worker.appData.webRtcServer = webRtcServer;
 
-  return msWorker;
+  return worker;
 };
 
 const announcedIp = process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP! : '127.0.0.1'
@@ -234,6 +234,7 @@ const peersSocketInit = async (
       producer = await producerTransport!.produce({
         kind,
         rtpParameters,
+        appData
       });
 
       console.log('Producer iD: ', producer.id, producer.kind);
