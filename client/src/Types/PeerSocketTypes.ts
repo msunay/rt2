@@ -2,7 +2,7 @@ import { types as mediasoupTypes } from 'mediasoup-client';
 
 export interface PeersClientToServerEvents {
   create_room: (cb: any) => void;
-  createWebRtcTransport: (senderObj: {sender: boolean}, callback: (params: any) => void) => void
+  createWebRtcTransport: (senderObj: {sender: boolean}, callback: (iceServers: any) => void) => void;
   transport_connect: (producerTransportConnect: producerTransportConnect) => void;
   transport_produce: (transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
   transport_recv_connect: (producerTransportConnect: producerTransportConnect) => void;

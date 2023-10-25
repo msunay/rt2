@@ -73,14 +73,14 @@ export default function UserStream({ partId }: { partId: string }) {
   ) => {
     try {
       device = new mediasoupClient.Device();
-      console.log('RTP Capabilities: ', rtpCapabilities);
-      await device.load({
+      device.load({
         routerRtpCapabilities: rtpCapabilities,
-      });
-      console.log('Device RTP Capabilities', device.rtpCapabilities);
+      }).then(() => {
+        createRecvTransport();
+        console.log('Device RTP Capabilities', device.rtpCapabilities);
+      })
 
       // once device loads create transport
-      createRecvTransport();
     } catch (err: any) {
       console.error(err);
       if (err.name === 'UnsupportedError')
@@ -97,12 +97,12 @@ export default function UserStream({ partId }: { partId: string }) {
   };
 
   const connectRecvTransport = async (
-    connConsumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-    connDevice: mediasoupTypes.Device
+    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    device: mediasoupTypes.Device
   ) => {
     const response = peersSocketService.emitConsume(
-      connConsumerTransport,
-      connDevice,
+      consumerTransport,
+      device,
       consumer,
       remoteVideo
     );

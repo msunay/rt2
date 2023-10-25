@@ -147,14 +147,16 @@ export default function HostStream({ quizId }: { quizId: string }) {
   ) => {
     try {
       device = new mediasoupClient.Device();
-      console.log('RTP Capabilities: ', rtpCapabilities);
-      await device.load({
-        routerRtpCapabilities: rtpCapabilities,
-      });
-      console.log('Device RTP Capabilities', device.rtpCapabilities);
+      await device
+        .load({
+          routerRtpCapabilities: rtpCapabilities,
+        })
+        .then(() => {
+          createSendTransport();
+          console.log('Device RTP Capabilities', device.rtpCapabilities);
+        });
 
       // once device loads create transport
-      createSendTransport();
     } catch (err: any) {
       console.error(err);
       if (err.name === 'UnsupportedError')

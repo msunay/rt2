@@ -25,7 +25,7 @@ type callback = ({ id }: { id: string }) => void;
 export const peersSocketService = {
   successListener: () =>
     peers.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-      console.log('peers socket connected :', socketId, producerAlreadyExists);
+      console.log('peers socket connected:', socketId, producerAlreadyExists);
     }),
 
   emitCreateRoom: (
@@ -35,10 +35,10 @@ export const peersSocketService = {
   ) => {
     peers.emit(
       'create_room',
-      (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        console.log('Router RTP Capabilities: ', data.rtpCapabilities);
+      ({ rtpCapabilities }: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
+        console.log('Router RTP Capabilities: ', rtpCapabilities);
         //assign to local variable
-        createDevice(data.rtpCapabilities);
+        createDevice(rtpCapabilities);
       }
     );
   },

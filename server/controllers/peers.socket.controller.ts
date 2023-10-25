@@ -37,6 +37,27 @@ const createWorker = async () => {
     setTimeout(() => process.exit(1), 2000);
   });
 
+  const announcedIp = process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP! : '127.0.0.1'
+  const ip = process.env.NODE_ENV === 'production' ? process.env.PRIVATE_IP! : '0.0.0.0'
+
+  const webRtcServerOptions = {
+    listenInfos :
+    [
+      {
+        protocol: 'udp',
+        ip,
+        announcedIp,
+        port: 40000
+      },
+      {
+        protocol: 'tcp',
+        ip,
+        announcedIp,
+        port: 40000
+      }
+    ]
+  } as WebRtcServerOptions
+
   const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions);
 
   worker.appData.webRtcServer = webRtcServer;
@@ -44,29 +65,30 @@ const createWorker = async () => {
   return worker;
 };
 
-const announcedIp = process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP! : '127.0.0.1'
-const ip = process.env.NODE_ENV === 'production' ? process.env.PRIVATE_IP! : '0.0.0.0'
-
-const webRtcServerOptions = {
-  listenInfos :
-  [
-    {
-      protocol: 'udp',
-      ip,
-      announcedIp,
-      port: 40000
-    },
-    {
-      protocol: 'tcp',
-      ip,
-      announcedIp,
-      port: 40000
-    }
-  ]
-} as WebRtcServerOptions
-
 createWorker().then((w) => (msWorker = w));
 
+const iceServers = [
+  {
+      "urls": "turn:a.relay.metered.ca:80",
+      "username": process.env.ICE_USERNAME,
+      "credential": process.env.ICE_CREDENTIAL
+  },
+  {
+      "urls": "turn:a.relay.metered.ca:80?transport=tcp",
+      "username": process.env.ICE_USERNAME,
+      "credential": process.env.ICE_CREDENTIAL
+  },
+  {
+      "urls": "turn:a.relay.metered.ca:443",
+      "username": process.env.ICE_USERNAME,
+      "credential": process.env.ICE_CREDENTIAL
+  },
+  {
+      "urls": "turn:a.relay.metered.ca:443?transport=tcp",
+      "username": process.env.ICE_USERNAME,
+      "credential": process.env.ICE_CREDENTIAL
+  }
+];
 
 const mediaCodecs: RtpCodecCapability[] = [
   {
@@ -120,7 +142,7 @@ const mediaCodecs: RtpCodecCapability[] = [
   },
 ];
 
-const createWebRtcTransport = async (callback: any) => {
+const createWebRtcTransport = async (callback: ({ transportParams }: { transportParams: any }) => void) => {
   try {
     const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
       webRtcServer: msWorker.appData.webRtcServer as WebRtcServer<AppData>,
@@ -151,6 +173,7 @@ const createWebRtcTransport = async (callback: any) => {
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
+        iceServers
       },
     }, {showHidden: false, depth: null, colors: true}))
     callback({
@@ -159,6 +182,7 @@ const createWebRtcTransport = async (callback: any) => {
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
+        iceServers
       },
     });
     return transport;
