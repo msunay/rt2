@@ -1,34 +1,36 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TypeScript Example
 
-## Getting Started
+<p>
+  <!-- iOS -->
+  <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
+  <!-- Android -->
+  <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
+  <!-- Web -->
+  <img alt="Supports Expo Web" longdesc="Supports Expo Web" src="https://img.shields.io/badge/web-4630EB.svg?style=flat-square&logo=GOOGLE-CHROME&labelColor=4285F4&logoColor=fff" />
+</p>
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```sh
+npx create-react-native-app -t with-typescript
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+TypeScript is a superset of JavaScript which gives you static types and powerful tooling in Visual Studio Code including autocompletion and useful inline warnings for type errors.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 How to use
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+#### Creating a new project
 
-## Learn More
+- Install the CLI: `npm i -g expo-cli`
+- Create a project: `npx create-react-native-app -t with-typescript`
+- `cd` into the project
 
-To learn more about Next.js, take a look at the following resources:
+### Adding TypeScript to existing projects
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Create a blank TypeScript config: `touch tsconfig.json`
+- Run `yarn start` or `npm run start` to automatically configure TypeScript
+- Rename files to TypeScript, `.tsx` for React components and `.ts` for plain typescript files
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+> 💡 You can disable the TypeScript setup in Expo CLI with the environment variable `EXPO_NO_TYPESCRIPT_SETUP=1 expo start`
 
-## Deploy on Vercel
+## 📝 Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [Expo TypeScript guide](https://docs.expo.dev/versions/latest/guides/typescript/)
