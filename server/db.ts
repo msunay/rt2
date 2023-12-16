@@ -21,12 +21,12 @@ const HOST = process.env.NODE_ENV === 'production' ? process.env.RDS_HOSTNAME : 
 
 export const sequelize = new Sequelize(...connection, {
   dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
-  },
+  // dialectOptions: {
+  //   ssl: {
+  //     require: true,
+  //     rejectUnauthorized: false
+  //   }
+  // },
   host: HOST,
   logging: console.log,
 });

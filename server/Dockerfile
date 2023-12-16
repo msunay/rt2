@@ -1,48 +1,40 @@
 # syntax = docker/dockerfile:1
 
-# Adjust NODE_VERSION as desired
-# ARG NODE_VERSION=18.13.0
+# Adjust NODE_VERSION and ENV as desired
+ARG NODE_VERSION=20.10.0
+ARG SELECTED_NODE_ENV=development
 
 # Base Image
-FROM node:18 as base
+FROM node:${NODE_VERSION}-slim as base
 
 LABEL launch_runtime="Node.js"
 WORKDIR /app
 ENV NODE_ENV=development
 
-# Install necessary packages for building native extensions
+# Update and install necessary packages for building native extensions
 FROM base as update
 
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install dev dependencies
-FROM update as devdeps
+# Install dev dependencies and compile typescript
+FROM update as build
 
-# Copy and install dev dependencies
-COPY package-lock.json package.json ./
-RUN npm ci
+COPY . ./
+RUN npm ci && \
+    npm run build
 
-# Compile typescript
-FROM devdeps as build
-
-COPY . .
-RUN npm run build
-
-# Install prod dependencies
+# Install non-dev dependencies
 FROM update as proddeps
 ENV NODE_ENV=production
 
-# Copy and install prod dependencies
 COPY package-lock.json package.json ./
 RUN npm ci
 
 # Production Image
-FROM base
-ENV NODE_ENV=production
+FROM proddeps
 
-COPY --from=proddeps /app/node_modules ./node_modules
 COPY --from=build /app/dist .
 
 # Expose the required ports
