@@ -1,14 +1,10 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { Feather, AntDesign, Entypo,  } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { StyleSheet, View } from 'react-native'
+import { Feather, AntDesign, Entypo } from '@expo/vector-icons';
 
 export default function Navbar() {
   return (
     <View style={styles.container}>
-      <Link href='/'>
-        <Feather name="home" size={24} color="black" />
-      </Link>
+      <Feather name="home" size={24} color="black" />
       <AntDesign name="find" size={24} color="black" />
       <Entypo name="graduation-cap" size={24} color="black" />
       <Entypo name="tools" size={24} color="black" />

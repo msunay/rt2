@@ -15,7 +15,7 @@ ENV NODE_ENV=development
 FROM base as update
 
 RUN apt-get update -qq && \
-    apt-get install -y build-essential pkg-config python-is-python3 && \
+    apt-get install -y build-essential pkg-config python3-pip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install dev dependencies and compile typescript
