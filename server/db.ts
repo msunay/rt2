@@ -18,7 +18,7 @@ const connection =
   process.env.NODE_ENV === 'production' ? cloudConnection : localConnection;
 
 const HOST = process.env.NODE_ENV === 'production' ? process.env.RDS_HOSTNAME : 'host.docker.internal';
-
+console.log(HOST);
 export const sequelize = new Sequelize(...connection, {
   dialect: 'postgres',
   // dialectOptions: {
@@ -27,7 +27,7 @@ export const sequelize = new Sequelize(...connection, {
   //     rejectUnauthorized: false
   //   }
   // },
-  host: HOST,
+  // host: HOST,
   logging: console.log,
 });
 

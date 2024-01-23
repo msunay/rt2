@@ -19,14 +19,15 @@ const app = express();
 const corsOrigin =
   process.env.NODE_ENV === 'production'
     ? process.env.CORS_ORIGIN
-    : 'http://localhost:3000';
+    : 'http://localhost:8081';
 
 const corsOptions = {
   origin: corsOrigin,
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   credentials: true,
 };
-app.use(cors(corsOptions));
+app.use(cors());
+// app.use(cors(corsOptions));
 app.use(express.json());
 app.use(router);
 

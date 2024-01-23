@@ -1,15 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import Header from '../components/header';
 import PlayNextQuizBtn from '../components/playNextQuizBtn';
+import HomeDiscover from '../components/homeDiscover';
 
 export default function Home() {
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={styles.headerContainer}>
           <Header />
         </View>
         <View style={styles.mainArea}>
@@ -17,11 +18,9 @@ export default function Home() {
             <PlayNextQuizBtn />
           </View>
           <View style={styles.discoverContainer}>
-
+            <HomeDiscover />
           </View>
-          <View style={styles.catagoriesContainer}>
-
-          </View>
+          <View style={styles.catagoriesContainer}></View>
         </View>
         <StatusBar style="auto" />
       </View>
@@ -32,7 +31,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    fontFamily: 'Nunito_700Bold'
+    marginHorizontal: 7,
   },
   container: {
     flex: 1,
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  header: {
+  headerContainer: {
     borderColor: '#FF0000',
     borderWidth: 1,
     flex: 1,
@@ -68,6 +67,6 @@ const styles = StyleSheet.create({
     flex: 1,
     borderColor: '#FF0000',
     borderWidth: 1,
-    marginBottom: 40
-  }
+    marginBottom: 40,
+  },
 });
