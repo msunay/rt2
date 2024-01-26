@@ -32,16 +32,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
+    justifyContent: 'space-between',
     marginVertical: 10,
     borderRadius: 17,
     backgroundColor: '#25CED1'
   },
   textContainer: {
-    borderColor: '#FF0000',
-    borderWidth: 1,
-    width: '45%',
-    marginLeft: '5%'
+    width: '40%',
+    marginLeft: '5%',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   h1Text: {
     color: 'white',
@@ -49,11 +49,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_700Bold'
   },
   nextQuizDetails: {
-    flex: 1,
+    // flex: 1,
     height: '100%',
     justifyContent: 'space-around',
-    borderColor: '#FF0000',
-    borderWidth: 1,
+    width: '45%',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   detailsText: {
     color: 'white',

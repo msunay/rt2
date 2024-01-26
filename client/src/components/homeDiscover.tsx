@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { useGetAllQuizzesQuery } from '../services/apiService';
 import { Quiz } from '../types/Types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomeDiscover() {
 
@@ -15,13 +15,6 @@ export default function HomeDiscover() {
   if (!fontsLoaded && !fontError) {
     return null;
   }
-
-
-  // if (error) {
-  //   console.error('Error fetching data:', error);
-  //   // return <Text>{`Oh no, there was an error: ${error}`}</Text>;
-  // }
-
 
   return (
     <View>
@@ -39,15 +32,13 @@ export default function HomeDiscover() {
         ) : data ? (
           data.map((quiz: Quiz) => (
             <View key={quiz.id}>
-              {/* Render your Quiz information here */}
               <Text>{quiz.quizName}</Text>
               <Text>{quiz.host_name}</Text>
-              {/* Add other Quiz properties as needed */}
             </View>
           ))
         ) : null}
 
-
+        <Text></Text>
       </View>
     </View>
   )
@@ -57,8 +48,8 @@ const styles = StyleSheet.create({
   discoverTitleLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderColor: '#FF0000',
-    borderWidth: 1,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   h1: {
     fontFamily: 'Nunito_700Bold',
