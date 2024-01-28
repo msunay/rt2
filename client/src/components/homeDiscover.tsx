@@ -1,9 +1,10 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
-import { useGetAllQuizzesQuery } from '../services/apiService';
-import { Quiz } from '../types/Types';
+import { useGetAllQuizzesQuery } from '@/services/apiService';
+import { Quiz } from '@/types/Types';
 import { FlashList } from '@shopify/flash-list';
+
 export default function HomeDiscover() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
 

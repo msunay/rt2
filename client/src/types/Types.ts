@@ -1,7 +1,5 @@
 // Database model types
 
-import { NumberLiteralType } from 'typescript';
-
 export interface User {
   id?: string;
   email: string;

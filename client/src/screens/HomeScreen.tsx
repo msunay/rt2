@@ -2,10 +2,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Header from '../components/header';
-import PlayNextQuizBtn from '../components/playNextQuizBtn';
-import HomeDiscover from '../components/homeDiscover';
-import HomeCatagories from '../components/homeCatagories';
+import Header from '@/components/header';
+import PlayNextQuizBtn from '@/components/playNextQuizBtn';
+import HomeDiscover from '@/components/homeDiscover';
+import HomeCatagories from '@/components/homeCatagories';
 
 export default function HomeScreen() {
   return (

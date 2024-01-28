@@ -15,11 +15,11 @@ import {
   FontAwesome5,
 } from '@expo/vector-icons';
 
-import { store } from './src/store';
-import HomeScreen from './src/screens/HomeScreen';
-import DiscoverScreen from './src/screens/DiscoverScreen';
-import HostQuizScreen from './src/screens/HostQuizScreen';
-import LoginScreen from './src/screens/LoginScreen';
+import { store } from '@/store';
+import HomeScreen from '@/screens/HomeScreen';
+import DiscoverScreen from '@/screens/DiscoverScreen';
+import HostQuizScreen from '@/screens/HostQuizScreen';
+import LoginScreen from '@/screens/LoginScreen';
 
 // SplashScreen.preventAutoHideAsync();
 

@@ -11,7 +11,7 @@ import {
   UserParticipations,
   QuizParticipations,
   Winner,
-} from '../types/Types';
+} from '@/types/Types';
 
 const BASE_URL: string =
   process.env.NODE_ENV === 'production'

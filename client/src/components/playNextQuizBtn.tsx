@@ -4,7 +4,7 @@ import {
   Nunito_700Bold,
   Nunito_400Regular,
 } from '@expo-google-fonts/nunito';
-import { useGetAllQuizzesQuery } from '../services/apiService';
+import { useGetAllQuizzesQuery } from '@/services/apiService';
 
 export default function PlayNextQuizBtn() {
 
