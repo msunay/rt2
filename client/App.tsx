@@ -16,8 +16,10 @@ import {
 } from '@expo/vector-icons';
 
 import { store } from './src/store';
-import Home from './src/screens/Home';
-import Discover from './src/screens/Discover';
+import HomeScreen from './src/screens/HomeScreen';
+import DiscoverScreen from './src/screens/DiscoverScreen';
+import HostQuizScreen from './src/screens/HostQuizScreen';
+import LoginScreen from './src/screens/LoginScreen';
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -55,7 +57,7 @@ export default function App() {
           >
             <Tabs.Screen
               name="Home"
-              component={Home}
+              component={HomeScreen}
               options={{
                 tabBarIcon: ({ size }: any) => (
                   <AntDesign
@@ -68,7 +70,7 @@ export default function App() {
             />
             <Tabs.Screen
               name="Discover"
-              component={Discover}
+              component={DiscoverScreen}
               options={{
                 tabBarIcon: ({ size }: any) => (
                   <Entypo
@@ -81,7 +83,7 @@ export default function App() {
             />
             <Tabs.Screen
               name="Start Quiz"
-              component={Discover}
+              component={DiscoverScreen}
               options={{
                 tabBarIcon: ({ size }: any) => (
                   <MaterialIcons
@@ -94,16 +96,30 @@ export default function App() {
             />
             <Tabs.Screen
               name="Host Quiz"
-              component={Discover}
+              component={HostQuizScreen}
               options={{
                 tabBarIcon: ({ size }: any) => (
                   <Octicons name="gear" size={size ? size : 24} color="black" />
                 ),
+                unmountOnBlur: true
               }}
             />
             <Tabs.Screen
               name="Profile"
-              component={Discover}
+              component={DiscoverScreen}
+              options={{
+                tabBarIcon: ({ size }: any) => (
+                  <FontAwesome5
+                    name="user"
+                    size={size ? size : 24}
+                    color="black"
+                  />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="Login"
+              component={LoginScreen}
               options={{
                 tabBarIcon: ({ size }: any) => (
                   <FontAwesome5

@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/header';
 
-export default function Discover() {
+export default function DiscoverScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>

@@ -14,7 +14,7 @@ export default function HomeCatagories() {
 
   return (
     <View style={styles.catagoriesTitleLine}>
-      <Text style={styles.h1}>Catagories</Text>
+      <Text style={styles.h1}>Top Catagories</Text>
       <View>
         <Text style={styles.h2}>View All  {'->'}</Text>
       </View>
@@ -31,10 +31,11 @@ const styles = StyleSheet.create({
   },
   h1: {
     fontFamily: 'Nunito_700Bold',
-    fontSize: 16
+    fontSize: 18
   },
   h2: {
     fontFamily: 'Nunito_700Bold',
-    fontSize: 12
+    fontSize: 12,
+    color: '#FF7F50',
   }
 })

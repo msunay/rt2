@@ -7,7 +7,7 @@ import PlayNextQuizBtn from '../components/playNextQuizBtn';
 import HomeDiscover from '../components/homeDiscover';
 import HomeCatagories from '../components/homeCatagories';
 
-export default function Home() {
+export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
+    marginHorizontal: '3%',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   discoverContainer: {
-    flex: 2.5,
+    flex: 2,
     // borderColor: '#FF0000',
     // borderWidth: 1,
   },

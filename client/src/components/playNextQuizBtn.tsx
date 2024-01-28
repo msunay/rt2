@@ -1,12 +1,18 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useFonts, Nunito_700Bold, Nunito_400Regular } from '@expo-google-fonts/nunito';
-
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  useFonts,
+  Nunito_700Bold,
+  Nunito_400Regular,
+} from '@expo-google-fonts/nunito';
+import { useGetAllQuizzesQuery } from '../services/apiService';
 
 export default function PlayNextQuizBtn() {
 
+  const { data, error, isLoading } = useGetAllQuizzesQuery();
+
   let [fontsLoaded, fontError] = useFonts({
     Nunito_700Bold,
-    Nunito_400Regular
+    Nunito_400Regular,
   });
 
   if (!fontsLoaded && !fontError) {
@@ -19,12 +25,12 @@ export default function PlayNextQuizBtn() {
         <Text style={styles.h1Text}>Play Next Quiz!</Text>
       </View>
       <View style={styles.nextQuizDetails}>
-        <Text style={styles.detailsText}>Quiz Name</Text>
-        <Text style={styles.detailsText}>Quiz Catagory</Text>
-        <Text style={styles.detailsText}>Quiz Start Time</Text>
+        <Text style={styles.detailsText}>{data && data[0].quizName}</Text>
+        <Text style={styles.detailsText}>{data && data[0].category}</Text>
+        <Text style={styles.detailsText}>{data && data[0].dateTime.toString()}</Text>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -35,7 +41,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 10,
     borderRadius: 17,
-    backgroundColor: '#25CED1'
+    backgroundColor: '#25CED1',
+    shadowColor: '#000000',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   textContainer: {
     width: '40%',
@@ -46,7 +56,7 @@ const styles = StyleSheet.create({
   h1Text: {
     color: 'white',
     fontSize: 22,
-    fontFamily: 'Nunito_700Bold'
+    fontFamily: 'Nunito_700Bold',
   },
   nextQuizDetails: {
     // flex: 1,
@@ -60,4 +70,4 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'Nunito_400Regular',
   },
-})
+});
