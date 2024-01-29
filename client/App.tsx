@@ -1,4 +1,3 @@
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import {
   AnimatedTabBarNavigator,
@@ -19,7 +18,7 @@ import { store } from '@/store';
 import HomeScreen from '@/screens/HomeScreen';
 import DiscoverScreen from '@/screens/DiscoverScreen';
 import HostQuizScreen from '@/screens/HostQuizScreen';
-import LoginScreen from '@/screens/LoginScreen';
+import LoginScreen from '@/app/login';
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -48,7 +47,6 @@ const appearanceOptions = {
 export default function App() {
   return (
     <Provider store={store}>
-      <SafeAreaProvider>
         <NavigationContainer>
           <Tabs.Navigator
             initialRouteName="Home"
@@ -132,7 +130,6 @@ export default function App() {
             />
           </Tabs.Navigator>
         </NavigationContainer>
-      </SafeAreaProvider>
     </Provider>
   );
 }

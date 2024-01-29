@@ -9,7 +9,7 @@ import HomeCatagories from '@/components/homeCatagories';
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    // <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -29,7 +29,7 @@ export default function HomeScreen() {
           <StatusBar style="auto" />
         </View>
       </View>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 }
 

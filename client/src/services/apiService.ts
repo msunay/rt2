@@ -11,6 +11,7 @@ import {
   UserParticipations,
   QuizParticipations,
   Winner,
+  LoginCredentials,
 } from '@/types/Types';
 
 const BASE_URL: string =
@@ -30,10 +31,7 @@ export const userApi = createApi({
       }),
     }),
 
-    loginUser: build.mutation<
-      ResponseUser,
-      { username: string; password: string }
-    >({
+    loginUser: build.mutation<ResponseUser, LoginCredentials>({
       query: ({ username, password }) => ({
         url: 'login',
         method: 'POST',

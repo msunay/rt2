@@ -18,6 +18,7 @@ export default function Header() {
     Nunito_700Bold
   });
 
+  //NOTE change font loading
   if (!fontsLoaded && !fontError) {
     return null;
   }

@@ -4,7 +4,7 @@ import Header from '@/components/header';
 
 export default function DiscoverScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    // <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -15,7 +15,7 @@ export default function DiscoverScreen() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }
 
