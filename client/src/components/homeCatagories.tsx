@@ -1,17 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
-
 
 export default function HomeCatagories() {
-
-  let [fontsLoaded, fontError] = useFonts({
-    Nunito_700Bold
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
-
   return (
     <View style={styles.catagoriesTitleLine}>
       <Text style={styles.h1}>Top Catagories</Text>
@@ -30,11 +19,11 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   h1: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     fontSize: 18
   },
   h2: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     fontSize: 12,
     color: '#FF7F50',
   }

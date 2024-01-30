@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { AdvancedImage } from 'cloudinary-react-native';
 import { Cloudinary } from '@cloudinary/url-gen';
-import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import SignOut from './signOut';
 
 
@@ -14,16 +13,6 @@ const myCld = new Cloudinary({
 let logo = myCld.image('rt2/images/wwhur1ze4imvqw4bveso');
 
 export default function Header() {
-
-  let [fontsLoaded, fontError] = useFonts({
-    Nunito_700Bold
-  });
-
-  //NOTE change font loading
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
-
   return (
       <View style={styles.headerContainer}>
         <View style={styles.logoContainer}>
@@ -59,7 +48,7 @@ const styles = StyleSheet.create({
     width: 30,
   },
   h1: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     fontSize: 16
   },
   greetingContainer: {
@@ -68,13 +57,13 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   greeting: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     textAlign: 'center',
     // borderColor: '#FF0000',
     // borderWidth: 1,
   },
   name: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     textAlign: 'center',
     color: '#FF7F50',
     // borderColor: '#FF0000',

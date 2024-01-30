@@ -1,23 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  useFonts,
-  Nunito_700Bold,
-  Nunito_400Regular,
-} from '@expo-google-fonts/nunito';
 import { useGetAllQuizzesQuery } from '@/services/apiService';
 
 export default function PlayNextQuizBtn() {
 
   const { data, error, isLoading } = useGetAllQuizzesQuery();
-
-  let [fontsLoaded, fontError] = useFonts({
-    Nunito_700Bold,
-    Nunito_400Regular,
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
 
   return (
     <View style={styles.playNextQuizBtnBackground}>
@@ -56,7 +42,7 @@ const styles = StyleSheet.create({
   h1Text: {
     color: 'white',
     fontSize: 22,
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
   },
   nextQuizDetails: {
     // flex: 1,
@@ -68,6 +54,6 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     color: 'white',
-    fontFamily: 'Nunito_400Regular',
+    fontFamily: 'Nunito-Regular',
   },
 });

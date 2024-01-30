@@ -1,20 +1,11 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { useGetAllQuizzesQuery } from '@/services/apiService';
 import { Quiz } from '@/types/Types';
 import { FlashList } from '@shopify/flash-list';
 
 export default function HomeDiscover() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
-
-  let [fontsLoaded, fontError] = useFonts({
-    Nunito_700Bold,
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
 
   return (
     <View style={styles.container}>
@@ -84,11 +75,11 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   h1: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     fontSize: 18,
   },
   h2: {
-    fontFamily: 'Nunito_700Bold',
+    fontFamily: 'Nunito-Bold',
     fontSize: 12,
     color: '#FF7F50',
   },

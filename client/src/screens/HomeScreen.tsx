@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,7 +9,7 @@ import HomeCatagories from '@/components/homeCatagories';
 
 export default function HomeScreen() {
   return (
-    // <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -29,7 +29,7 @@ export default function HomeScreen() {
           <StatusBar style="auto" />
         </View>
       </View>
-    // </SafeAreaView>
+    </SafeAreaView>
   );
 }
 

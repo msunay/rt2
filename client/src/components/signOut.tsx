@@ -1,4 +1,4 @@
-import { Button, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import React from 'react';
 import { useSession } from '@/services/authctx';
 import { FontAwesome } from '@expo/vector-icons';
@@ -19,7 +19,6 @@ export default function SignOut() {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     position: 'absolute',
     height: '100%',
     justifyContent: 'center',
