@@ -1,4 +1,4 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect } from 'expo-router';
 
 import { useSession } from '@/services/authctx';
 import { Text } from 'react-native';
@@ -7,8 +7,6 @@ import {
   DotSize,
   TabElementDisplayOptions,
 } from 'react-native-animated-nav-tab-bar';
-import * as SplashScreen from 'expo-splash-screen';
-import { useFonts } from 'expo-font';
 import {
   AntDesign,
   Entypo,
@@ -20,9 +18,6 @@ import {
 import HomeScreen from '@/screens/HomeScreen';
 import DiscoverScreen from '@/screens/DiscoverScreen';
 import HostQuizScreen from '@/screens/HostQuizScreen';
-import { useEffect } from 'react';
-
-SplashScreen.preventAutoHideAsync();
 
 const Tabs = AnimatedTabBarNavigator();
 
@@ -49,24 +44,7 @@ const appearanceOptions = {
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
-  const [fontsLoaded] = useFonts({
-    'Nunito-Black': require('../../../assets/fonts/Nunito-Black.ttf'),
-    'Nunito-Regular': require('../../../assets/fonts/Nunito-Regular.ttf'),
-    'Nunito-ExtraLight': require('../../../assets/fonts/Nunito-ExtraLight.ttf'),
-    'Nunito-Light': require('../../../assets/fonts/Nunito-Light.ttf'),
-    'Nunito-Medium': require('../../../assets/fonts/Nunito-Medium.ttf'),
-    'Nunito-SemiBold': require('../../../assets/fonts/Nunito-SemiBold.ttf'),
-    'Nunito-Bold': require('../../../assets/fonts/Nunito-Bold.ttf'),
-    'Nunito-ExtraBold': require('../../../assets/fonts/Nunito-ExtraBold.ttf'),
-  });
 
-  useEffect(() => {
-    (async () => {
-      if (fontsLoaded) {
-        await SplashScreen.hideAsync();
-      }
-    })();
-  }, [fontsLoaded]);
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
