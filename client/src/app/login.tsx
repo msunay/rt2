@@ -1,4 +1,5 @@
 import {
+  Alert,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -45,14 +46,18 @@ export default function LoginScreen() {
         <Pressable
           style={({ pressed }) => [
             {
-              backgroundColor: pressed ? '#ffb296' : '#FF7F50'
+              backgroundColor: pressed ? '#ffb296' : '#FF7F50',
             },
-            styles.loginBtn
+            styles.loginBtn,
           ]}
           onPress={() => {
-            signIn({username, password}).then(() => {
-              router.replace('/')
-            })
+            if (username && password) {
+              signIn({ username, password }).then(() => {
+                router.replace('/');
+              })
+            } else {
+              Alert.alert('Please enter your details to sign-in');
+            }
           }}
         >
           <Text style={styles.btnText}>Sign In</Text>
@@ -106,9 +111,9 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     height: 50,
     borderRadius: 10,
-    marginTop: 10
+    marginTop: 10,
   },
   btnText: {
     textAlign: 'center',
-  }
+  },
 });
