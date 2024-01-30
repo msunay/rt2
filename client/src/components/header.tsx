@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { AdvancedImage } from 'cloudinary-react-native';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
+import SignOut from './signOut';
 
 
 const myCld = new Cloudinary({
@@ -33,6 +34,7 @@ export default function Header() {
           <Text style={styles.greeting}>Hello</Text>
           <Text style={styles.name}>Bob Syor Ancl!</Text>
         </View>
+        <SignOut />
       </View>
   )
 }

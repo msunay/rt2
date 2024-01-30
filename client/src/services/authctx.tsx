@@ -20,11 +20,6 @@ const AuthContext = createContext<{
 // This hook can be used to access the user info.
 export function useSession() {
   const value = useContext(AuthContext);
-  // if (process.env.NODE_ENV !== 'production') {
-  if (!value) {
-    throw new Error('useSession must be wrapped in a <SessionProvider />');
-  }
-  // }
 
   return value;
 }
@@ -44,13 +39,6 @@ export function SessionProvider(props: PropsWithChildren) {
         console.error('Login failed:', error);
         Alert.alert(error.data);
       });
-
-    // if (data && data.token) {
-    //   setSession(data.token); // Set session state with token
-    // } else {
-    //   setSession(null); // Reset session state on failure
-    //   console.error('Login failed:', error);
-    // }
   };
 
   return (

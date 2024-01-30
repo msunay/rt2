@@ -41,6 +41,8 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: '#f0f0f0',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   container: {
     flex: 1,
