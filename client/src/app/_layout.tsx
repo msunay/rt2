@@ -10,7 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
 export default function Root() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'Nunito-Black': require('../../assets/fonts/Nunito-Black.ttf'),
     'Nunito-Regular': require('../../assets/fonts/Nunito-Regular.ttf'),
     'Nunito-ExtraLight': require('../../assets/fonts/Nunito-ExtraLight.ttf'),
@@ -23,12 +23,16 @@ export default function Root() {
 
   useEffect(() => {
     (async () => {
-      if (fontsLoaded) {
+      if (fontsLoaded || fontError) {
         await SplashScreen.hideAsync();
       }
     })();
-  }, [fontsLoaded]);
-  
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <Provider store={store}>
       <SessionProvider>

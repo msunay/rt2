@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Keyboard,
   Pressable,
@@ -12,21 +11,76 @@ import { Image } from 'expo-image';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useSession } from '@/services/authctx';
+import { object, string } from 'yup';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 export default function LoginScreen() {
-  const [registering, setRegistering] = useState(false)
-
-  const [loginForm, setLoginForm] = useState({username: '', password: ''})
-  const [registrationForm, setRegistrationForm] = useState({email: '', username: '', password: '', repeatPassword: ''})
+  const [registering, setRegistering] = useState(false);
 
   const { signIn } = useSession();
 
-  const btnPressStyle = ({ pressed }: { pressed: boolean}) => [
+  let loginSchema = object().shape({
+    username: string().required('Please enter username'),
+    password: string().required('Please enter password'),
+  });
+
+  const {
+    control: loginControl,
+    handleSubmit: loginHandleSubmit,
+    formState: { errors: loginErrors },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const onLogin = (formData: any) => {
+    signIn({
+      username: formData.username,
+      password: formData.password,
+    }).then(() => {
+      router.replace('/');
+    });
+  };
+
+  let registrationSchema = object({
+    email: string()
+      .email('Not a valid email address')
+      .required('Email is required'),
+    username: string().required('Username is required'),
+    password: string()
+      .min(8, 'Password must contain at least 8 characters')
+      .required('Password is required'),
+    repeatPassword: string().required(),
+  });
+
+  const {
+    control: registrationControl,
+    handleSubmit: registrationHandleSubmit,
+    formState: { errors: registrationErrors },
+  } = useForm({
+    resolver: yupResolver(registrationSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      repeatPassword: '',
+    },
+  });
+
+  const onRegister = (formData: any) => {
+    // register logic
+  }
+
+  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
     {
       backgroundColor: pressed ? '#ffb296' : '#FF7F50',
     },
     styles.loginBtn,
-  ]
+  ];
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
@@ -39,77 +93,163 @@ export default function LoginScreen() {
       </View>
       {!registering ? (
         <View style={styles.form}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Username"
-            autoCapitalize="none"
-            value={loginForm.username}
-            onChangeText={(username) => setLoginForm((prev) => ({...prev, username}))}
+          <Controller
+            control={loginControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Username"
+                autoCapitalize="none"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="username"
           />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Password"
-            secureTextEntry
-            autoCapitalize="none"
-            value={loginForm.password}
-            onChangeText={(password) => setLoginForm((prev) => ({...prev, password}))}
+          {loginErrors.username && (
+            <Text style={styles.validationError}>
+              {loginErrors.username.message}
+            </Text>
+          )}
+          <Controller
+            control={loginControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Password"
+                secureTextEntry
+                autoCapitalize="none"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="password"
           />
+          {loginErrors.password && (
+            <Text style={styles.validationError}>
+              {loginErrors.password.message}
+            </Text>
+          )}
           <Pressable
             style={btnPressStyle}
-            onPress={() => {
-              if (loginForm.username && loginForm.password) {
-                signIn({ username: loginForm.username, password: loginForm.password }).then(() => {
-                  router.replace('/');
-                });
-              } else {
-                Alert.alert('Please enter your details to sign-in');
-              }
-            }}
+            onPress={loginHandleSubmit(onLogin)}
           >
             <Text style={styles.btnText}>Sign In</Text>
           </Pressable>
-          <Button title="Register" onPress={() => {setRegistering(true)}} />
+          <Button
+            title="Don't have an account yet?"
+            onPress={() => {
+              setRegistering(true);
+            }}
+          />
         </View>
       ) : (
         <View style={styles.form}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Email"
-            autoCapitalize="none"
-            keyboardType='email-address'
-            value={registrationForm.email}
-            onChangeText={(email) => setRegistrationForm((prev) => ({...prev, email}))}
+          <Controller
+            control={registrationControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Email"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="email"
           />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Username"
-            autoCapitalize="none"
-            value={registrationForm.username}
-            onChangeText={(username) => setRegistrationForm((prev) => ({...prev, username}))}
+          {registrationErrors.email && (
+            <Text style={styles.validationError}>
+              {registrationErrors.email.message}
+            </Text>
+          )}
+          <Controller
+            control={registrationControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Username"
+                autoCapitalize="none"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="username"
           />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Password"
-            secureTextEntry
-            autoCapitalize="none"
-            value={registrationForm.password}
-            onChangeText={(password) => setRegistrationForm((prev) => ({...prev, password}))}
+          {registrationErrors.username && (
+            <Text style={styles.validationError}>
+              {registrationErrors.username.message}
+            </Text>
+          )}
+          <Controller
+            control={registrationControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Password"
+                secureTextEntry
+                autoCapitalize="none"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="password"
           />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Repeat Password"
-            secureTextEntry
-            autoCapitalize="none"
-            value={registrationForm.repeatPassword}
-            onChangeText={(repeatPassword) => setRegistrationForm((prev) => ({...prev, repeatPassword}))}
+          {registrationErrors.password && (
+            <Text style={styles.validationError}>
+              {registrationErrors.password.message}
+            </Text>
+          )}
+          <Controller
+            control={registrationControl}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={styles.textInput}
+                placeholder="Repeat Password"
+                secureTextEntry
+                autoCapitalize="none"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="repeatPassword"
           />
+          {registrationErrors.repeatPassword && (
+            <Text style={styles.validationError}>
+              {registrationErrors.repeatPassword.message}
+            </Text>
+          )}
           <Pressable
             style={btnPressStyle}
-            onPress={() => Alert.alert('Use Yup for validation')}
+            onPress={registrationHandleSubmit(onRegister)}
           >
             <Text style={styles.btnText}>Register</Text>
           </Pressable>
-          <Button title="Sign-In" onPress={() => {setRegistering(false)}} />
+          <Button
+            title="Already have an account?"
+            onPress={() => {
+              setRegistering(false);
+            }}
+          />
         </View>
       )}
     </Pressable>
@@ -125,7 +265,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#f0f0f0',
-
   },
   imageContainer: {
     height: '100%',
@@ -148,13 +287,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingLeft: 15,
     fontSize: 16,
+    fontFamily: 'Nunito-Regular',
   },
-  password: {
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    fontSize: 16,
-    paddingLeft: 15,
+  validationError: {
+    fontFamily: 'Nunito-Light',
+    color: 'red',
   },
   loginBtn: {
     justifyContent: 'center',
@@ -165,5 +302,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     textAlign: 'center',
+    fontSize: 16,
+    fontFamily: 'Nunito-Bold',
   },
 });
