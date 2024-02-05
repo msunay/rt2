@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 
-import { useSession } from '@/services/authctx';
+import { useSession } from '@/utils/authctx';
 import { Text } from 'react-native';
 import {
   AnimatedTabBarNavigator,
@@ -17,7 +17,14 @@ import {
 
 import HomeScreen from '@/screens/HomeScreen';
 import DiscoverScreen from '@/screens/DiscoverScreen';
-import HostQuizScreen from '@/screens/HostQuizScreen';
+import HostQuizScreen from '@/screens/CameraScreen';
+import { useGetUserDetailsQuery } from '@/services/backendApi';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
+import { useEffect } from 'react';
+import { setCurrentUser } from '@/features/userSlice';
+import ProfileScreen from '@/screens/ProfileScreen';
+import HostingScreen from '@/screens/HostingScreen';
+
 
 const Tabs = AnimatedTabBarNavigator();
 
@@ -45,7 +52,6 @@ const appearanceOptions = {
 export default function AppLayout() {
   const { session, isLoading } = useSession();
 
-
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -72,11 +78,7 @@ export default function AppLayout() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ size }: any) => (
-            <AntDesign
-              name="home"
-              size={size ? size : 24}
-              color="black"
-            />
+            <AntDesign name="home" size={size ? size : 24} color="black" />
           ),
         }}
       />
@@ -85,11 +87,7 @@ export default function AppLayout() {
         component={DiscoverScreen}
         options={{
           tabBarIcon: ({ size }: any) => (
-            <Entypo
-              name="compass"
-              size={size ? size : 24}
-              color="black"
-            />
+            <Entypo name="compass" size={size ? size : 24} color="black" />
           ),
         }}
       />
@@ -98,37 +96,29 @@ export default function AppLayout() {
         component={DiscoverScreen}
         options={{
           tabBarIcon: ({ size }: any) => (
-            <MaterialIcons
-              name="quiz"
-              size={size ? size : 24}
-              color="black"
-            />
+            <MaterialIcons name="quiz" size={size ? size : 24} color="black" />
           ),
         }}
       />
       <Tabs.Screen
         name="Host Quiz"
-        component={HostQuizScreen}
+        component={HostingScreen}
         options={{
           tabBarIcon: ({ size }: any) => (
             <Octicons name="gear" size={size ? size : 24} color="black" />
           ),
-          unmountOnBlur: true
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
         name="Profile"
-        component={DiscoverScreen}
+        component={ProfileScreen}
         options={{
           tabBarIcon: ({ size }: any) => (
-            <FontAwesome5
-              name="user"
-              size={size ? size : 24}
-              color="black"
-            />
+            <FontAwesome5 name="user" size={size ? size : 24} color="black" />
           ),
         }}
       />
     </Tabs.Navigator>
-  )
+  );
 }

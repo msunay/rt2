@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import React from 'react';
-import { useSession } from '@/services/authctx';
+import { useSession } from '@/utils/authctx';
 import { FontAwesome } from '@expo/vector-icons';
 
 export default function SignOut() {
@@ -8,10 +8,12 @@ export default function SignOut() {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => {
+      <Pressable
+        onPress={() => {
           signOut();
-        }}>
-          <FontAwesome name="sign-out" size={24} color="black" />
+        }}
+      >
+        <FontAwesome name="sign-out" size={24} color="black" />
       </Pressable>
     </View>
   );
@@ -22,6 +24,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: '100%',
     justifyContent: 'center',
-    right: 5
+    right: 5,
   },
 });

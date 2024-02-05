@@ -1,11 +1,10 @@
-import { Slot } from 'expo-router';
-import { SessionProvider } from '@/services/authctx';
+import { Stack } from 'expo-router';
+import { SessionProvider } from '@/utils/authctx';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,9 +35,8 @@ export default function Root() {
   return (
     <Provider store={store}>
       <SessionProvider>
-        <Slot />
+        <Stack screenOptions={{headerShown: false}} />
       </SessionProvider>
     </Provider>
-
   );
 }

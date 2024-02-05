@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { useGetAllQuizzesQuery } from '@/services/apiService';
+import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { FlashList } from '@shopify/flash-list';
 
@@ -46,8 +46,8 @@ export default function HomeDiscover() {
               <View style={styles.quizCard}>
                 <Image
                   style={styles.images}
-                  source={require('../../assets/images/tech.png')}
-                  contentFit='contain'
+                  source={require('../../../assets/images/catagories/tech.png')}
+                  contentFit="contain"
                 />
                 <Text>{quiz.quizName}</Text>
                 <Text>{quiz.category}</Text>
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     margin: 10,
-  //   borderColor: '#FF0000',
-  //   borderWidth: 1,
+    //   borderColor: '#FF0000',
+    //   borderWidth: 1,
   },
   cardContainer: {
     overflow: 'scroll',

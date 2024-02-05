@@ -19,8 +19,8 @@ const BASE_URL: string =
     ? process.env.BACKEND_URL!
     : 'http://192.168.0.215:3001/';
 
-export const userApi = createApi({
-  reducerPath: 'userApi',
+export const backendApi = createApi({
+  reducerPath: 'backendApi',
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (build) => ({
     postUser: build.mutation<ResponseUser, UserPost>({
@@ -149,4 +149,4 @@ export const {
   useDeleteParticipationMutation,
   useCreateParticipationAnswerMutation,
   useGetParticipationAnswersQuery,
-} = userApi;
+} = backendApi;

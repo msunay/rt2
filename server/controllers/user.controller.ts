@@ -91,7 +91,7 @@ async function userLogin(req: Request, res: Response) {
     const { username, password } = req.body;
     const response = await models.User.findOne({ where: { username: username } });
     const data = response?.dataValues;
-    const token = tokenGenerator(response?.dataValues.id || '', response?.dataValues.username || '');
+    const token = tokenGenerator(data?.id || '', data?.username || '');
     if (data && compareSync(password, data?.password)) {
       res.status(200).send({ username: response.username, id: response.id, token: token });
     } else {

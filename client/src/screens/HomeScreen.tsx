@@ -2,12 +2,25 @@ import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Header from '@/components/header';
-import PlayNextQuizBtn from '@/components/playNextQuizBtn';
-import HomeDiscover from '@/components/homeDiscover';
-import HomeCatagories from '@/components/homeCatagories';
+import Header from '@/components/global/header';
+import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
+import HomeDiscover from '@/components/homeScreen/homeDiscover';
+import HomeCatagories from '@/components/homeScreen/homeCatagories';
+import { useGetUserDetailsQuery } from '@/services/backendApi';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
+import { setCurrentUser } from '@/features/userSlice';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
+  const { data, isSuccess } = useGetUserDetailsQuery(
+    useAppSelector((state) => state.userIdSlice.value)
+  );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (data) dispatch(setCurrentUser(data));
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>

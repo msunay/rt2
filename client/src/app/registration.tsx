@@ -10,29 +10,38 @@ import {
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useSession } from '@/utils/authctx';
-import { object, string } from 'yup';
+import { object, ref, string } from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { LoginCredentials, ResponseUser } from '@/types/Types';
+import { ResponseUser, UserPost } from '@/types/Types';
 import { useAppDispatch } from '@/utils/hooks';
-import {
-  useGetUserDetailsQuery,
-  useGetUserIdQuery,
-} from '@/services/backendApi';
-import { setCurrentUser } from '@/features/userSlice';
 import { setUserId } from '@/features/userIdSlice';
 
-export default function LoginScreen() {
+export default function RegistrationScreen() {
+  // const [email, setEmail] = useState('') //BUG broken useForm onChange/value workaround
+  // const [registrationForm, setRegistrationForm] = useState({
+  //   email: '',
+  //   username: '',
+  //   password: '',
+  //   repeatPassword: ''
+  // })
   const dispatch = useAppDispatch();
 
-  const { signIn } = useSession();
+  const { register } = useSession();
 
-  // const [id, setId] = useState('');
-  // const { data, refetch } = useGetUserDetailsQuery(id);
-
-  let loginSchema = object().shape({
-    username: string().required('Please enter username'),
-    password: string().required('Please enter password'),
+  let registrationSchema = object().shape({
+    email: string()
+      .email('Not a valid email address')
+      .required('Email is required'),
+    username: string()
+      .min(5, 'Username must contain at least 5 characters')
+      .required('Username is required'),
+    password: string()
+      .min(8, 'Password must contain at least 8 characters')
+      .required('Password is required'),
+    repeatPassword: string()
+      .oneOf([ref('password')], 'Passwords must match')
+      .required(),
   });
 
   const {
@@ -40,15 +49,19 @@ export default function LoginScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(registrationSchema),
     defaultValues: {
+      email: '',
       username: '',
       password: '',
+      repeatPassword: '',
     },
   });
 
-  const onLogin = (formData: LoginCredentials) => {
-    signIn!({
+  const onRegister = (formData: UserPost) => {
+    console.log(formData);
+    register!({
+      email: formData.email,
       username: formData.username,
       password: formData.password,
     }).then((res: ResponseUser) => {
@@ -74,6 +87,24 @@ export default function LoginScreen() {
         />
       </View>
       <View style={styles.form}>
+        <Controller
+          name="email"
+          control={control}
+          render={({ field: { onChange, value, onBlur } }) => (
+            <TextInput
+              style={styles.textInput}
+              placeholder="Email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
+        />
+        {errors.email && (
+          <Text style={styles.validationError}>{errors.email.message}</Text>
+        )}
         <Controller
           name="username"
           control={control}
@@ -109,13 +140,33 @@ export default function LoginScreen() {
         {errors.password && (
           <Text style={styles.validationError}>{errors.password.message}</Text>
         )}
-        <Pressable style={btnPressStyle} onPress={handleSubmit(onLogin)}>
-          <Text style={styles.btnText}>Sign In</Text>
+        <Controller
+          name="repeatPassword"
+          control={control}
+          render={({ field: { onChange, value, onBlur } }) => (
+            <TextInput
+              style={styles.textInput}
+              placeholder="Repeat Password"
+              secureTextEntry
+              autoCapitalize="none"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
+        />
+        {errors.repeatPassword && (
+          <Text style={styles.validationError}>
+            {errors.repeatPassword.message}
+          </Text>
+        )}
+        <Pressable style={btnPressStyle} onPress={handleSubmit(onRegister)}>
+          <Text style={styles.btnText}>Register</Text>
         </Pressable>
         <Button
-          title="Don't have an account yet?"
+          title="Already have an account?"
           onPress={() => {
-            router.replace('/registration');
+            router.replace('/login');
           }}
         />
       </View>

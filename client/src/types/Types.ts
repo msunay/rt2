@@ -170,7 +170,8 @@ export interface ParticipationAndAnswers {
 // Authentication types
 
 export interface ResponseUser {
-  dataValues: User;
+  id: string;
+  username: string;
   token: string;
 }
 

@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useGetAllQuizzesQuery } from '@/services/apiService';
+import { useGetAllQuizzesQuery } from '@/services/backendApi';
 
 export default function PlayNextQuizBtn() {
-
   const { data, error, isLoading } = useGetAllQuizzesQuery();
 
   return (
@@ -13,7 +12,9 @@ export default function PlayNextQuizBtn() {
       <View style={styles.nextQuizDetails}>
         <Text style={styles.detailsText}>{data && data[0].quizName}</Text>
         <Text style={styles.detailsText}>{data && data[0].category}</Text>
-        <Text style={styles.detailsText}>{data && data[0].dateTime.toString()}</Text>
+        <Text style={styles.detailsText}>
+          {data && data[0].dateTime.toString()}
+        </Text>
       </View>
     </View>
   );

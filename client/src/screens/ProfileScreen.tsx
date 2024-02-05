@@ -2,20 +2,9 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/global/header';
 import { FlashList } from '@shopify/flash-list';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
-import { Quiz } from '@/types/Types';
-import HostQuizCard from '@/components/quiz/hostQuizCard';
+import CreateQuiz from '@/components/quiz/createQuiz';
 
-export default function DiscoverScreen() {
-
-  const { data, error, isLoading } = useGetAllQuizzesQuery()
-
-  const renderItem = ({ item }: { item: Quiz}) => {
-    return (
-      <HostQuizCard quiz={item} />
-    );
-  }
-
+export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
@@ -24,11 +13,7 @@ export default function DiscoverScreen() {
             <Header />
           </View>
           <View style={styles.mainArea}>
-            <FlashList
-              data={data}
-              renderItem={renderItem}
-              estimatedItemSize={108}
-            />
+            <CreateQuiz />
           </View>
         </View>
       </View>
