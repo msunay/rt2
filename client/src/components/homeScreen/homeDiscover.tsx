@@ -1,11 +1,14 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
+import { useGetAllQuizzesQuery, useGetUserDetailsQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { FlashList } from '@shopify/flash-list';
+import { CATEGORY_IMAGES } from '@/utils/images';
 
 export default function HomeDiscover() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
+
+  // const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
   return (
     <View style={styles.container}>
@@ -46,12 +49,11 @@ export default function HomeDiscover() {
               <View style={styles.quizCard}>
                 <Image
                   style={styles.images}
-                  source={require('../../../assets/images/catagories/tech.png')}
+                  source={CATEGORY_IMAGES.tech}
                   contentFit="contain"
                 />
                 <Text>{quiz.quizName}</Text>
                 <Text>{quiz.category}</Text>
-                <Text>{quiz.quizOwner}</Text>
               </View>
             </View>
           ))

@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import React from 'react';
 import { useSession } from '@/utils/authctx';
 import { FontAwesome } from '@expo/vector-icons';
 

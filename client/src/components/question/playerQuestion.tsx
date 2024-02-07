@@ -10,7 +10,10 @@ import {
 // import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/utils/hooks';
 import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useCreateParticipationAnswerMutation, useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
+import {
+  useCreateParticipationAnswerMutation,
+  useGetOneQuizQuestionAnswerQuery,
+} from '@/services/backendApi';
 
 export default function PlayerQuestion({
   hidden,
@@ -44,7 +47,8 @@ export default function PlayerQuestion({
     isLoading,
   } = useGetOneQuizQuestionAnswerQuery(participation!.QuizId!);
 
-  const [createParticipationAnswer, result] = useCreateParticipationAnswerMutation();
+  const [createParticipationAnswer, result] =
+    useCreateParticipationAnswerMutation();
 
   useEffect(() => {
     if (trigger > 0) createHandle();
@@ -65,7 +69,7 @@ export default function PlayerQuestion({
   // }, []);
 
   useEffect(() => {
-    if (!error) {
+    if (!error && !isLoading) {
       setCurrentQuestion(
         quiz!.Questions.find(
           (question) => question.positionInQuiz === trigger + 1
@@ -81,10 +85,10 @@ export default function PlayerQuestion({
   }, [currentQuestion]);
 
   async function handleAnswerClick(e: any) {
-    document
-      .querySelectorAll('button[name="a"]')
-      //@ts-ignore
-      .forEach((btn) => btn.classList.remove('active'));
+    // document
+    //   .querySelectorAll('button[name="a"]')
+    //   //@ts-ignore
+    //   .forEach((btn) => btn.classList.remove('active'));
     e.target.classList.add('active');
     const match: number = e.target.className.match(/\w+(\d)/)[1];
     if (match) {
@@ -113,10 +117,11 @@ export default function PlayerQuestion({
               <Pressable
                 // name="a"
                 key={index}
+                style={{flex: 1}}
                 // style={`answer${index + 1}`}
                 onPress={handleAnswerClick}
               >
-                {answer.answerText}
+                <Text>{answer.answerText}</Text>
               </Pressable>
             ))}
           </View>
@@ -127,8 +132,16 @@ export default function PlayerQuestion({
 }
 
 const styles = StyleSheet.create({
-  question_component: {},
-  question_container: {},
-  question_text: {},
-  answer_container: {},
+  question_component: {
+    flex: 1,
+  },
+  question_container: {
+    flex: 1
+  },
+  question_text: {
+    fontFamily: 'Nunito-Regular'
+  },
+  answer_container: {
+    flex: 1
+  },
 });

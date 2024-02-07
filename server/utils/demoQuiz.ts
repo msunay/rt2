@@ -4,9 +4,9 @@ import models from '../models/index';
 export async function addDemoQuiz(req: Request, res: Response) {
   try {
     const quiz = await models.Quiz.create({
-      quizName: 'Demo Quiz',
+      quizName: req.body.quizName,
       quizOwner: req.body.ownerId,
-      category: 'Thesis Project',
+      category: req.body.category,
       dateTime: req.body.startTime,
     });
 

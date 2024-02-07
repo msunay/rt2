@@ -15,20 +15,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoginCredentials, ResponseUser } from '@/types/Types';
 import { useAppDispatch } from '@/utils/hooks';
-import {
-  useGetUserDetailsQuery,
-  useGetUserIdQuery,
-} from '@/services/backendApi';
-import { setCurrentUser } from '@/features/userSlice';
 import { setUserId } from '@/features/userIdSlice';
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch();
 
   const { signIn } = useSession();
-
-  // const [id, setId] = useState('');
-  // const { data, refetch } = useGetUserDetailsQuery(id);
 
   let loginSchema = object().shape({
     username: string().required('Please enter username'),
@@ -52,7 +44,7 @@ export default function LoginScreen() {
       username: formData.username,
       password: formData.password,
     }).then((res: ResponseUser) => {
-      dispatch(setUserId(res.id));
+      dispatch(setUserId(res));
       router.replace('/');
     });
   };
@@ -112,6 +104,7 @@ export default function LoginScreen() {
         <Pressable style={btnPressStyle} onPress={handleSubmit(onLogin)}>
           <Text style={styles.btnText}>Sign In</Text>
         </Pressable>
+
         <Button
           title="Don't have an account yet?"
           onPress={() => {

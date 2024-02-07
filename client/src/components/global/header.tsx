@@ -13,7 +13,7 @@ const myCld = new Cloudinary({
 let logo = myCld.image('rt2/images/wwhur1ze4imvqw4bveso');
 
 export default function Header() {
-  const username = useAppSelector((state) => state.userSlice.username);
+  const username = useAppSelector((state) => state.userIdSlice.username);
   return (
     <View style={styles.headerContainer}>
       <View style={styles.logoContainer}>

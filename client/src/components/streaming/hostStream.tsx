@@ -7,7 +7,7 @@ import { useAppSelector, useAppDispatch } from '@/utils/hooks';
 import { incrementQuestionNumber } from '@/features/questionSlice';
 import { router } from 'expo-router';
 import { quizSocketService, startTimer } from '@/services/quizSocketService';
-import { Button, Pressable, StyleSheet, View } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Video, VideoProps, VideoState } from 'expo-av';
 import HostQuestion from '../question/hostQuestion';
 import { QUESTION_TIME } from '@/services/quizSocketService'
@@ -44,7 +44,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
   }, []);
 
   function startQuiz() {
-    startTimer();
+    // startTimer();
     setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
     dispatch(incrementQuestionNumber());
@@ -58,14 +58,14 @@ export default function HostStream({ quizId }: { quizId: string }) {
         setNextDisabled(false);
       }, QUESTION_TIME + 2000);
     }
-    document
-      .querySelectorAll('button[name="a"]')
-      //@ts-ignore
-      .forEach((btn) => (btn.disabled = false));
+    // document
+    //   .querySelectorAll('button[name="a"]')
+    //   //@ts-ignore
+    //   .forEach((btn) => (btn.disabled = false));
     dispatch(incrementQuestionNumber());
-    document.getElementById('countdown-canvas')!.hidden = false;
+    // document.getElementById('countdown-canvas')!.hidden = false;
     quizSocketService.emitNextQ();
-    startTimer();
+    // startTimer();
     setTrigger((trigger) => trigger + 1);
   }
 
@@ -213,7 +213,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
       <View style={styles.btn_holder}>
         <View style={styles.quiz_controls}>
-          <canvas id="countdown-canvas" width={80} height={80}></canvas>
+          {/* <canvas id="countdown-canvas" width={80} height={80}></canvas> */}
           {quizStarted ? (
             currentQuestionNumber === 10 ? (
               <Pressable
@@ -224,7 +224,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
                 }}
                 // disabled={disabled}
               >
-                Reveal Winners
+                <Text>Reveal Winners</Text>
               </Pressable>
             ) : (
               <Pressable
@@ -232,7 +232,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
                 style={styles.next_q_btn}
                 onPress={nextQuestion}
               >
-                Next Question
+                <Text>Next Question</Text>
               </Pressable>
             )
           ) : (
@@ -241,7 +241,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
               style={styles.next_q_btn}
               onPress={startQuiz}
             >
-              Start Quiz
+              <Text>Start Quiz</Text>
             </Pressable>
           )}
         </View>

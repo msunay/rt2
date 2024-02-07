@@ -50,11 +50,14 @@ export const backendApi = createApi({
       query: (userId) => `userDetails/${userId}`,
     }),
 
-    addDemoQuiz: build.mutation<Quiz, { ownerId: string; startTime: Date }>({
-      query: ({ ownerId, startTime }) => ({
+    addDemoQuiz: build.mutation<
+      Quiz,
+      { ownerId: string; startTime: Date; category: string; quizName: string }
+    >({
+      query: ({ ownerId, startTime, category, quizName }) => ({
         url: 'demoQuiz',
         method: 'POST',
-        body: { ownerId, startTime },
+        body: { ownerId, startTime, category, quizName },
       }),
     }),
 

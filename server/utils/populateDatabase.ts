@@ -36,7 +36,7 @@ async function populateDatabase() {
         id: mocks.quizIdArray[i],
         quizName: `Mock Quiz ${i}`,
         quizOwner: mocks.hosts[0].id,
-        category: 'General Knowledge',
+        category: 'general-knowledge',
         dateTime: moment().add(i, 'days').toDate(),
       });
 

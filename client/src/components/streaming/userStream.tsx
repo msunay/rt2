@@ -6,11 +6,18 @@ import { Participation } from '@/types/Types';
 import { quizSocketService } from '@/services/quizSocketService';
 import { peersSocketService } from '@/services/peersSocketService';
 import { useGetOneParticipationByPartIdQuery } from '@/services/backendApi';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+} from 'react-native';
 import { Link } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
 import PlayerQuestion from '../question/playerQuestion';
+import { QUIZ_BACKGROUND } from '@/utils/images';
 
 export default function UserStream({ partId }: { partId: string }) {
   // const userId = useAppSelector((state) => state.userIdSlice.value);
@@ -38,12 +45,12 @@ export default function UserStream({ partId }: { partId: string }) {
   } = useGetOneParticipationByPartIdQuery(partId);
 
   const remoteVideo = useRef(null);
-
+  /*
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
-
+*/
   // useEffect(() => {
   //   if (!errParticipation) setUserParticipation(participation!)
   // }, [participation])
@@ -54,13 +61,13 @@ export default function UserStream({ partId }: { partId: string }) {
     quizSocketService.startQuizListener(setQuizStarted);
     quizSocketService.startTimerListener(setQuestionHidden);
     quizSocketService.revealListener(setQuestionHidden, setTrigger);
-    peersSocketService.successListener();
-    peersSocketService.producerClosedListener(
-      consumerTransportState,
-      consumerState
-    );
+    // peersSocketService.successListener();
+    // peersSocketService.producerClosedListener(
+    //   consumerTransportState,
+    //   consumerState
+    // );
   }, []);
-
+  /*
   // Consume Trigger
   const goConsume = () => {
     device === undefined ? getRtpCapabilities() : createRecvTransport();
@@ -115,7 +122,7 @@ export default function UserStream({ partId }: { partId: string }) {
     setConsumerTransportState(response.consumerTransport);
     setConsumerState(response.consumer);
   };
-
+*/
   return (
     <View>
       <View style={styles.unit}>
@@ -142,14 +149,16 @@ export default function UserStream({ partId }: { partId: string }) {
             />
           )}
         </View>
-        {/*trigger < 11 ? (
+        {trigger < 11 ? (
           trigger === 10 ? (
-          <FinalScore userParticipation={participation} />
+            <></>
           ) : (
+            // <FinalScore userParticipation={participation} />
             <View style={styles.question_component_container}>
               {quizStarted && (
                 <PlayerQuestion
-                  partId={partId}
+                  // partId={partId}
+                  participation={participation}
                   trigger={trigger}
                   hidden={questionHidden}
                 />
@@ -158,27 +167,34 @@ export default function UserStream({ partId }: { partId: string }) {
           )
         ) : (
           <>
-            <Winners quizId={participation.QuizId!} partId={partId} />
+            {/* <Winners quizId={participation.QuizId!} partId={partId} /> */}
           </>
-        )*/}
+        )}
 
         {/* <div className="current-question"></div> */}
       </View>
-      <Pressable
+      {/* <Pressable
         style={styles.btn_join}
         id="join-stream-btn"
         onPress={goConsume}
         disabled={false}
       >
         <Text>Join Stream</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  unit: {},
-  close_btn: {},
+  unit: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  close_btn: {
+    flex: 1,
+    width: 10
+  },
   count_down: {},
   video_container: {},
   video: {},

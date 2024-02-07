@@ -18,13 +18,7 @@ import { useAppDispatch } from '@/utils/hooks';
 import { setUserId } from '@/features/userIdSlice';
 
 export default function RegistrationScreen() {
-  // const [email, setEmail] = useState('') //BUG broken useForm onChange/value workaround
-  // const [registrationForm, setRegistrationForm] = useState({
-  //   email: '',
-  //   username: '',
-  //   password: '',
-  //   repeatPassword: ''
-  // })
+
   const dispatch = useAppDispatch();
 
   const { register } = useSession();
@@ -59,13 +53,12 @@ export default function RegistrationScreen() {
   });
 
   const onRegister = (formData: UserPost) => {
-    console.log(formData);
     register!({
       email: formData.email,
       username: formData.username,
       password: formData.password,
     }).then((res: ResponseUser) => {
-      dispatch(setUserId(res.id));
+      dispatch(setUserId(res));
       router.replace('/');
     });
   };

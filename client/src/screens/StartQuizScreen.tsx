@@ -2,31 +2,48 @@ import { RefreshControl, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '@/components/global/header';
 import { FlashList } from '@shopify/flash-list';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
+import { useGetAllQuizzesQuery, useGetUserParticipationsQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
-import DiscoverQuizCard from '@/components/quiz/discoverQuizCard';
 import { useEffect, useState } from 'react';
+import ParticipationQuizCard from '@/components/quiz/participationQuizCard';
+import { useAppSelector } from '@/utils/hooks';
 
-export default function DiscoverScreen() {
-  const { data, error, isFetching, refetch } = useGetAllQuizzesQuery();
+export default function StartQuizScreen() {
+  const { data, error, isFetching, isLoading, refetch } = useGetAllQuizzesQuery();
+  const id = useAppSelector((state) => state.userIdSlice.id);
+
+
+  const { data: participations } = useGetUserParticipationsQuery(id)
+  const [participationList, setParticipationList] = useState<Quiz[]>([]);
+
 
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
 
   const renderItem = ({ item }: { item: Quiz }) => {
-    return <DiscoverQuizCard quiz={item} />;
+    return <ParticipationQuizCard quiz={item} />;
   };
 
+
   useEffect(() => {
-    if (data) {
+    console.log(participations);
+    if (data && participations) {
       const sorted = [...data]
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime()
       )
-      setSortedList(sorted)
+      sorted.forEach((quiz) => {
+        participations?.quizzes.forEach((partQuiz) => {
+          if (quiz.id === partQuiz.id) {
+            setSortedList(prevList => [...prevList, quiz])
+          }
+
+        })
+      })
+      // setSortedList(sorted)
     }
-  }, [data]);
+  }, [data, participations]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

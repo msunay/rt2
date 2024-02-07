@@ -28,7 +28,7 @@ export const quizSocketService = {
   ) =>
     quiz.on('start_question_timer', () => {
       setQuestionHidden(false);
-      document.getElementById('countdown-canvas')!.hidden = false;
+      // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
   startQuizListener: (
@@ -36,7 +36,7 @@ export const quizSocketService = {
   ) =>
     quiz.on('start_quiz', () => {
       setQuizStarted(true);
-      document.getElementById('countdown-canvas')!.hidden = false;
+      // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
 
@@ -46,15 +46,15 @@ export const quizSocketService = {
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
-      document
-        .querySelectorAll('button[name="a"]')
-        //@ts-ignore
-        .forEach((btn, i) => (btn.disabled = true));
+      // document
+      //   .querySelectorAll('button[name="a"]')
+      //   //@ts-ignore
+      //   .forEach((btn, i) => (btn.disabled = true));
 
       setTimeout(() => {
         setTrigger((trigger) => trigger + 1);
         setQuestionHidden(true);
-        document.getElementById('countdown-canvas')!.hidden = true;
+        // document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
     });
   },
@@ -73,7 +73,7 @@ export const quizSocketService = {
 
       setTimeout(() => {
         setQuestionHidden(true);
-        document.getElementById('countdown-canvas')!.hidden = true;
+        // document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
     });
   },
@@ -113,17 +113,17 @@ export function startTimer() {
         return '#dc3545'; // red
     }
   };
-  new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
-    duration: QUESTION_TIME,
-    radius: 40,
-    clockwise: true,
-    captionColor: pickColorByPercentage,
-    progressBarWidth: 15,
-    progressBarOffset: 0,
-    circleBackgroundColor: '#f5f5f5',
-    emptyProgressBarBackgroundColor: '#b9c1c7',
-    filledProgressBarBackgroundColor: '#17a2b8',
-    captionFont: '22px serif',
-    showCaption: true,
-  }).start();
+  // new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
+  //   duration: QUESTION_TIME,
+  //   radius: 40,
+  //   clockwise: true,
+  //   captionColor: pickColorByPercentage,
+  //   progressBarWidth: 15,
+  //   progressBarOffset: 0,
+  //   circleBackgroundColor: '#f5f5f5',
+  //   emptyProgressBarBackgroundColor: '#b9c1c7',
+  //   filledProgressBarBackgroundColor: '#17a2b8',
+  //   captionFont: '22px serif',
+  //   showCaption: true,
+  // }).start();
 }

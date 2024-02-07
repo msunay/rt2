@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const { data, isSuccess } = useGetUserDetailsQuery(
-    useAppSelector((state) => state.userIdSlice.value)
+    useAppSelector((state) => state.userIdSlice.id)
   );
   const dispatch = useAppDispatch();
 

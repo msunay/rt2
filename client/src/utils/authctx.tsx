@@ -13,10 +13,11 @@ import { setCurrentUser } from '../features/userSlice';
 const AuthContext = createContext<{
   signIn?: ({ username, password }: LoginCredentials) => any;
   register?: ({ email, username, password }: UserPost) => any;
-  signOut?: () => void;
+  signOut: () => void;
   session: string | null;
   isLoading: boolean;
 }>({
+  signOut: () => {},
   session: null,
   isLoading: false,
 });

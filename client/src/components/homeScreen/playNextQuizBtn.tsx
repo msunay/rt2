@@ -1,8 +1,32 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
+import { StyleSheet, Text, View } from 'react-native';
+import { useGetAllQuizzesQuery, useGetUserDetailsQuery } from '@/services/backendApi';
+import { useEffect, useState } from 'react';
+import { Quiz } from '@/types/Types';
+import { format } from 'date-fns';
 
 export default function PlayNextQuizBtn() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
+
+  const [nextQuiz, setNextQuiz] = useState<Quiz>();
+  // const { data: host, refetch } = useGetUserDetailsQuery(nextQuiz!.quizOwner)
+
+  useEffect(() => {
+    if (data) {
+      const sorted = [...data]
+      sorted.sort(
+        (quizA, quizB) =>
+          new Date(quizA.dateTime).getTime() -
+          new Date(quizB.dateTime).getTime()
+      )
+      setNextQuiz(sorted[0])
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (nextQuiz) {
+      // refetch()
+    }
+  }, [nextQuiz])
 
   return (
     <View style={styles.playNextQuizBtnBackground}>
@@ -10,10 +34,10 @@ export default function PlayNextQuizBtn() {
         <Text style={styles.h1Text}>Play Next Quiz!</Text>
       </View>
       <View style={styles.nextQuizDetails}>
-        <Text style={styles.detailsText}>{data && data[0].quizName}</Text>
-        <Text style={styles.detailsText}>{data && data[0].category}</Text>
+        <Text style={styles.detailsText}>{nextQuiz && nextQuiz.quizName}</Text>
+        <Text style={styles.detailsText}>{nextQuiz && nextQuiz.category}</Text>
         <Text style={styles.detailsText}>
-          {data && data[0].dateTime.toString()}
+          {nextQuiz && format(nextQuiz.dateTime, 'PPPp')}
         </Text>
       </View>
     </View>

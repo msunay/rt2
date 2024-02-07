@@ -1,19 +1,23 @@
+import { ResponseUser } from "@/types/Types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface userIdState {
-  value: string;
+  id: string;
+  username: string;
 }
 
 const initialState: userIdState = {
-  value: "",
+  id: "",
+  username: ''
 };
 
 export const userIdSlice = createSlice({
   name: "userId",
   initialState,
   reducers: {
-    setUserId: (state, action) => {
-      state.value = action.payload;
+    setUserId: (state, { payload }: { payload: ResponseUser }) => {
+      state.id = payload.id;
+      state.username = payload.username;
     },
   },
 });

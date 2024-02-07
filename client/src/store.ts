@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { backendApi } from '@/services/backendApi';
-import userSlice from './features/userSlice';
-import userIdSlice from './features/userIdSlice';
-import questionSlice from './features/questionSlice';
+import userSlice from '@/features/userSlice';
+import userIdSlice from '@/features/userIdSlice';
+import questionSlice from '@/features/questionSlice';
+import participatingSlice from '@/features/participatingSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     userSlice,
     userIdSlice,
     questionSlice,
+    participatingSlice
   },
 
   middleware: (getDefaultMiddleware) =>

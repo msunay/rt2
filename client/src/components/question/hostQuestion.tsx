@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { QuestionAnswer, QuizQuestionAnswer, Answer } from '@/types/Types';
-// import { userApiService } from '@/redux/services/apiService';
 // import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/utils/hooks';
 import { Button, StyleSheet, Text, View } from 'react-native';
