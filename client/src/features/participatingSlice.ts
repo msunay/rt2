@@ -1,24 +1,27 @@
-import { UserParticipations } from '@/types/Types';
+import { Quiz, UserParticipations } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface participatingState {
-  value: UserParticipations;
+  value: Quiz[];
 }
 
 const initialState: participatingState = {
-  value: {} as UserParticipations,
+  value: [],
 };
 
 export const participatingSlice = createSlice({
   name: 'participating',
   initialState,
   reducers: {
-    setParticipatingList: (state, { payload }: { payload: UserParticipations }) => {
-      state.value = payload;
+    addToParticipatingList: (state, { payload }: { payload: Quiz }) => {
+      state.value = [...state.value, payload];
     },
+    removeFromParticipatingList: (state, { payload }: { payload: Quiz }) => {
+      state.value = state.value.filter(quiz => quiz.id !== payload.id)
+    }
   },
 });
 
-export const { setParticipatingList } = participatingSlice.actions;
+export const { addToParticipatingList, removeFromParticipatingList } = participatingSlice.actions;
 
 export default participatingSlice.reducer;

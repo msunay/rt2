@@ -6,30 +6,15 @@ import CreateQuiz from '@/components/quiz/createQuiz';
 
 export default function ProfileScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.background}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <Header />
-          </View>
-          <View style={styles.mainArea}>
-            <CreateQuiz />
-          </View>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.mainArea}>
+        <CreateQuiz />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-  },
-  background: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-  },
   container: {
     flex: 1,
     marginHorizontal: 12,

@@ -52,6 +52,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <AntDesign name="home" size={size ? size : 24} color="black" />
           ),
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -61,6 +62,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <Entypo name="compass" size={size ? size : 24} color="black" />
           ),
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -70,6 +72,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <MaterialIcons name="quiz" size={size ? size : 24} color="black" />
           ),
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -89,6 +92,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <FontAwesome5 name="user" size={size ? size : 24} color="black" />
           ),
+          unmountOnBlur: true,
         }}
       />
     </Tabs.Navigator>

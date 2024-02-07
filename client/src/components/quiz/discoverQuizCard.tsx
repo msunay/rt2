@@ -1,31 +1,46 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Quiz } from '@/types/Types';
 import { Image } from 'expo-image';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import {
   useAddParticipationMutation,
+  useDeleteParticipationMutation,
   useGetUserDetailsQuery,
 } from '@/services/backendApi';
 import { formatDistance } from 'date-fns';
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
-import { setParticipatingList } from '@/features/participatingSlice';
+import { addToParticipatingList, removeFromParticipatingList } from '@/features/participatingSlice';
 
 export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
   const [participating, setParticipating] = useState(false);
 
-  const [createParticipation, { data, error }] = useAddParticipationMutation();
+  const [createParticipation] = useAddParticipationMutation();
+  const [deleteParticipation] = useDeleteParticipationMutation();
+
   const id = useAppSelector((state) => state.userIdSlice.id);
+  const participatingList = useAppSelector((state) => state.participatingSlice.value)
 
   const dispatch = useAppDispatch();
 
   const onPress = () => {
-    setParticipating(true);
-    createParticipation({ quizId: quiz.id!, userId: id });
-    // dispatch(setParticipatingList())
+    if (participating) {
+      deleteParticipation({ quizId: quiz.id!, userId: id })
+      dispatch(removeFromParticipatingList(quiz));
+    } else {
+      createParticipation({ quizId: quiz.id!, userId: id });
+      dispatch(addToParticipatingList(quiz))
+    }
+    setParticipating(prev => !prev);
   };
+
+  useEffect(() => {
+    participatingList.forEach((q) => {
+      if (q.id === quiz.id) setParticipating(true);
+    })
+  }, [])
 
   return (
     <View style={styles.container}>

@@ -18,48 +18,36 @@ export default function DiscoverScreen() {
 
   useEffect(() => {
     if (data) {
-      const sorted = [...data]
+      const sorted = [...data];
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime()
-      )
-      setSortedList(sorted)
+      );
+      setSortedList(sorted);
     }
   }, [data]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.background}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <Header />
-          </View>
-          <View style={styles.mainArea}>
-            <FlashList
-              data={sortedList}
-              renderItem={renderItem}
-              estimatedItemSize={108}
-              refreshControl={
-                <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
-              }
+    <View style={styles.container}>
+      <View style={styles.mainArea}>
+        <FlashList
+          data={sortedList}
+          renderItem={renderItem}
+          estimatedItemSize={108}
+          refreshControl={
+            <RefreshControl
+              onRefresh={() => refetch()}
+              refreshing={isFetching}
             />
-          </View>
-        </View>
+          }
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-  },
-  background: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-  },
   container: {
     flex: 1,
     marginHorizontal: 12,
