@@ -12,6 +12,7 @@ import {
   QuizParticipations,
   Winner,
   LoginCredentials,
+  SubmitFullQuiz,
 } from '@/types/Types';
 
 const BASE_URL: string =
@@ -59,6 +60,14 @@ export const backendApi = createApi({
         method: 'POST',
         body: { ownerId, startTime, category, quizName },
       }),
+    }),
+
+    addFullQuiz: build.mutation<Quiz, SubmitFullQuiz>({
+      query: (quiz) => ({
+        url: 'quiz',
+        method: 'POST',
+        body: quiz
+      })
     }),
 
     getOneQuiz: build.query<Quiz, string>({
@@ -140,6 +149,7 @@ export const {
   useGetUserIdQuery,
   useGetUserDetailsQuery,
   useAddDemoQuizMutation,
+  useAddFullQuizMutation,
   useGetOneQuizQuery,
   useGetAllQuizzesQuery,
   useGetOneQuizQuestionAnswerQuery,

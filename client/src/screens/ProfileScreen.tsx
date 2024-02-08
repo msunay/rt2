@@ -1,14 +1,24 @@
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/global/header';
-import { FlashList } from '@shopify/flash-list';
-import CreateQuiz from '@/components/quiz/createQuiz';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import { QUIZ_BTNS } from '@/utils/images';
+import { Link } from 'expo-router';
 
 export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.mainArea}>
-        <CreateQuiz />
+        <Link
+          href="/createQuiz"
+          asChild
+        >
+          <Pressable style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              contentFit="contain"
+              source={QUIZ_BTNS.create}
+            />
+          </Pressable>
+        </Link>
       </View>
     </View>
   );
@@ -17,7 +27,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -31,6 +41,17 @@ const styles = StyleSheet.create({
   mainArea: {
     flex: 10,
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  image: {
+    flex: 1,
+  },
+  imageContainer: {
+    height: 150,
+    width: '60%',
     // borderColor: '#FF0000',
     // borderWidth: 1,
   },

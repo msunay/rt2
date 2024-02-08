@@ -24,6 +24,7 @@ router.post('/login', userController.userLogin);
 
 // Quiz routes
 router.post('/demoQuiz', addDemoQuiz);
+router.post('/quiz', quizController.createFullQuiz);
 router.get(
   '/quizzesQuestionsAnswers',
   quizController.getQuizzesQuestionsAnswers

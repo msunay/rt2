@@ -50,7 +50,7 @@ export default function DiscoverScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',

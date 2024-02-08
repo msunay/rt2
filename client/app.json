@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "rt2-client",
+    "slug": "rt2-client",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,13 +14,19 @@
     "assetBundlePatterns": ["**/*"],
     "scheme": "rt2-scheme",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.msunay.rt2"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,14 +36,14 @@
         "expo-font",
         {
           "fonts": [
-            "/assets/fonts/Nunito-Black.ttf",
-            "/assets/fonts/Nunito-Regular.ttf",
-            "/assets/fonts/Nunito-ExtraLight.ttf",
-            "/assets/fonts/Nunito-Light.ttf",
-            "/assets/fonts/Nunito-Medium.ttf",
-            "/assets/fonts/Nunito-SemiBold.ttf",
-            "/assets/fonts/Nunito-Bold.ttf",
-            "/assets/fonts/Nunito-ExtraBold.ttf"
+            "./assets/fonts/Nunito-Black.ttf",
+            "./assets/fonts/Nunito-Regular.ttf",
+            "./assets/fonts/Nunito-Light.ttf",
+            "./assets/fonts/Nunito-ExtraLight.ttf",
+            "./assets/fonts/Nunito-Medium.ttf",
+            "./assets/fonts/Nunito-SemiBold.ttf",
+            "./assets/fonts/Nunito-Bold.ttf",
+            "./assets/fonts/Nunito-ExtraBold.ttf"
           ]
         }
       ],
@@ -61,6 +67,14 @@
         }
       ]
     ],
-    "jsEngine": "hermes"
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c1ac51d9-87e4-427e-a2ab-01244251a217"
+      }
+    },
+    "owner": "msunay"
   }
 }

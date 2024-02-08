@@ -1,11 +1,5 @@
 import { RefreshControl, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/global/header';
 import { FlashList } from '@shopify/flash-list';
-import {
-  useGetAllQuizzesQuery,
-  useGetUserParticipationsQuery,
-} from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
 import ParticipationQuizCard from '@/components/quiz/participationQuizCard';
@@ -53,7 +47,7 @@ export default function StartQuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',

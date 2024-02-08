@@ -8,27 +8,24 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { date, object, string } from 'yup';
-import {
-  Controller,
-  useController,
-  useForm,
-  useFormState,
-} from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAddDemoQuizMutation } from '@/services/backendApi';
 import { useAppSelector } from '@/utils/hooks';
+import { CATEGORY_IMAGES } from '@/utils/images';
+import { Image, ImageSource } from 'expo-image';
+import { Link } from 'expo-router';
 
 export default function CreateQuiz() {
-  const [show, setShow] = useState(false);
+  const [addQuiz] = useAddDemoQuizMutation();
 
-  const [addQuiz, response] = useAddDemoQuizMutation();
+  const [catagoryImage, setCatagoryImage] = useState<ImageSource>(
+    CATEGORY_IMAGES['general-knowledge']
+  );
 
-  const id = useAppSelector((state) => state.userIdSlice.id)
-  const showMode = () => {
-    setShow(true);
-  };
+  const id = useAppSelector((state) => state.userIdSlice.id);
 
   let quizSchema = object().shape({
     quizName: string().required('Please fill in field'),
@@ -44,6 +41,7 @@ export default function CreateQuiz() {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm({
     resolver: yupResolver(quizSchema),
     defaultValues: {
@@ -53,22 +51,27 @@ export default function CreateQuiz() {
     },
   });
 
+  const watchCatagory = watch('category');
+
+  useEffect(() => {
+    setCatagoryImage(CATEGORY_IMAGES[watchCatagory]);
+  }, [watchCatagory]);
+
   const createQuiz = ({
     quizName,
     category,
-    startTime
+    startTime,
   }: {
     quizName: string;
     category: string;
     startTime: Date;
   }) => {
-    console.log('ID: ', id);
     addQuiz({
       quizName,
       category,
       startTime,
-      ownerId: id
-    }).then(quiz => console.log('Create Quiz Response: ', quiz));
+      ownerId: id,
+    }).then((quiz) => console.log('Create Quiz Response: ', quiz));
   };
 
   const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
@@ -80,6 +83,11 @@ export default function CreateQuiz() {
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
+      <Image
+        source={catagoryImage}
+        style={styles.categoryImage}
+        contentFit="contain"
+      />
       <View style={styles.form}>
         <Text>Quiz Name</Text>
         <Controller
@@ -116,7 +124,10 @@ export default function CreateQuiz() {
               <Picker.Item label="Architecture" value="architecture" />
               <Picker.Item label="Environment" value="environment" />
               <Picker.Item label="Food" value="food" />
-              <Picker.Item label="General Knowledge" value="general-knowledge" />
+              <Picker.Item
+                label="General Knowledge"
+                value="general-knowledge"
+              />
               <Picker.Item label="Geography" value="geography" />
               <Picker.Item label="History" value="history" />
               <Picker.Item label="Music" value="music" />
@@ -129,7 +140,6 @@ export default function CreateQuiz() {
         {errors.category && (
           <Text style={styles.validationError}>{errors.category.message}</Text>
         )}
-        {/* <Text>selected: {date.toLocaleString()}</Text> */}
         <Controller
           name="startTime"
           control={control}
@@ -147,12 +157,21 @@ export default function CreateQuiz() {
         {errors.startTime && (
           <Text style={styles.validationError}>{errors.startTime.message}</Text>
         )}
-        {/* {show && (
-
-        )} */}
         <Pressable style={btnPressStyle} onPress={handleSubmit(createQuiz)}>
-          <Text style={styles.btnText}>Create Quiz</Text>
+          <Text style={styles.btnText}>Create Demo Quiz</Text>
         </Pressable>
+        <Link
+          style={styles.loginBtn}
+          href={{
+            pathname: '/createQuiz/[qno]',
+            params: { qno: 1 },
+          }}
+          asChild
+        >
+          <Pressable>
+            <Text style={styles.btnText}>Create Full Quiz</Text>
+          </Pressable>
+        </Link>
       </View>
     </Pressable>
   );
@@ -165,6 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   form: {
+    flex: 1.6,
     width: '90%',
     alignSelf: 'center',
   },
@@ -201,5 +221,8 @@ const styles = StyleSheet.create({
   pickerItem: {
     height: 130,
     fontSize: 15,
+  },
+  categoryImage: {
+    flex: 1,
   },
 });

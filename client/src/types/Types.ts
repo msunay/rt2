@@ -142,6 +142,36 @@ export interface QuizQuestionAnswer {
     }[];
   }[];
 }
+export interface FullQuizState {
+  quizName: string;
+  quizOwner: string;
+  category: string;
+  dateTime: string;
+  Questions: {
+    questionText: string;
+    positionInQuiz: number;
+    Answers: {
+      answerText: string;
+      isCorrect: boolean;
+    }[];
+  }[];
+}
+export interface SubmitFullQuiz {
+  quizName: string;
+  quizOwner: string;
+  category: string;
+  dateTime: Date;
+  Questions: {
+    questionText: string;
+    positionInQuiz: number;
+    QuizId: string;
+    Answers: {
+      answerText: string;
+      isCorrect: boolean;
+      QuestionId: string;
+    }[];
+  }[];
+}
 
 export interface ParticipationAndAnswers {
   id: string;

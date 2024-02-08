@@ -103,10 +103,55 @@ async function getWinners(req: Request, res: Response) {
   }
 }
 
+async function createFullQuiz(req: Request, res: Response) {
+  try {
+    const quiz = await models.Quiz.create({
+      quizName: req.body.quizName,
+      quizOwner: req.body.quizOwner,
+      category: req.body.category,
+      dateTime: req.body.dateTime,
+    });
+
+    async function createQuestionWithAnswers(
+      questionText: string,
+      answers: string[],
+      correctIndex: number,
+      positionInQuiz: number
+    ) {
+      const question = await models.Question.create({
+        questionText,
+        positionInQuiz,
+      });
+
+      answers.forEach((answer, index) => {
+        question.createAnswer({
+          answerText: answer,
+          isCorrect: index === correctIndex,
+        });
+      });
+      await quiz.addQuestion(question);
+    }
+
+    for (let i = 0; i > 10; i++) {
+      await createQuestionWithAnswers(
+        req.body.Questions[i].questionText,
+        req.body.Questions[i].Answers,
+        0,
+        i + 1
+      );
+    }
+    res.status(201).send(quiz)
+  } catch (err) {
+    console.error('Could not create quiz::', err);
+    res.status(500).send();
+  }
+}
+
 export default {
   getAllQuizzes,
   getQuizzesQuestionsAnswers,
   getOneQuizQuestionAnswers,
   getOneQuiz,
   getWinners,
+  createFullQuiz
 };
