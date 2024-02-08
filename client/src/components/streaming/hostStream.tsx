@@ -1,5 +1,10 @@
 // import styles from '@/styles/streaming.module.css';
-import React, { ReactComponentElement, useEffect, useRef, useState } from 'react';
+import React, {
+  ReactComponentElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
 import { peersSocketService } from '@/services/peersSocketService';
@@ -10,8 +15,7 @@ import { quizSocketService, startTimer } from '@/services/quizSocketService';
 import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Video, VideoProps, VideoState } from 'expo-av';
 import HostQuestion from '../question/hostQuestion';
-import { QUESTION_TIME } from '@/services/quizSocketService'
-
+import { QUESTION_TIME } from '@/services/quizSocketService';
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(
@@ -22,10 +26,10 @@ export default function HostStream({ quizId }: { quizId: string }) {
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
   const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
-  const [nextDisabled, setNextDisabled] = useState(false)
-  const [startDisabled, setStartDisabled] = useState(false)
+  const [nextDisabled, setNextDisabled] = useState(false);
+  const [startDisabled, setStartDisabled] = useState(false);
 
-  // const localVideo = useRef(null);
+  const localVideo = useRef(null);
   const nextQBtn = useRef(null);
   const startBtn = useRef(null);
   // const { push } = useRouter();
@@ -201,12 +205,19 @@ export default function HostStream({ quizId }: { quizId: string }) {
           style={styles.video}
         ></Video> */}
         <View style={styles.question_component_container}>
-          {quizStarted && (
+          {quizStarted ? (
             <HostQuestion
               quizId={quizId}
               trigger={trigger}
               hidden={questionHidden}
             />
+          ) : (
+            <View>
+              <Button title="" />
+              <Button title="" />
+              <Button title="" />
+              <Button title="" />
+            </View>
           )}
         </View>
       </View>
@@ -265,10 +276,24 @@ const styles = StyleSheet.create({
   count_down: {},
   video_container: {},
   video: {},
-  question_component_container: {},
+  question_component_container: {
+    // flex: 1,
+    height: 170,
+    borderColor: '#FF0000',
+    borderWidth: 1,
+  },
   btn_join: {},
   btn_holder: {},
-  quiz_controls: {},
+  quiz_controls: {
+    // flex: 1,
+    // height: 85,
+    // width: '100%',
+    // justifyContent: 'space-around',
+    // alignItems: 'center',
+    // alignContent: 'flex-end',
+    // box-sizing: border-box,
+    // padding: 15px 20px,
+  },
   next_q_btn: {},
   stream_btns: {},
 });

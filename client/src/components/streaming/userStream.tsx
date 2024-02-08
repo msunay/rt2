@@ -126,9 +126,9 @@ export default function UserStream({ partId }: { partId: string }) {
   return (
     <View>
       <View style={styles.unit}>
-        <Link href="/" style={styles.close_btn}>
+        {/* <Link href="/" style={styles.close_btn}>
           <FontAwesome name="close" size={24} color="black" />
-        </Link>
+        </Link> */}
         {/* <canvas className={styles.count_down} id="countdown-canvas"></canvas> */}
         <View style={styles.video_container}>
           <Video
@@ -138,26 +138,15 @@ export default function UserStream({ partId }: { partId: string }) {
             onPlaybackStatusUpdate={(status) => setStatus(() => status)}
           />
         </View>
-        <View style={styles.question_component_container}>
-          {quizStarted && (
-            <PlayerQuestion
-              // partId={partId}
-              // partId={partId}
-              participation={participation}
-              trigger={trigger}
-              hidden={questionHidden}
-            />
-          )}
-        </View>
         {trigger < 11 ? (
           trigger === 10 ? (
-            <></>
+            <>
+            {/* <FinalScore userParticipation={participation} /> */}
+            </>
           ) : (
-            // <FinalScore userParticipation={participation} />
             <View style={styles.question_component_container}>
               {quizStarted && (
                 <PlayerQuestion
-                  // partId={partId}
                   participation={participation}
                   trigger={trigger}
                   hidden={questionHidden}
@@ -187,17 +176,22 @@ export default function UserStream({ partId }: { partId: string }) {
 
 const styles = StyleSheet.create({
   unit: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   close_btn: {
-    flex: 1,
-    width: 10
+    // flex: 1,
+    // width: 10
   },
   count_down: {},
   video_container: {},
   video: {},
-  question_component_container: {},
+  question_component_container: {
+      // flex: 1,
+      height: '60%',
+      // borderColor: '#FF0000',
+      // borderWidth: 1,
+  },
   btn_join: {},
 });

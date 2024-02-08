@@ -44,6 +44,7 @@ export default function LoginScreen() {
       username: formData.username,
       password: formData.password,
     }).then((res: ResponseUser) => {
+      console.log('res: ', res);
       dispatch(setUserId(res));
       router.replace('/');
     });

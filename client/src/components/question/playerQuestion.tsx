@@ -109,19 +109,21 @@ export default function PlayerQuestion({
     <View style={styles.question_component}>
       {currentQuestion && !hidden && (
         <View style={styles.question_container}>
-          <Text style={styles.question_text}>
-            {currentQuestion.questionText}
-          </Text>
+          <View style={styles.questionTextContainer}>
+            <Text style={styles.question_text}>
+              {currentQuestion.questionText}
+            </Text>
+          </View>
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <Pressable
                 // name="a"
                 key={index}
-                style={{flex: 1}}
+                style={styles.answerBtn}
                 // style={`answer${index + 1}`}
                 onPress={handleAnswerClick}
               >
-                <Text>{answer.answerText}</Text>
+                <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
             ))}
           </View>
@@ -134,14 +136,39 @@ export default function PlayerQuestion({
 const styles = StyleSheet.create({
   question_component: {
     flex: 1,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   question_container: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  questionTextContainer: {
     flex: 1
   },
   question_text: {
-    fontFamily: 'Nunito-Regular'
+    // flex: 1,
+    fontFamily: 'Nunito-Regular',
   },
   answer_container: {
-    flex: 1
+    flex: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    alignContent: 'space-between',
+  },
+  answerText: {
+    fontFamily: 'Nunito-Regular',
+    textAlign: 'center',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  answerBtn: {
+    // flex: 1,
+    justifyContent: 'center',
+    width: '50%',
+    height: '50%',
+    backgroundColor: 'grey',
+    
   },
 });

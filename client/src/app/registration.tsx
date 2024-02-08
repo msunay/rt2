@@ -18,7 +18,6 @@ import { useAppDispatch } from '@/utils/hooks';
 import { setUserId } from '@/features/userIdSlice';
 
 export default function RegistrationScreen() {
-
   const dispatch = useAppDispatch();
 
   const { register } = useSession();
@@ -57,8 +56,14 @@ export default function RegistrationScreen() {
       email: formData.email,
       username: formData.username,
       password: formData.password,
-    }).then((res: ResponseUser) => {
-      dispatch(setUserId(res));
+    }).then((res: any) => {
+      console.log('res: ', res);
+      const responseUser: ResponseUser = {
+        token: res.token,
+        id: res.dataValues.id,
+        username: res.dataValues.username,
+      };
+      dispatch(setUserId(responseUser));
       router.replace('/');
     });
   };
