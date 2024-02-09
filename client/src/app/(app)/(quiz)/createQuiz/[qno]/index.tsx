@@ -1,16 +1,39 @@
-import { useAppDispatch } from '@/utils/hooks';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  GestureResponderEvent,
+  Keyboard,
+  NativeTouchEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { object, string } from 'yup';
-import { addQuestionWithAnswers } from '@/features/quizCreationSlice';
+import {
+  addQuestionWithAnswers,
+  resetQuizStore,
+} from '@/features/quizCreationSlice';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRef } from 'react';
+import { useAddFullQuizMutation } from '@/services/backendApi';
 
 export default function QuizContent() {
   const { qno } = useLocalSearchParams<{ qno: string }>();
   const questionNum = parseInt(qno!);
 
   const dispatch = useAppDispatch();
+  const quizState = useAppSelector((state) => state.quizCreationSlice);
+
+  const [submitFullQuiz, { isSuccess }] = useAddFullQuizMutation();
+
+  const ref_input2 = useRef<TextInput>(null);
+  const ref_input3 = useRef<TextInput>(null);
+  const ref_input4 = useRef<TextInput>(null);
 
   let questionSchema = object().shape({
     questionText: string().required('Please fill in field'),
@@ -61,140 +84,230 @@ export default function QuizContent() {
           { answerText: answer4, isCorrect: false },
         ],
       })
-      );
+    );
+
+    router.navigate({
+      pathname: '/createQuiz/[qno]',
+      params: { qno: questionNum + 1 },
+    });
   };
 
+  const submitQuiz = (e: GestureResponderEvent) => {
+    submitFullQuiz(quizState).then(() => {
+      dispatch(resetQuizStore());
+      router.navigate('/');
+    });
+  };
+
+  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
+    {
+      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
+    },
+    styles.loginBtn,
+  ];
+
   if (questionNum === 11) {
+    console.log(console.log(JSON.stringify(quizState, null, 2)));
     return (
-      <View style={styles.background}>
-        <Text>Quiz Submitted</Text>
-      </View>
-    )
+      <SafeAreaView edges={['top']} style={styles.background}>
+        <ScrollView>
+          <Text>{JSON.stringify(quizState, null, 2)}</Text>
+        </ScrollView>
+        <Pressable style={btnPressStyle} onPress={submitQuiz}>
+          <Text>Submit Quiz</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
   }
 
   return (
-    <Pressable style={styles.background} onPress={Keyboard.dismiss}>
-      <View style={styles.form}>
-        <Text>{`Question ${questionNum}`}</Text>
-        <Controller
-          name="questionText"
-          control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
-            <TextInput
-            style={styles.questionInput}
-            placeholder="Write yout question here..."
-              multiline
-              autoCapitalize="sentences"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
+    <SafeAreaView style={styles.safeArea}>
+      <Pressable style={styles.background} onPress={Keyboard.dismiss}>
+        <Text style={styles.title}>{`Question ${questionNum}`}</Text>
+        <View style={styles.form}>
+          <Text>Question</Text>
+          <Controller
+            name="questionText"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <TextInput
+                style={styles.questionInput}
+                placeholder="Write yout question here..."
+                multiline
+                returnKeyType="next"
+                // returnKeyLabel='Next'+
+                autoCapitalize="sentences"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                onSubmitEditing={() => ref_input2.current!.focus()}
               />
-              )}
-        />
-        {errors.questionText && (
-          <Text style={styles.validationError}>
-            {errors.questionText.message}
-          </Text>
-        )}
-        <Controller
-          name="answer1"
-          control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
-            <TextInput
-              style={styles.answerInput}
-              placeholder="Write an answer here..."
-              multiline
-              autoCapitalize="sentences"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
+            )}
+          />
+          {errors.questionText && (
+            <Text style={styles.validationError}>
+              {errors.questionText.message}
+            </Text>
           )}
-        />
-        {errors.answer1 && (
-          <Text style={styles.validationError}>{errors.answer1.message}</Text>
-        )}
-        <Controller
-          name="answer2"
-          control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
-            <TextInput
-              style={styles.answerInput}
-              placeholder="Write an answer here..."
-              multiline
-              autoCapitalize="sentences"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
+          <Text>Correct Answer</Text>
+          <Controller
+            name="answer1"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <TextInput
+                ref={ref_input2}
+                style={styles.answerInput}
+                placeholder="Write an answer here..."
+                multiline
+                autoCapitalize="sentences"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                onSubmitEditing={() => ref_input3.current!.focus()}
+              />
+            )}
+          />
+          <Text>Answer 2</Text>
+          <Controller
+            name="answer2"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <TextInput
+                ref={ref_input3}
+                style={styles.answerInput}
+                placeholder="Write an answer here..."
+                multiline
+                autoCapitalize="sentences"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                onSubmitEditing={() => ref_input4.current!.focus()}
+              />
+            )}
+          />
+          {errors.answer2 && (
+            <Text style={styles.validationError}>{errors.answer2.message}</Text>
           )}
-        />
-        {errors.answer2 && (
-          <Text style={styles.validationError}>{errors.answer2.message}</Text>
-        )}
-        <Controller
-          name="answer3"
-          control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
-            <TextInput
-              style={styles.answerInput}
-              placeholder="Write an answer here..."
-              multiline
-              autoCapitalize="sentences"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
+          <Text>Answer 3</Text>
+          <Controller
+            name="answer3"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <TextInput
+                ref={ref_input4}
+                style={styles.answerInput}
+                placeholder="Write an answer here..."
+                multiline
+                autoCapitalize="sentences"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          {errors.answer3 && (
+            <Text style={styles.validationError}>{errors.answer3.message}</Text>
           )}
-        />
-        {errors.answer3 && (
-          <Text style={styles.validationError}>{errors.answer3.message}</Text>
-        )}
-        <Controller
-          name="answer4"
-          control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
-            <TextInput
-              style={styles.answerInput}
-              placeholder="Write an answer here..."
-              multiline
-              autoCapitalize="sentences"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
+          <Text>Answer 4</Text>
+          <Controller
+            name="answer4"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) => (
+              <TextInput
+                style={styles.answerInput}
+                placeholder="Write an answer here..."
+                multiline
+                autoCapitalize="sentences"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          {errors.answer4 && (
+            <Text style={styles.validationError}>{errors.answer4.message}</Text>
           )}
-        />
-        {errors.answer4 && (
-          <Text style={styles.validationError}>{errors.answer4.message}</Text>
-        )}
-      </View>
-      <Link
+        </View>
+        {/* <Link
           style={styles.loginBtn}
           href={{
             pathname: '/createQuiz/[qno]',
             params: { qno: questionNum + 1 },
           }}
           asChild
-        >
-          <Pressable onPress={handleSubmit(storeQuestion)}>
-            <Text style={styles.btnText}>Next</Text>
-          </Pressable>
-        </Link>
-    </Pressable>
+          > */}
+        <Pressable style={btnPressStyle} onPress={handleSubmit(storeQuestion)}>
+          <Text style={styles.btnText}>Next</Text>
+        </Pressable>
+        {/* </Link> */}
+      </Pressable>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   background: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#f0f0f0',
+    marginHorizontal: '3%',
   },
-  form: {flex: 1},
-  questionInput: {},
-  answerInput: {},
-  loginBtn: {},
-  validationError: {},
-  btnText: {},
+  title: {
+    fontFamily: 'Nunito-Black',
+    fontSize: 20,
+  },
+  form: {
+    flex: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    width: '100%',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  questionInput: {
+    height: 50,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 60,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontFamily: 'Nunito-Regular',
+    width: '100%',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  answerInput: {
+    height: 50,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 10,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontFamily: 'Nunito-Regular',
+    width: '100%',
+  },
+  loginBtn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: 50,
+    backgroundColor: '#FF7F50',
+    borderRadius: 10,
+    marginTop: 10,
+
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  validationError: {
+    fontFamily: 'Nunito-Light',
+    color: 'red',
+  },
+  btnText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontFamily: 'Nunito-Bold',
+  },
 });

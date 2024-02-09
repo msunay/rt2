@@ -13,6 +13,7 @@ import {
   Winner,
   LoginCredentials,
   SubmitFullQuiz,
+  FullQuizState,
 } from '@/types/Types';
 
 const BASE_URL: string =
@@ -62,11 +63,11 @@ export const backendApi = createApi({
       }),
     }),
 
-    addFullQuiz: build.mutation<Quiz, SubmitFullQuiz>({
+    addFullQuiz: build.mutation<Quiz, FullQuizState>({
       query: (quiz) => ({
         url: 'quiz',
         method: 'POST',
-        body: quiz
+        body: {...quiz, dateTime: new Date(quiz.dateTime)}
       })
     }),
 

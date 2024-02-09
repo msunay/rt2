@@ -1,4 +1,4 @@
-import { QuizQuestionAnswer, FullQuizState } from '@/types/Types';
+import { QuizQuestionAnswer, FullQuizState, SubmitFullQuiz } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 import { formatISO } from 'date-fns';
 
@@ -23,14 +23,14 @@ export const quizCreationSlice = createSlice({
           quizName: string;
           quizOwner: string;
           category: string;
-          dateTime: Date;
+          dateTime: string;
         };
       }
     ) => {
       state.quizName = payload.quizName;
       state.quizOwner = payload.quizOwner;
       state.category = payload.category;
-      state.dateTime = formatISO(payload.dateTime);
+      state.dateTime = payload.dateTime;
     },
     addQuestionWithAnswers: (
       state,
@@ -49,10 +49,13 @@ export const quizCreationSlice = createSlice({
     ) => {
       state.Questions = [...state.Questions, payload];
     },
+    resetQuizStore: (state => {
+      state = initialState;
+    })
   },
 });
 
-export const { addQuestionWithAnswers, addQuizData } =
+export const { addQuestionWithAnswers, addQuizData, resetQuizStore } =
   quizCreationSlice.actions;
 
 export default quizCreationSlice.reducer;

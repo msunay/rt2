@@ -13,13 +13,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAddDemoQuizMutation } from '@/services/backendApi';
-import { useAppSelector } from '@/utils/hooks';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import { Image, ImageSource } from 'expo-image';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { addQuizData } from '@/features/quizCreationSlice';
 
 export default function CreateQuiz() {
   const [addQuiz] = useAddDemoQuizMutation();
+  // const [setQuizDetails] =
+  const dispatch = useAppDispatch();
 
   const [catagoryImage, setCatagoryImage] = useState<ImageSource>(
     CATEGORY_IMAGES['general-knowledge']
@@ -30,7 +33,7 @@ export default function CreateQuiz() {
   let quizSchema = object().shape({
     quizName: string().required('Please fill in field'),
     category: string().required('Please fill in field'),
-    startTime: date()
+    dateTime: date()
       .required()
       .default(() => new Date(Date.now() + 120000))
       .min(new Date(Date.now()), 'please set a future time'),
@@ -47,7 +50,7 @@ export default function CreateQuiz() {
     defaultValues: {
       quizName: '',
       category: 'architecture',
-      startTime: new Date(Date.now() + 120000),
+      dateTime: new Date(Date.now() + 120000),
     },
   });
 
@@ -60,18 +63,34 @@ export default function CreateQuiz() {
   const createQuiz = ({
     quizName,
     category,
-    startTime,
+    dateTime,
   }: {
     quizName: string;
     category: string;
-    startTime: Date;
+    dateTime: Date;
   }) => {
     addQuiz({
       quizName,
       category,
-      startTime,
+      startTime: dateTime,
       ownerId: id,
     }).then((quiz) => console.log('Create Quiz Response: ', quiz));
+  };
+
+  const storeQuizDetails = ({
+    quizName,
+    category,
+    dateTime,
+  }: {
+    quizName: string;
+    category: string;
+    dateTime: Date;
+  }) => {
+    dispatch(addQuizData({ quizName, category, dateTime: dateTime.toISOString(), quizOwner: id }));
+    router.navigate({
+      pathname: '/createQuiz/[qno]',
+      params: { qno: 1 },
+    })
   };
 
   const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
@@ -141,7 +160,7 @@ export default function CreateQuiz() {
           <Text style={styles.validationError}>{errors.category.message}</Text>
         )}
         <Controller
-          name="startTime"
+          name="dateTime"
           control={control}
           render={({ field: { value } }) => (
             <DateTimePicker
@@ -149,29 +168,20 @@ export default function CreateQuiz() {
               value={value}
               mode="datetime"
               onChange={(_, date) => {
-                setValue('startTime', date!, { shouldValidate: true });
+                setValue('dateTime', date!, { shouldValidate: true });
               }}
             />
           )}
         />
-        {errors.startTime && (
-          <Text style={styles.validationError}>{errors.startTime.message}</Text>
+        {errors.dateTime && (
+          <Text style={styles.validationError}>{errors.dateTime.message}</Text>
         )}
         <Pressable style={btnPressStyle} onPress={handleSubmit(createQuiz)}>
           <Text style={styles.btnText}>Create Demo Quiz</Text>
         </Pressable>
-        <Link
-          style={styles.loginBtn}
-          href={{
-            pathname: '/createQuiz/[qno]',
-            params: { qno: 1 },
-          }}
-          asChild
-        >
-          <Pressable>
-            <Text style={styles.btnText}>Create Full Quiz</Text>
-          </Pressable>
-        </Link>
+        <Pressable style={btnPressStyle} onPress={handleSubmit(storeQuizDetails)}>
+          <Text style={styles.btnText}>Create Full Quiz</Text>
+        </Pressable>
       </View>
     </Pressable>
   );
