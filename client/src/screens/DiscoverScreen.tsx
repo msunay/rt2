@@ -1,6 +1,4 @@
 import { RefreshControl, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/global/header';
 import { FlashList } from '@shopify/flash-list';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
@@ -50,7 +48,6 @@ export default function DiscoverScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -58,13 +55,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   mainArea: {
     flex: 10,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
 });

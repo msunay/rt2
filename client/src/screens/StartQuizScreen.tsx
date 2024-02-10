@@ -1,4 +1,4 @@
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
@@ -35,9 +35,6 @@ export default function StartQuizScreen() {
           data={sortedList}
           renderItem={renderItem}
           estimatedItemSize={108}
-          // refreshControl={
-          //   <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
-          // }
         />
       </View>
     </View>
@@ -47,7 +44,6 @@ export default function StartQuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -55,13 +51,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   mainArea: {
     flex: 10,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
 });

@@ -15,8 +15,6 @@ const styles = StyleSheet.create({
   catagoriesTitleLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   h1: {
     fontFamily: 'Nunito-Bold',

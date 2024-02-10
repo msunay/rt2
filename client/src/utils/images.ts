@@ -32,6 +32,6 @@ export const QUIZ_BACKGROUND = {
 export const TILE_IMAGES = {
   createQuiz: require('../../assets/images/tiles/create-quiz-btn.png'),
   joinQuiz: require('../../assets/images/tiles/join-quiz-btn.png'),
-  nextQuizBg: require('../../assets/images/tiles/play-next-quiz-bg.png'),
+  nextQuizBg: require('../../assets/images/tiles/play-next-quiz-bg.svg'),
   questionBubbles: require('../../assets/images/tiles/question-bubbles.png')
 }

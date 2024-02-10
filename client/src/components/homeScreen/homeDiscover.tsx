@@ -1,14 +1,11 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { useGetAllQuizzesQuery, useGetUserDetailsQuery } from '@/services/backendApi';
+import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
-import { FlashList } from '@shopify/flash-list';
 import { CATEGORY_IMAGES } from '@/utils/images';
 
 export default function HomeDiscover() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
-
-  // const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
   return (
     <View style={styles.container}>
@@ -23,22 +20,6 @@ export default function HomeDiscover() {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       >
-        {/* <FlashList
-          data={data}
-          estimatedItemSize={48}
-          renderItem={({item}) => {
-            return (
-              <View key={item.id} style={styles.quizCard}>
-                <Text>{item.quizName}</Text>
-                <Text>{item.category}</Text>
-                <Image
-                  style={styles.images}
-                  source={require('../../assets/images/tech.png')}
-                />
-              </View>
-            )
-          }}
-        /> */}
         {error ? (
           <Text>Oh no, there was an error</Text>
         ) : isLoading ? (
@@ -67,14 +48,10 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     width: '103.5%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   discoverTitleLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   h1: {
     fontFamily: 'Nunito-Bold',
@@ -94,15 +71,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     marginRight: 8,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   quizCard: {
     flex: 1,
     height: '100%',
     margin: 10,
-    //   borderColor: '#FF0000',
-    //   borderWidth: 1,
   },
   cardContainer: {
     overflow: 'scroll',
@@ -113,7 +86,6 @@ const styles = StyleSheet.create({
   images: {
     flex: 1,
     width: '100%',
-    // margin: 9,
     borderRadius: 10,
   },
 });

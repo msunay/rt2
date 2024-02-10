@@ -40,8 +40,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginHorizontal: 12,
-    // marginHorizontal: '3%',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -49,29 +47,21 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   mainArea: {
     flex: 10,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   playNextQuizBtnContainer: {
     flex: 1,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
   },
   discoverContainer: {
     flex: 2,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   catagoriesContainer: {
     flex: 1,
     marginBottom: 40,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
 });

@@ -21,7 +21,6 @@ import { addQuizData } from '@/features/quizCreationSlice';
 
 export default function CreateQuiz() {
   const [addQuiz] = useAddDemoQuizMutation();
-  // const [setQuizDetails] =
   const dispatch = useAppDispatch();
 
   const [catagoryImage, setCatagoryImage] = useState<ImageSource>(

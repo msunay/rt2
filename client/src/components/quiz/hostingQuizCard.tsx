@@ -6,13 +6,10 @@ import {
   useGetUserDetailsQuery,
 } from '@/services/backendApi';
 import { formatDistance } from 'date-fns';
-import { useAppSelector } from '@/utils/hooks';
 import { Link } from 'expo-router';
 
 export default function HostingQuizCard({ quiz }: { quiz: Quiz }) {
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
-
-  const id = useAppSelector((state) => state.userIdSlice.id);
 
   return (
     <Link

@@ -27,7 +27,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginHorizontal: 12,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -35,16 +34,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   mainArea: {
     flex: 10,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   image: {
     flex: 1,
@@ -52,7 +47,5 @@ const styles = StyleSheet.create({
   imageContainer: {
     height: 150,
     width: '60%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
 });

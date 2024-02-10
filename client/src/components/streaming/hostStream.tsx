@@ -279,8 +279,8 @@ const styles = StyleSheet.create({
   question_component_container: {
     // flex: 1,
     height: 170,
-    borderColor: '#FF0000',
-    borderWidth: 1,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   btn_join: {},
   btn_holder: {},
