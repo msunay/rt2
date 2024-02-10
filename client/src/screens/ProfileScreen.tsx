@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
-import { QUIZ_BTNS } from '@/utils/images';
+import { TILE_IMAGES } from '@/utils/images';
 import { Link } from 'expo-router';
 
 export default function ProfileScreen() {
@@ -15,7 +15,7 @@ export default function ProfileScreen() {
             <Image
               style={styles.image}
               contentFit="contain"
-              source={QUIZ_BTNS.create}
+              source={TILE_IMAGES.createQuiz}
             />
           </Pressable>
         </Link>

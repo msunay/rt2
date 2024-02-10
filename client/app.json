@@ -12,9 +12,9 @@
       "backgroundColor": "#07102c"
     },
     "assetBundlePatterns": ["**/*"],
-    "scheme": "rt2-scheme",
+    "scheme": "rt2",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.msunay.rt2"
     },
     "android": {

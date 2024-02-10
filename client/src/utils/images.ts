@@ -1,15 +1,17 @@
+import { ImageSource } from "expo-image";
+
 export const CATEGORY_IMAGES: {
-  architecture: any;
-  environment: any;
-  food: any;
-  'general-knowledge': any;
-  geography: any;
-  history: any;
-  music: any;
-  nature: any;
-  science: any;
-  tech: any;
-  [key: string]: any;
+  architecture: ImageSource;
+  environment: ImageSource;
+  food: ImageSource;
+  'general-knowledge': ImageSource;
+  geography: ImageSource;
+  history: ImageSource;
+  music: ImageSource;
+  nature: ImageSource;
+  science: ImageSource;
+  tech: ImageSource;
+  [key: string]: ImageSource;
 } = {
   architecture: require('../../assets/images/categories/architecture.png'),
   environment: require('../../assets/images/categories/environment.png'),
@@ -27,6 +29,9 @@ export const QUIZ_BACKGROUND = {
   background: require('../../assets/quiz-background.png')
 }
 
-export const QUIZ_BTNS = {
-  create: require('../../assets/images/create-quiz-btn.png')
+export const TILE_IMAGES = {
+  createQuiz: require('../../assets/images/tiles/create-quiz-btn.png'),
+  joinQuiz: require('../../assets/images/tiles/join-quiz-btn.png'),
+  nextQuizBg: require('../../assets/images/tiles/play-next-quiz-bg.png'),
+  questionBubbles: require('../../assets/images/tiles/question-bubbles.png')
 }

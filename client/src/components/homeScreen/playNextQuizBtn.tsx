@@ -1,8 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { useGetAllQuizzesQuery, useGetUserDetailsQuery } from '@/services/backendApi';
+import {
+  useGetAllQuizzesQuery,
+  useGetUserDetailsQuery,
+} from '@/services/backendApi';
 import { useEffect, useState } from 'react';
 import { Quiz } from '@/types/Types';
 import { format } from 'date-fns';
+import { Image, ImageBackground } from 'expo-image';
+import { TILE_IMAGES } from '@/utils/images';
 
 export default function PlayNextQuizBtn() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
@@ -12,13 +17,13 @@ export default function PlayNextQuizBtn() {
 
   useEffect(() => {
     if (data) {
-      const sorted = [...data]
+      const sorted = [...data];
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime()
-      )
-      setNextQuiz(sorted[0])
+      );
+      setNextQuiz(sorted[0]);
     }
   }, [data]);
 
@@ -26,10 +31,19 @@ export default function PlayNextQuizBtn() {
     if (nextQuiz) {
       // refetch()
     }
-  }, [nextQuiz])
+  }, [nextQuiz]);
 
   return (
-    <View style={styles.playNextQuizBtnBackground}>
+    <ImageBackground
+      style={styles.playNextQuizBtnBackground}
+      source={TILE_IMAGES.nextQuizBg}
+
+    >
+      <Image
+        source={TILE_IMAGES.questionBubbles}
+        style={styles.questionBubbles}
+        contentFit="contain"
+      />
       <View style={styles.textContainer}>
         <Text style={styles.h1Text}>Play Next Quiz!</Text>
       </View>
@@ -40,7 +54,7 @@ export default function PlayNextQuizBtn() {
           {nextQuiz && format(nextQuiz.dateTime, 'PPPp')}
         </Text>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -51,16 +65,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginVertical: 10,
-    borderRadius: 17,
-    backgroundColor: '#25CED1',
-    shadowColor: '#000000',
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    // borderRadius: 17,
+    // backgroundColor: '#25CED1',
+    // shadowColor: '#000000',
+    // shadowOffset: { width: 1, height: 2 },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 3,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+  questionBubbles: {
+    alignSelf: 'flex-end',
+    height: '65%',
+    width: '65%',
+    position: 'absolute',
+    bottom: 5,
   },
   textContainer: {
     width: '40%',
     marginLeft: '5%',
+    marginTop: '2%',
+    alignSelf: 'flex-start'
     // borderColor: '#FF0000',
     // borderWidth: 1,
   },

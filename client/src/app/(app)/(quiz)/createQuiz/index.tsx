@@ -16,7 +16,7 @@ import { useAddDemoQuizMutation } from '@/services/backendApi';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import { Image, ImageSource } from 'expo-image';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { addQuizData } from '@/features/quizCreationSlice';
 
 export default function CreateQuiz() {
