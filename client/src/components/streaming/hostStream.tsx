@@ -196,6 +196,12 @@ export default function HostStream({ quizId }: { quizId: string }) {
   //   // producerTransport.close();
   //   // mediaStream.getTracks().forEach((track) => track.stop());
   // };
+  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
+    {
+      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
+    },
+    styles.next_q_btn,
+  ];
 
   return (
     <View style={styles.unit}>
@@ -205,20 +211,22 @@ export default function HostStream({ quizId }: { quizId: string }) {
           style={styles.video}
         ></Video> */}
         <View style={styles.question_component_container}>
-          {quizStarted ? (
+          {quizStarted && (
             <HostQuestion
               quizId={quizId}
               trigger={trigger}
               hidden={questionHidden}
             />
-          ) : (
-            <View>
-              <Button title="" />
-              <Button title="" />
-              <Button title="" />
-              <Button title="" />
-            </View>
-          )}
+          )
+          // : (
+          //   <View>
+          //     <Button title="" />
+          //     <Button title="" />
+          //     <Button title="" />
+          //     <Button title="" />
+          //   </View>
+          // )
+          }
         </View>
       </View>
 
@@ -228,31 +236,31 @@ export default function HostStream({ quizId }: { quizId: string }) {
           {quizStarted ? (
             currentQuestionNumber === 10 ? (
               <Pressable
-                style={styles.next_q_btn}
+                style={btnPressStyle}
                 onPress={() => {
                   handleWinners();
                   dispatch(incrementQuestionNumber());
                 }}
                 // disabled={disabled}
               >
-                <Text>Reveal Winners</Text>
+                <Text style={styles.next_q_btnText}>Reveal Winners</Text>
               </Pressable>
             ) : (
               <Pressable
                 ref={nextQBtn}
-                style={styles.next_q_btn}
                 onPress={nextQuestion}
+                style={btnPressStyle}
               >
-                <Text>Next Question</Text>
+                <Text style={styles.next_q_btnText}>Next Question</Text>
               </Pressable>
             )
           ) : (
             <Pressable
               ref={startBtn}
-              style={styles.next_q_btn}
+              style={btnPressStyle}
               onPress={startQuiz}
             >
-              <Text>Start Quiz</Text>
+              <Text style={styles.next_q_btnText}>Start Quiz</Text>
             </Pressable>
           )}
         </View>
@@ -279,11 +287,11 @@ const styles = StyleSheet.create({
   question_component_container: {
     // flex: 1,
     height: 170,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   btn_join: {},
-  btn_holder: {},
+  btn_holder: {
+    alignSelf: 'center'
+  },
   quiz_controls: {
     // flex: 1,
     // height: 85,
@@ -294,6 +302,16 @@ const styles = StyleSheet.create({
     // box-sizing: border-box,
     // padding: 15px 20px,
   },
-  next_q_btn: {},
+  next_q_btn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+    width: 200,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  next_q_btnText: {
+    fontFamily: 'Nunito-Bold'
+  },
   stream_btns: {},
 });

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { QuestionAnswer, QuizQuestionAnswer, Answer } from '@/types/Types';
 // import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/utils/hooks';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
 
 export default function HostQuestion({
@@ -24,7 +24,6 @@ export default function HostQuestion({
     {} as QuestionAnswer
   );
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
-
 
   const {
     data: quiz,
@@ -58,16 +57,22 @@ export default function HostQuestion({
     <View style={styles.question_component}>
       {currentQuestion && !hidden && (
         <View style={styles.host_question_container}>
-          <Text style={styles.question_text}>
-            {currentQuestion.questionText}
-          </Text>
+          <View style={styles.questionTextContainer}>
+            <Text style={styles.question_text}>
+              {currentQuestion.questionText}
+            </Text>
+          </View>
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
-              <Button
-                title={answer.answerText}
+              <Pressable
+                // name="a"
                 key={index}
+                style={styles.answerBtn}
                 // style={`answer${index + 1}`}
-              />
+                // onPress={handleAnswerClick}
+              >
+                <Text style={styles.answerText}>{answer.answerText}</Text>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -77,8 +82,36 @@ export default function HostQuestion({
 }
 
 const styles = StyleSheet.create({
-  question_component: {},
-  host_question_container: {},
-  question_text: {},
-  answer_container: {},
+  question_component: {
+    flex: 1,
+  },
+  host_question_container: {
+    flex: 1,
+    alignItems: 'center',
+    // borderColor: '#FF0000',
+    // borderWidth: 1
+  },
+  questionTextContainer: {
+    flex: 1
+  },
+  question_text: {
+    fontFamily: 'Nunito-Black',
+  },
+  answer_container: {
+    flex: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    alignContent: 'space-between',
+  },
+  answerText: {
+    fontFamily: 'Nunito-Regular',
+    textAlign: 'center',
+  },
+  answerBtn: {
+    justifyContent: 'center',
+    width: '50%',
+    height: '50%',
+    backgroundColor: 'grey',
+  },
 });

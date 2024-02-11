@@ -15,6 +15,7 @@ import { addToParticipatingList, removeFromParticipatingList } from '@/features/
 
 export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
+
   const [participating, setParticipating] = useState(false);
 
   const [createParticipation] = useAddParticipationMutation();
@@ -46,7 +47,7 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <Image
-          source={CATEGORY_IMAGES['general-knowledge']}
+          source={CATEGORY_IMAGES[quiz.category]}
           style={styles.image}
           contentFit="cover"
         />

@@ -136,8 +136,6 @@ export default function PlayerQuestion({
 const styles = StyleSheet.create({
   question_component: {
     flex: 1,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   question_container: {
     flex: 1,
@@ -148,7 +146,7 @@ const styles = StyleSheet.create({
   },
   question_text: {
     // flex: 1,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: 'Nunito-Black',
   },
   answer_container: {
     flex: 4,
@@ -160,15 +158,12 @@ const styles = StyleSheet.create({
   answerText: {
     fontFamily: 'Nunito-Regular',
     textAlign: 'center',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   answerBtn: {
-    // flex: 1,
     justifyContent: 'center',
     width: '50%',
     height: '50%',
     backgroundColor: 'grey',
-    
+
   },
 });
