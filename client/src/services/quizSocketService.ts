@@ -6,7 +6,7 @@ import {
 import CanvasCircularCountdown from 'canvas-circular-countdown';
 
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'

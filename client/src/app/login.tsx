@@ -16,6 +16,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { LoginCredentials, ResponseUser } from '@/types/Types';
 import { useAppDispatch } from '@/utils/hooks';
 import { setUserId } from '@/features/userIdSlice';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch();
@@ -49,12 +50,8 @@ export default function LoginScreen() {
     });
   };
 
-  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
-    {
-      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
-    },
-    styles.loginBtn,
-  ];
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
@@ -101,7 +98,7 @@ export default function LoginScreen() {
         {errors.password && (
           <Text style={styles.validationError}>{errors.password.message}</Text>
         )}
-        <Pressable style={btnPressStyle} onPress={handleSubmit(onLogin)}>
+        <Pressable style={pressableStyle} onPress={handleSubmit(onLogin)}>
           <Text style={styles.btnText}>Sign In</Text>
         </Pressable>
 

@@ -114,8 +114,7 @@ async function createFullQuiz(req: Request, res: Response) {
 
     async function createQuestionWithAnswers(
       questionText: string,
-      answers: string[],
-      correctIndex: number,
+      answers: {answerText: string, isCorrect: boolean}[],
       positionInQuiz: number
     ) {
       const question = await models.Question.create({
@@ -123,21 +122,20 @@ async function createFullQuiz(req: Request, res: Response) {
         positionInQuiz,
       });
 
-      answers.forEach((answer, index) => {
-        question.createAnswer({
-          answerText: answer,
-          isCorrect: index === correctIndex,
+      answers.forEach( async (answer, index) => {
+        await question.createAnswer({
+          answerText: answer.answerText,
+          isCorrect: answer.isCorrect,
           answerNumber: index
         });
       });
       await quiz.addQuestion(question);
     }
 
-    for (let i = 0; i > 10; i++) {
+    for (let i = 0; i < req.body.Questions.length; i++) {
       await createQuestionWithAnswers(
         req.body.Questions[i].questionText,
         req.body.Questions[i].Answers,
-        0,
         i + 1
       );
     }

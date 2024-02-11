@@ -16,6 +16,7 @@ import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Video, VideoProps, VideoState } from 'expo-av';
 import HostQuestion from '../question/hostQuestion';
 import { QUESTION_TIME } from '@/services/quizSocketService';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(
@@ -196,12 +197,9 @@ export default function HostStream({ quizId }: { quizId: string }) {
   //   // producerTransport.close();
   //   // mediaStream.getTracks().forEach((track) => track.stop());
   // };
-  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
-    {
-      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
-    },
-    styles.next_q_btn,
-  ];
+
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.next_q_btn);
 
   return (
     <View style={styles.unit}>
@@ -217,26 +215,16 @@ export default function HostStream({ quizId }: { quizId: string }) {
               trigger={trigger}
               hidden={questionHidden}
             />
-          )
-          // : (
-          //   <View>
-          //     <Button title="" />
-          //     <Button title="" />
-          //     <Button title="" />
-          //     <Button title="" />
-          //   </View>
-          // )
-          }
+          )}
         </View>
       </View>
 
       <View style={styles.btn_holder}>
         <View style={styles.quiz_controls}>
-          {/* <canvas id="countdown-canvas" width={80} height={80}></canvas> */}
           {quizStarted ? (
             currentQuestionNumber === 10 ? (
               <Pressable
-                style={btnPressStyle}
+                style={pressableStyle}
                 onPress={() => {
                   handleWinners();
                   dispatch(incrementQuestionNumber());
@@ -249,17 +237,13 @@ export default function HostStream({ quizId }: { quizId: string }) {
               <Pressable
                 ref={nextQBtn}
                 onPress={nextQuestion}
-                style={btnPressStyle}
+                style={pressableStyle}
               >
                 <Text style={styles.next_q_btnText}>Next Question</Text>
               </Pressable>
             )
           ) : (
-            <Pressable
-              ref={startBtn}
-              style={btnPressStyle}
-              onPress={startQuiz}
-            >
+            <Pressable ref={startBtn} style={pressableStyle} onPress={startQuiz}>
               <Text style={styles.next_q_btnText}>Start Quiz</Text>
             </Pressable>
           )}
@@ -290,7 +274,7 @@ const styles = StyleSheet.create({
   },
   btn_join: {},
   btn_holder: {
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   quiz_controls: {
     // flex: 1,
@@ -311,7 +295,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   next_q_btnText: {
-    fontFamily: 'Nunito-Bold'
+    fontFamily: 'Nunito-Bold',
   },
   stream_btns: {},
 });

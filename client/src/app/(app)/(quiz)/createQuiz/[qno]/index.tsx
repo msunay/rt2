@@ -1,11 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import {
   GestureResponderEvent,
   Keyboard,
-  NativeTouchEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +20,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRef } from 'react';
 import { useAddFullQuizMutation } from '@/services/backendApi';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function QuizContent() {
   const { qno } = useLocalSearchParams<{ qno: string }>();
@@ -47,8 +47,6 @@ export default function QuizContent() {
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm({
     resolver: yupResolver(questionSchema),
     defaultValues: {
@@ -99,21 +97,17 @@ export default function QuizContent() {
     });
   };
 
-  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
-    {
-      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
-    },
-    styles.loginBtn,
-  ];
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+  btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
   if (questionNum === 11) {
-    console.log(console.log(JSON.stringify(quizState, null, 2)));
+    // console.log(console.log(JSON.stringify(quizState, null, 2)));
     return (
-      <SafeAreaView edges={['top']} style={styles.background}>
+      <SafeAreaView edges={['top', 'bottom']} style={styles.background}>
         <ScrollView>
           <Text>{JSON.stringify(quizState, null, 2)}</Text>
         </ScrollView>
-        <Pressable style={btnPressStyle} onPress={submitQuiz}>
+        <Pressable style={pressableStyle} onPress={submitQuiz}>
           <Text>Submit Quiz</Text>
         </Pressable>
       </SafeAreaView>
@@ -236,7 +230,7 @@ export default function QuizContent() {
           }}
           asChild
           > */}
-        <Pressable style={btnPressStyle} onPress={handleSubmit(storeQuestion)}>
+        <Pressable style={pressableStyle} onPress={handleSubmit(storeQuestion)}>
           <Text style={styles.btnText}>Next</Text>
         </Pressable>
         {/* </Link> */}

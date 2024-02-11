@@ -18,6 +18,8 @@ import { CATEGORY_IMAGES } from '@/utils/images';
 import { Image, ImageSource } from 'expo-image';
 import { router } from 'expo-router';
 import { addQuizData } from '@/features/quizCreationSlice';
+import { btnPressStyle } from '@/utils/helpers';
+
 
 export default function CreateQuiz() {
   const [addQuiz] = useAddDemoQuizMutation();
@@ -92,12 +94,8 @@ export default function CreateQuiz() {
     })
   };
 
-  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
-    {
-      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
-    },
-    styles.loginBtn,
-  ];
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
@@ -175,10 +173,10 @@ export default function CreateQuiz() {
         {errors.dateTime && (
           <Text style={styles.validationError}>{errors.dateTime.message}</Text>
         )}
-        <Pressable style={btnPressStyle} onPress={handleSubmit(createQuiz)}>
+        <Pressable style={pressableStyle} onPress={handleSubmit(createQuiz)}>
           <Text style={styles.btnText}>Create Demo Quiz</Text>
         </Pressable>
-        <Pressable style={btnPressStyle} onPress={handleSubmit(storeQuizDetails)}>
+        <Pressable style={pressableStyle} onPress={handleSubmit(storeQuizDetails)}>
           <Text style={styles.btnText}>Create Full Quiz</Text>
         </Pressable>
       </View>

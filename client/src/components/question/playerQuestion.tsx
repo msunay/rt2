@@ -1,47 +1,26 @@
 import { useState, useEffect } from 'react';
 import {
   QuestionAnswer,
-  QuizQuestionAnswer,
   Answer,
   Participation,
   ParticipationAnswer,
 } from '@/types/Types';
-// import { userApiService } from '@/redux/services/apiService';
-// import style from '@/styles/question.module.css';
-import { useAppSelector } from '@/utils/hooks';
-import { Button, GestureResponderEvent, NativeTouchEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   useCreateParticipationAnswerMutation,
-  useGetOneParticipationByPartIdQuery,
   useGetOneQuizQuestionAnswerQuery,
 } from '@/services/backendApi';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function PlayerQuestion({
   hidden,
   trigger,
-  // partId,
   participation,
 }: {
   hidden: boolean;
   trigger: number;
   participation?: Participation;
-  // partId: string;
 }) {
-  const [userParticipationAnswer, setUserParticipationAnswer] =
-    useState<ParticipationAnswer>({} as ParticipationAnswer);
-
-  // LOGIC FOR HOSTING THE QUIZ
-  // const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
-  //   {} as QuizQuestionAnswer
-  // );
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
-    {} as QuestionAnswer
-  );
-  const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
-  const [userParticipation, setUserParticipation] = useState<Participation>(
-    {} as Participation
-  );
-
   const {
     data: quiz,
     error,
@@ -51,23 +30,18 @@ export default function PlayerQuestion({
   const [createParticipationAnswer, result] =
     useCreateParticipationAnswerMutation();
 
+  const [userParticipationAnswer, setUserParticipationAnswer] =
+    useState<ParticipationAnswer>({} as ParticipationAnswer);
+
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
+    {} as QuestionAnswer
+  );
+
+  const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
+
   useEffect(() => {
     if (trigger > 0) createHandle();
   }, [trigger]);
-
-  // useEffect(() => {
-  //   userApiService
-  //     .getOneParticipationByPartId(partId)
-  //     .then((newParticipation) => {
-  //       setUserParticipation(newParticipation);
-  //       return newParticipation;
-  //     })
-  //     .then((newParticipation) => {
-  //       userApiService
-  //         .getOneQuizQuestionAnswer(newParticipation.QuizId!)
-  //         .then((newQuiz) => setQuiz(newQuiz));
-  //     });
-  // }, []);
 
   useEffect(() => {
     if (!error && !isLoading) {
@@ -86,23 +60,10 @@ export default function PlayerQuestion({
   }, [currentQuestion]);
 
   async function handleAnswerClick(index: number) {
-    // document
-    //   .querySelectorAll('button[name="a"]')
-    //   //@ts-ignore
-    //   .forEach((btn) => btn.classList.remove('active'));
-    // e.target.classList.add('active');
-    // const match: number = e.target.className.match(/\w+(\d)/)[1];
-    // if (match) {
-    //   setUserParticipationAnswer({
-    //     AnswerId: currentAnswers[match - 1].id,
-    //     ParticipationId: userParticipation.id,
-    //   } as ParticipationAnswer);
-    // }
     setUserParticipationAnswer({
       AnswerId: currentAnswers[index].id!,
-      ParticipationId: participation!.id!
-    })
-
+      ParticipationId: participation!.id!,
+    });
   }
 
   function createHandle() {
@@ -111,6 +72,9 @@ export default function PlayerQuestion({
     setUserParticipationAnswer({} as ParticipationAnswer);
   }
 
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+    btnPressStyle(pressed, ['silver', 'grey'], styles.answerBtn);
+    
   return (
     <View style={styles.question_component}>
       {currentQuestion && !hidden && (
@@ -123,10 +87,8 @@ export default function PlayerQuestion({
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <Pressable
-                // name="a"
                 key={index}
-                style={styles.answerBtn}
-                // style={`answer${index + 1}`}
+                style={pressableStyle}
                 onPress={() => handleAnswerClick(index)}
               >
                 <Text style={styles.answerText}>{answer.answerText}</Text>
@@ -148,10 +110,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionTextContainer: {
-    flex: 1
+    flex: 1,
   },
   question_text: {
-    // flex: 1,
     fontFamily: 'Nunito-Black',
   },
   answer_container: {
@@ -169,7 +130,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '50%',
     height: '50%',
-    backgroundColor: 'grey',
-
   },
 });

@@ -28,7 +28,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
       <Pressable style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
-            source={CATEGORY_IMAGES['general-knowledge']}
+            source={CATEGORY_IMAGES[quiz.category]}
             style={styles.image}
             contentFit="cover"
           />

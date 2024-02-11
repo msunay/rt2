@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { QuestionAnswer, QuizQuestionAnswer, Answer } from '@/types/Types';
-// import style from '@/styles/question.module.css';
+import { QuestionAnswer, Answer } from '@/types/Types';
 import { useAppSelector } from '@/utils/hooks';
-import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function HostQuestion({
   hidden,
@@ -14,28 +14,20 @@ export default function HostQuestion({
   trigger: number;
   quizId: string;
 }) {
-  const currentQuestionNumber = useAppSelector(
-    (state) => state.questionSlice.value
-  );
-  // const [quiz, setQuiz] = useState<QuizQuestionAnswer>(
-  //   {} as QuizQuestionAnswer
-  // );
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
-    {} as QuestionAnswer
-  );
-  const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
-
   const {
     data: quiz,
     error,
     isLoading,
   } = useGetOneQuizQuestionAnswerQuery(quizId);
 
-  // useEffect(() => {
-  //   userApiService.getOneQuizQuestionAnswer(quizId).then((data) => {
-  //     setQuiz(data);
-  //   });
-  // }, []);
+  const currentQuestionNumber = useAppSelector(
+    (state) => state.questionSlice.value
+  );
+
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
+    {} as QuestionAnswer
+  );
+  const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
 
   useEffect(() => {
     if (quiz) {
@@ -65,11 +57,10 @@ export default function HostQuestion({
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
               <Pressable
-                // name="a"
                 key={index}
-                style={styles.answerBtn}
-                // style={`answer${index + 1}`}
-                // onPress={handleAnswerClick}
+                style={({ pressed }) =>
+                  btnPressStyle(pressed, ['silver', 'grey'], styles.answerBtn)
+                }
               >
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
@@ -88,11 +79,9 @@ const styles = StyleSheet.create({
   host_question_container: {
     flex: 1,
     alignItems: 'center',
-    // borderColor: '#FF0000',
-    // borderWidth: 1
   },
   questionTextContainer: {
-    flex: 1
+    flex: 1,
   },
   question_text: {
     fontFamily: 'Nunito-Black',
@@ -112,6 +101,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '50%',
     height: '50%',
-    backgroundColor: 'grey',
   },
 });

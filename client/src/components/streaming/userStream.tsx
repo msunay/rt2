@@ -18,6 +18,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
 import PlayerQuestion from '../question/playerQuestion';
 import { QUIZ_BACKGROUND } from '@/utils/images';
+import FinalScore from '../quiz/finalScore';
 
 export default function UserStream({ partId }: { partId: string }) {
   // const userId = useAppSelector((state) => state.userIdSlice.value);
@@ -129,7 +130,6 @@ export default function UserStream({ partId }: { partId: string }) {
         {/* <Link href="/" style={styles.close_btn}>
           <FontAwesome name="close" size={24} color="black" />
         </Link> */}
-        {/* <canvas className={styles.count_down} id="countdown-canvas"></canvas> */}
         <View style={styles.video_container}>
           <Video
             ref={remoteVideo}
@@ -140,9 +140,7 @@ export default function UserStream({ partId }: { partId: string }) {
         </View>
         {trigger < 11 ? (
           trigger === 10 ? (
-            <>
-            {/* <FinalScore userParticipation={participation} /> */}
-            </>
+            <FinalScore userParticipation={participation!} />
           ) : (
             <View style={styles.question_component_container}>
               {quizStarted && (
@@ -188,10 +186,10 @@ const styles = StyleSheet.create({
   video_container: {},
   video: {},
   question_component_container: {
-      // flex: 1,
-      height: '60%',
-      // borderColor: '#FF0000',
-      // borderWidth: 1,
+    // flex: 1,
+    height: '60%',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
   btn_join: {},
 });

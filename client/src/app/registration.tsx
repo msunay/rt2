@@ -16,6 +16,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ResponseUser, UserPost } from '@/types/Types';
 import { useAppDispatch } from '@/utils/hooks';
 import { setUserId } from '@/features/userIdSlice';
+import { btnPressStyle } from '@/utils/helpers';
 
 export default function RegistrationScreen() {
   const dispatch = useAppDispatch();
@@ -68,12 +69,8 @@ export default function RegistrationScreen() {
     });
   };
 
-  const btnPressStyle = ({ pressed }: { pressed: boolean }) => [
-    {
-      backgroundColor: pressed ? '#ffb296' : '#FF7F50',
-    },
-    styles.loginBtn,
-  ];
+  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
+  btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
@@ -158,7 +155,7 @@ export default function RegistrationScreen() {
             {errors.repeatPassword.message}
           </Text>
         )}
-        <Pressable style={btnPressStyle} onPress={handleSubmit(onRegister)}>
+        <Pressable style={pressableStyle} onPress={handleSubmit(onRegister)}>
           <Text style={styles.btnText}>Register</Text>
         </Pressable>
         <Button
