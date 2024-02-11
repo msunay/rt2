@@ -1,5 +1,5 @@
 import models from '../models/index';
-import { Request, response, Response } from 'express';
+import { Request, Response } from 'express';
 import { tokenGenerator } from '../utils/token';
 import { CustomRequest } from '../middleware/auth';
 import { compareSync } from 'bcrypt';
@@ -76,9 +76,16 @@ async function changePassword(req: Request, res: Response) {
   }
 }
 
-async function getUserId(req: Request, res: Response) {
+async function getUser(req: Request, res: Response) {
   try {
-    const response = (req as CustomRequest).userId;
+    const userId = (req as CustomRequest).userId;
+    const username = (req as CustomRequest).username;
+    const token = (req as CustomRequest).token;
+    const response = {
+      id: userId,
+      username,
+      token
+    }
     res.status(200).send(response);
   } catch (err) {
     console.error('failed to get user id::', err);
@@ -108,7 +115,7 @@ export default {
   getAllUsers,
   changeUsername,
   changePassword,
-  getUserId,
+  getUser,
   getUserDetails,
   userLogin
 };

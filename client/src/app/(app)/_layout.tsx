@@ -1,13 +1,23 @@
 import { Text } from 'react-native';
 import { Redirect, Stack } from 'expo-router';
 import { useSession } from '@/utils/authctx';
-import { useAppSelector } from '@/utils/hooks';
-
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
+import { useGetUserQuery } from '@/services/backendApi';
+// import { useStorageState } from '@/utils/useStorageState';
+import { useEffect } from 'react';
+import { setUserId } from '@/features/userIdSlice';
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
 
-  const id = useAppSelector(state => state.userIdSlice.id)
+  const dispatch = useAppDispatch();
+  const id = useAppSelector((state) => state.userIdSlice.id);
+  const { data } = useGetUserQuery(session!)
+
+  // On reload of app get ID with authToken (session)
+  useEffect(() => {
+    if (!id && data) dispatch(setUserId(data));
+  }, [data]);
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
@@ -21,11 +31,6 @@ export default function AppLayout() {
     // in the headless Node process that the pages are rendered in.
     return <Redirect href="/login" />;
   }
-
-  if (!id) {
-    session
-  }
-
   // This layout can be deferred because it's not the root layout.
   return <Stack screenOptions={{ headerShown: false }} />;
 }

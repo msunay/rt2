@@ -41,7 +41,7 @@ export const backendApi = createApi({
       }),
     }),
 
-    getUserId: build.query<string, string>({
+    getUser: build.query<ResponseUser, string>({
       query: (authToken) => ({
         url: 'userId',
         headers: { Authorization: `Bearer ${authToken}` },
@@ -147,7 +147,7 @@ export const backendApi = createApi({
 export const {
   usePostUserMutation,
   useLoginUserMutation,
-  useGetUserIdQuery,
+  useGetUserQuery,
   useGetUserDetailsQuery,
   useAddDemoQuizMutation,
   useAddFullQuizMutation,

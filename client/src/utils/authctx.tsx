@@ -2,13 +2,11 @@
 import { PropsWithChildren, createContext, useContext } from 'react';
 import { useStorageState } from '@/utils/useStorageState';
 import {
-  useGetUserDetailsQuery,
   useLoginUserMutation,
   usePostUserMutation,
 } from '@/services/backendApi';
-import { LoginCredentials, ResponseUser, User, UserPost } from '@/types/Types';
+import { LoginCredentials, UserPost } from '@/types/Types';
 import { Alert } from 'react-native';
-import { setCurrentUser } from '../features/userSlice';
 
 const AuthContext = createContext<{
   signIn?: ({ username, password }: LoginCredentials) => any;
