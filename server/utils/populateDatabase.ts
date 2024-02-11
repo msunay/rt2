@@ -57,6 +57,7 @@ async function populateDatabase() {
           await question.createAnswer({
             answerText: `Answer ${j} for Question ${i}`,
             isCorrect,
+            answerNumber: j - 1
           });
         }
       }

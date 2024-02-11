@@ -9,9 +9,10 @@ import {
 // import { userApiService } from '@/redux/services/apiService';
 // import style from '@/styles/question.module.css';
 import { useAppSelector } from '@/utils/hooks';
-import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button, GestureResponderEvent, NativeTouchEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   useCreateParticipationAnswerMutation,
+  useGetOneParticipationByPartIdQuery,
   useGetOneQuizQuestionAnswerQuery,
 } from '@/services/backendApi';
 
@@ -84,19 +85,24 @@ export default function PlayerQuestion({
     }
   }, [currentQuestion]);
 
-  async function handleAnswerClick(e: any) {
+  async function handleAnswerClick(index: number) {
     // document
     //   .querySelectorAll('button[name="a"]')
     //   //@ts-ignore
     //   .forEach((btn) => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    const match: number = e.target.className.match(/\w+(\d)/)[1];
-    if (match) {
-      setUserParticipationAnswer({
-        AnswerId: currentAnswers[match - 1].id,
-        ParticipationId: userParticipation.id,
-      } as ParticipationAnswer);
-    }
+    // e.target.classList.add('active');
+    // const match: number = e.target.className.match(/\w+(\d)/)[1];
+    // if (match) {
+    //   setUserParticipationAnswer({
+    //     AnswerId: currentAnswers[match - 1].id,
+    //     ParticipationId: userParticipation.id,
+    //   } as ParticipationAnswer);
+    // }
+    setUserParticipationAnswer({
+      AnswerId: currentAnswers[index].id!,
+      ParticipationId: participation!.id!
+    })
+
   }
 
   function createHandle() {
@@ -121,7 +127,7 @@ export default function PlayerQuestion({
                 key={index}
                 style={styles.answerBtn}
                 // style={`answer${index + 1}`}
-                onPress={handleAnswerClick}
+                onPress={() => handleAnswerClick(index)}
               >
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>

@@ -25,6 +25,7 @@ export async function addDemoQuiz(req: Request, res: Response) {
         question.createAnswer({
           answerText: answer,
           isCorrect: index === correctIndex,
+          answerNumber: index
         });
       });
       await quiz.addQuestion(question);

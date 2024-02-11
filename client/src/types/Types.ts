@@ -47,6 +47,7 @@ export interface Answer {
   id?: string;
   answerText: string;
   isCorrect: boolean;
+  answerNumber: number;
   createdAt?: Date;
   updatedAt?: Date;
   QuestionId?: string;
@@ -89,6 +90,7 @@ export interface QuestionAnswer {
     id: string;
     answerText: string;
     isCorrect: boolean;
+    answerNumber: number;
     createdAt: Date;
     updatedAt: Date;
     QuestionId: string;
@@ -136,6 +138,7 @@ export interface QuizQuestionAnswer {
       id: string;
       answerText: string;
       isCorrect: boolean;
+      answerNumber: number;
       createdAt: Date;
       updatedAt: Date;
       QuestionId: string;

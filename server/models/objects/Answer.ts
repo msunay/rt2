@@ -20,11 +20,11 @@ import {
   Model,
   NonAttribute,
   Sequelize,
-} from "sequelize";
-import type { Participation } from "../reference_tables/Participation";
-import type { Question } from "./Question";
+} from 'sequelize';
+import type { Participation } from '../reference_tables/Participation';
+import type { Question } from './Question';
 
-type AnswerAssociations = "question" | "participations";
+type AnswerAssociations = 'question' | 'participations';
 
 export class Answer extends Model<
   InferAttributes<Answer, { omit: AnswerAssociations }>,
@@ -33,6 +33,7 @@ export class Answer extends Model<
   declare id: CreationOptional<string>;
   declare answerText: string;
   declare isCorrect: boolean;
+  declare answerNumber: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -97,6 +98,10 @@ export class Answer extends Model<
         },
         isCorrect: {
           type: DataTypes.BOOLEAN,
+          allowNull: false,
+        },
+        answerNumber: {
+          type: DataTypes.INTEGER,
           allowNull: false,
         },
         createdAt: {
