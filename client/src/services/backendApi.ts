@@ -67,8 +67,8 @@ export const backendApi = createApi({
       query: (quiz) => ({
         url: 'quiz',
         method: 'POST',
-        body: {...quiz, dateTime: new Date(quiz.dateTime)}
-      })
+        body: { ...quiz, dateTime: new Date(quiz.dateTime) },
+      }),
     }),
 
     getOneQuiz: build.query<Quiz, string>({

@@ -19,6 +19,7 @@ import { Video, ResizeMode } from 'expo-av';
 import PlayerQuestion from '../question/playerQuestion';
 import { QUIZ_BACKGROUND } from '@/utils/images';
 import FinalScore from '../quiz/finalScore';
+import Winners from '../quiz/winners';
 
 export default function UserStream({ partId }: { partId: string }) {
   // const userId = useAppSelector((state) => state.userIdSlice.value);
@@ -140,6 +141,7 @@ export default function UserStream({ partId }: { partId: string }) {
         </View>
         {trigger < 11 ? (
           trigger === 10 ? (
+            //BUG last question not sent to backend before final score registered
             <FinalScore userParticipation={participation!} />
           ) : (
             <View style={styles.question_component_container}>
@@ -153,9 +155,7 @@ export default function UserStream({ partId }: { partId: string }) {
             </View>
           )
         ) : (
-          <>
-            {/* <Winners quizId={participation.QuizId!} partId={partId} /> */}
-          </>
+          <Winners quizId={participation?.QuizId!} />
         )}
 
         {/* <div className="current-question"></div> */}

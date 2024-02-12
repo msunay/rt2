@@ -1,4 +1,4 @@
-import { ImageSource } from "expo-image";
+import { ImageSource } from 'expo-image';
 
 export const CATEGORY_IMAGES: {
   architecture: ImageSource;
@@ -23,15 +23,17 @@ export const CATEGORY_IMAGES: {
   nature: require('../../assets/images/categories/nature.png'),
   science: require('../../assets/images/categories/science.png'),
   tech: require('../../assets/images/categories/tech.png'),
-}
+};
 
 export const QUIZ_BACKGROUND = {
-  background: require('../../assets/quiz-background.png')
-}
+  background: require('../../assets/quiz-background.png'),
+};
 
 export const TILE_IMAGES = {
   createQuiz: require('../../assets/images/tiles/create-quiz-btn.png'),
   joinQuiz: require('../../assets/images/tiles/join-quiz-btn.png'),
   nextQuizBg: require('../../assets/images/tiles/play-next-quiz-bg.svg'),
-  questionBubbles: require('../../assets/images/tiles/question-bubbles.png')
-}
+  questionBubbles: require('../../assets/images/tiles/question-bubbles.png'),
+};
+
+export const LOGO = { logo: require('../../assets/logo.png') };
