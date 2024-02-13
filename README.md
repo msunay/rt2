@@ -8,7 +8,6 @@ Welcome to Real Time Trivia, a platform that enables users to create, host, and 
 - [Technologies Used](#technologies-used)
 - [Features](#features)
 - [Getting Started](#getting-started)
-- [Deployment](#deployment)
 - [Team Members](#team-members)
 
 ## Introduction
@@ -19,12 +18,12 @@ Real Time Trivia is an interactive platform designed to facilitate engaging live
 
 ### Frontend
 
-- **Next.js 13:** A popular React framework offering server-side rendering and other advanced features.
+- **React Native:** A popular React framework offering server-side rendering and other advanced features.
 - **TypeScript:** A statically typed superset of JavaScript that enhances code quality and readability.
 - **Redux Toolkit:** A set of tools for efficient Redux development, managing the application's state.
+- **RTK Query:** A data fetching and caching tool for making API requests.
 - **Web Sockets:** Real-time communication technology for interactive features.
-- **Web RTC:** A technology enabling real-time communication in the browser.
-- **Axios:** A promise-based HTTP client for making API requests.
+- **Web RTC:** A technology enabling live-streaming.
 
 ### Backend
 
@@ -54,44 +53,52 @@ Real Time Trivia is an interactive platform designed to facilitate engaging live
 To begin using Real Time Trivia, follow these steps:
 
 1. Clone this repository.
-  ```
-  git clone https://github.com/msunay/rt2.git
-  ```
+
+```
+git clone https://github.com/msunay/rt2.git
+```
+
 2. Set up the frontend by navigating to the frontend directory and running `npm install`.
-  ```
-  cd rt2/client
-  npm install
-  ```
+
+```
+cd rt2/client
+npm install
+```
+
 3. Similarly, set up the backend by going to the backend directory and running `npm install`.
-  ```
-  cd rt2/server
-  npm install
-  ```
+
+```
+cd rt2/server
+npm install
+```
+
 4. Create a PostgreSQL database for the application and update the connection configuration in the backend's `.env` file.
 5. Obtain and set up JWT secret and other environment variables in the backend's `.env` file.
 6. Start the backend server using `npm run dev` in the backend directory.
-  ```
-  cd rt2/server
-  npm run dev
-  ```
-7. Start the frontend development server using `npm run dev` in the `/frontend` directory.
-  ```
-  cd rt2/client
-  npm run dev
-  ```
-8. Populate the database with mock data.
-  ```
-  cd server
-  npm run populate
-  ```
 
-## Deployment
+```
+cd rt2/server
+npm run dev
+```
 
-The Real Time Trivia application is deployed at [real-time-trivia.app](https://www.real-time-trivia.app). Visit the deployment to experience the quizzes firsthand.
+7. Download Expo Go on your device from either the Android Play Store or iOS App Store.
+8. Start the frontend development server using `npx expo start` in the `/client` directory.
+
+```
+cd rt2/client
+npx expo start
+```
+
+8. Populate the database with mock data by running this command in the `/server` directory.
+
+```
+npm run populate
+```
 
 ## Team Members
 
 Real Time Trivia was developed by a dedicated team of developers:
+
 - Thiago Los [LinkedIn](https://www.linkedin.com/in/thiagolos/)
 - Alex Eze [LinkedIn](https://www.linkedin.com/in/alex-eze-dev/)
 - Atai Ismaiilov [LinkedIn](https://www.linkedin.com/in/atai-ismaiilov-185a0b1a8/)
