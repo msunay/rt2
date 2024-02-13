@@ -81,19 +81,21 @@ cd rt2/server
 npm run dev
 ```
 
-7. Download Expo Go on your device from either the Android Play Store or iOS App Store.
-8. Start the frontend development server using `npx expo start` in the `/client` directory.
+7. Populate the database with mock data by running this command in the `/server` directory.
+
+```
+npm run populate
+```
+8. Download Expo Go on your device from either the Android Play Store or iOS App Store.
+9. Start the frontend development server using `npx expo start` in the `/client` directory.
 
 ```
 cd rt2/client
 npx expo start
 ```
 
-8. Populate the database with mock data by running this command in the `/server` directory.
+10. Scan the QR code with either the Expo Go app (on Android) or with your camera (on IOS) to open the app
 
-```
-npm run populate
-```
 
 ## Team Members
 
