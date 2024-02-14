@@ -35,9 +35,9 @@ async function populateDatabase() {
       const quiz = await models.Quiz.create({
         id: mocks.quizIdArray[i],
         quizName: `Mock Quiz ${i}`,
-        quizOwner: mocks.hosts[0].id,
-        category: 'general-knowledge',
-        dateTime: moment().add(i, 'days').toDate(),
+        quizOwner: mocks.hosts[Math.round(Math.random() * mocks.hosts.length)].id,
+        category: mocks.categories[Math.round(Math.random() * mocks.categories.length)],
+        dateTime: moment().add(i + 1, 'days').toDate(),
       });
 
       // Create questions and answers
