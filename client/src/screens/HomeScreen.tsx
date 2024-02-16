@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
-import HomeDiscover from '@/components/homeScreen/homeDiscover';
-import HomeCatagories from '@/components/homeScreen/homeCatagories';
+import HomeDiscover from '@/components/lists/homeDiscover';
+import HomeCatagories from '@/components/lists/homeCatagories';
 import { useGetUserDetailsQuery } from '@/services/backendApi';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { setCurrentUser } from '@/features/userSlice';

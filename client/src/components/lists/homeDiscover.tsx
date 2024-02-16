@@ -1,19 +1,14 @@
 import {
   Dimensions,
   FlatList,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
-import { CATEGORY_IMAGES } from '@/utils/images';
-import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
-import { CATEGORIES } from '@/utils/consts';
+import HomeDiscoverCard from '../cards/homeDiscoverCard';
 
 export default function HomeDiscover() {
   const { data, error, isFetching, isLoading, refetch } =
@@ -34,17 +29,7 @@ export default function HomeDiscover() {
   }, [data]);
 
   const renderItem = ({ item }: { item: Quiz }) => (
-    <View key={item.id} style={styles.quizCardContainer}>
-      <View style={styles.quizCard}>
-        <Image
-          style={styles.images}
-          source={CATEGORY_IMAGES[item.category]}
-          contentFit="cover"
-        />
-        <Text style={styles.cardTextTitle}>{item.quizName}</Text>
-        <Text style={styles.cardText}>{CATEGORIES[item.category]}</Text>
-      </View>
-    </View>
+    <HomeDiscoverCard quiz={item} />
   );
 
   return (
@@ -90,51 +75,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#FF7F50',
   },
-  // scrollView: {
-  //   height: '100%',
-  // },
-  // listContainer: {
-  // },
   listContainer: {
     // height: '100%',
     height: '80%',
     width: Dimensions.get('window').width
   },
-  quizCardContainer: {
-    // flex: 1,
-    // width: 290,
-    shadowColor: '#000000',
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.2,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    marginRight: 8,
-  },
-  quizCard: {
-    flex: 1,
-    height: '100%',
-    margin: 10,
-  },
-  cardTextTitle: {
-    // flex: 1,
-    fontFamily: 'Nunito-Black',
-    // maxHeight: 25,
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
-  },
-  cardText: {
-    fontFamily: 'Nunito-Regular',
-  },
+
   cardContainer: {
     overflow: 'scroll',
     height: '60%',
     paddingVertical: 10,
     flexDirection: 'row',
-  },
-  images: {
-    // flex: 1,
-    width: 170,
-    height: 100,
-    borderRadius: 10,
   },
 });

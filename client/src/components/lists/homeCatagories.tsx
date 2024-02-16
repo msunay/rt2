@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import CategoryQuizCard from './categoryQuizCard';
+import CategoryQuizCard from '../cards/categoryQuizCard';
 import { FlashList } from '@shopify/flash-list';
 
 export default function HomeCatagories() {

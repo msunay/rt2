@@ -19,7 +19,7 @@ import {
 const BASE_URL: string =
   process.env.NODE_ENV === 'production'
     ? process.env.BACKEND_URL!
-    : 'http://192.168.0.214:3001/';
+    : process.env.EXPO_PUBLIC_LOCAL_IP!;
 
 export const backendApi = createApi({
   reducerPath: 'backendApi',

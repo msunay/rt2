@@ -2,7 +2,7 @@ import { RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
-import DiscoverQuizCard from '@/components/quiz/discoverQuizCard';
+import DiscoverQuizCard from '@/components/cards/discoverQuizCard';
 import { useEffect, useState } from 'react';
 
 export default function DiscoverScreen() {

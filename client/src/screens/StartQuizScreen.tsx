@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
-import ParticipationQuizCard from '@/components/quiz/participationQuizCard';
+import ParticipationQuizCard from '@/components/cards/participationQuizCard';
 import { useAppSelector } from '@/utils/hooks';
 import { SafeAreaView } from 'react-native-safe-area-context';
 

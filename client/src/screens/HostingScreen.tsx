@@ -4,7 +4,7 @@ import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/utils/hooks';
-import HostingQuizCard from '@/components/quiz/hostingQuizCard';
+import HostingQuizCard from '@/components/cards/hostingQuizCard';
 
 export default function HostingScreen() {
   const { data, error, isFetching, isSuccess, refetch } =
