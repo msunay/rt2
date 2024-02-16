@@ -5,6 +5,7 @@ import { Quiz } from '@/types/Types';
 import { format } from 'date-fns';
 import { Image, ImageBackground } from 'expo-image';
 import { TILE_IMAGES } from '@/utils/images';
+import { CATEGORIES } from '@/utils/consts';
 
 export default function PlayNextQuizBtn() {
   const { data, error, isLoading } = useGetAllQuizzesQuery();
@@ -38,7 +39,7 @@ export default function PlayNextQuizBtn() {
       </View>
       <View style={styles.nextQuizDetails}>
         <Text style={styles.detailsText}>{nextQuiz && nextQuiz.quizName}</Text>
-        <Text style={styles.detailsText}>{nextQuiz && nextQuiz.category}</Text>
+        <Text style={styles.detailsText}>{nextQuiz && CATEGORIES[nextQuiz.category]}</Text>
         <Text style={styles.detailsText}>
           {nextQuiz && format(nextQuiz.dateTime, 'PPPp')}
         </Text>

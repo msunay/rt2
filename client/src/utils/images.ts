@@ -2,6 +2,7 @@ import { ImageSource } from 'expo-image';
 
 export const CATEGORY_IMAGES: {
   architecture: ImageSource;
+  culture: ImageSource;
   environment: ImageSource;
   food: ImageSource;
   'general-knowledge': ImageSource;
@@ -14,6 +15,7 @@ export const CATEGORY_IMAGES: {
   [key: string]: ImageSource;
 } = {
   architecture: require('../../assets/images/categories/architecture.png'),
+  culture: require('../../assets/images/categories/culture.png'),
   environment: require('../../assets/images/categories/environment.png'),
   food: require('../../assets/images/categories/food.png'),
   'general-knowledge': require('../../assets/images/categories/general-knowledge.png'),

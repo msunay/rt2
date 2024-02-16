@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   FlatList,
   RefreshControl,
   ScrollView,
@@ -12,6 +13,7 @@ import { Quiz } from '@/types/Types';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
+import { CATEGORIES } from '@/utils/consts';
 
 export default function HomeDiscover() {
   const { data, error, isFetching, isLoading, refetch } =
@@ -39,8 +41,8 @@ export default function HomeDiscover() {
           source={CATEGORY_IMAGES[item.category]}
           contentFit="cover"
         />
-        <Text style={styles.cardText}>{item.quizName}</Text>
-        <Text style={styles.cardText}>{item.category}</Text>
+        <Text style={styles.cardTextTitle}>{item.quizName}</Text>
+        <Text style={styles.cardText}>{CATEGORIES[item.category]}</Text>
       </View>
     </View>
   );
@@ -53,49 +55,15 @@ export default function HomeDiscover() {
           <Text style={styles.h2}>View All {'->'}</Text>
         </View>
       </View>
-      {/* <View style={styles.listContainer}> */}
+      <View style={styles.listContainer}>
         <FlatList
           data={sortedList}
           renderItem={renderItem}
           horizontal
-          // contentContainerStyle={{}}
-          // disableHorizontalListHeightMeasurement={true}
-          // style={styles.list}
-          // estimatedItemSize={187}
           onRefresh={() => refetch()}
           refreshing={isFetching}
-          // refreshControl={
-          //   <RefreshControl
-          //   />
-          // }
         />
-      {/* <ScrollView
-        contentContainerStyle={styles.cardContainer}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        style={styles.scrollView}
-      >
-        {error ? (
-          <Text>Oh no, there was an error</Text>
-        ) : isLoading ? (
-          <Text>Loading...</Text>
-        ) : data ? (
-          data.map((quiz: Quiz) => (
-            <View key={quiz.id} style={styles.quizCardContainer}>
-              <View style={styles.quizCard}>
-                <Image
-                  style={styles.images}
-                  source={CATEGORY_IMAGES[quiz.category]}
-                  contentFit='cover'
-                />
-                <Text>{quiz.quizName}</Text>
-                <Text>{quiz.category}</Text>
-              </View>
-            </View>
-          ))
-        ) : null}
-      </ScrollView> */}
-      {/* </View> */}
+      </View>
     </View>
   );
 }
@@ -105,7 +73,9 @@ const styles = StyleSheet.create({
     // flex: 1,
     height: '100%',
     // width: '103.5%',
-      overflow: 'visible'
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+    overflow: 'visible'
   },
   discoverTitleLine: {
     flexDirection: 'row',
@@ -125,10 +95,14 @@ const styles = StyleSheet.create({
   // },
   // listContainer: {
   // },
+  listContainer: {
+    // height: '100%',
+    height: '80%',
+    width: Dimensions.get('window').width
+  },
   quizCardContainer: {
     // flex: 1,
     // width: 290,
-    height: '70%',
     shadowColor: '#000000',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.2,
@@ -141,11 +115,15 @@ const styles = StyleSheet.create({
     height: '100%',
     margin: 10,
   },
-  cardText: {
+  cardTextTitle: {
     // flex: 1,
+    fontFamily: 'Nunito-Black',
     // maxHeight: 25,
     // borderColor: '#FF0000',
     // borderWidth: 1,
+  },
+  cardText: {
+    fontFamily: 'Nunito-Regular',
   },
   cardContainer: {
     overflow: 'scroll',

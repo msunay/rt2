@@ -31,6 +31,7 @@ export default function HomeScreen() {
         <View style={styles.catagoriesContainer}>
           <HomeCatagories />
         </View>
+        <View style={styles.footerSpace}></View>
       </View>
       <StatusBar style="auto" />
     </View>
@@ -56,12 +57,20 @@ const styles = StyleSheet.create({
     flex: 1,
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
+    marginBottom: 15
   },
   discoverContainer: {
-    flex: 2,
+    flex: 1.5,
   },
   catagoriesContainer: {
     flex: 1,
-    marginBottom: 40,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+    // marginBottom: 40,
+  },
+  footerSpace: {
+    flex: 0.7,
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
 });

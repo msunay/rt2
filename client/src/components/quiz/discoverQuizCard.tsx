@@ -11,7 +11,11 @@ import {
 import { formatDistance } from 'date-fns';
 import { Entypo, AntDesign } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
-import { addToParticipatingList, removeFromParticipatingList } from '@/features/participatingSlice';
+import {
+  addToParticipatingList,
+  removeFromParticipatingList,
+} from '@/features/participatingSlice';
+import { CATEGORIES } from '@/utils/consts';
 
 export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
@@ -22,26 +26,28 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
   const [deleteParticipation] = useDeleteParticipationMutation();
 
   const id = useAppSelector((state) => state.userIdSlice.id);
-  const participatingList = useAppSelector((state) => state.participatingSlice.value)
+  const participatingList = useAppSelector(
+    (state) => state.participatingSlice.value
+  );
 
   const dispatch = useAppDispatch();
 
   const onPress = () => {
     if (participating) {
-      deleteParticipation({ quizId: quiz.id!, userId: id })
+      deleteParticipation({ quizId: quiz.id!, userId: id });
       dispatch(removeFromParticipatingList(quiz));
     } else {
       createParticipation({ quizId: quiz.id!, userId: id });
-      dispatch(addToParticipatingList(quiz))
+      dispatch(addToParticipatingList(quiz));
     }
-    setParticipating(prev => !prev);
+    setParticipating((prev) => !prev);
   };
 
   useEffect(() => {
     participatingList.forEach((q) => {
       if (q.id === quiz.id) setParticipating(true);
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -54,7 +60,7 @@ export default function DiscoverQuizCard({ quiz }: { quiz: Quiz }) {
       </View>
       <View style={styles.detailsContainer}>
         <Text style={styles.quizName}>{quiz.quizName}</Text>
-        <Text style={styles.category}>{quiz.category}</Text>
+        <Text style={styles.category}>{CATEGORIES[quiz.category]}</Text>
         <Text style={styles.category}>{host?.username}</Text>
         <Text style={styles.category}>
           {formatDistance(quiz.dateTime, Date.now(), { addSuffix: true })}

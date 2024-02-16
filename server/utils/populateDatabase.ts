@@ -16,7 +16,9 @@ import mocks from './mocks';
 
 async function addMockUsers() {
   try {
-    await models.User.create(mocks.hosts[0]);
+    mocks.hosts.forEach(async (host) => {
+      await models.User.create(host);
+    });
 
     mocks.players.forEach(async (player) => {
       await models.User.create(player);
@@ -35,8 +37,8 @@ async function populateDatabase() {
       const quiz = await models.Quiz.create({
         id: mocks.quizIdArray[i],
         quizName: `Mock Quiz ${i}`,
-        quizOwner: mocks.hosts[Math.round(Math.random() * mocks.hosts.length)].id,
-        category: mocks.categories[Math.round(Math.random() * mocks.categories.length)],
+        quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
+        category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
         dateTime: moment().add(i + 1, 'days').toDate(),
       });
 

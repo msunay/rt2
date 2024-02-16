@@ -46,6 +46,7 @@ export default function HostingScreen() {
               refreshing={isFetching}
             />
           }
+          ListFooterComponent={<View style={styles.listFooter}></View>}
         />
       </View>
     </View>
@@ -67,4 +68,7 @@ const styles = StyleSheet.create({
     flex: 10,
     width: '100%',
   },
+  listFooter: {
+    height: 100
+  }
 });
