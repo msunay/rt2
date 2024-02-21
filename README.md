@@ -68,7 +68,7 @@ npm install
 
 ```
 cd client
-cp .env.example .env
+cp .env.example .env.local
 ```
 4. Similarly, set up the backend by going to the backend directory and running `npm install`.
 
