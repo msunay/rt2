@@ -64,7 +64,7 @@ git clone https://github.com/msunay/rt2.git
 cd rt2/client
 npm install
 ```
-3. Whilst in `/client` copy `.env.example` to a `.env` file and fill in variables (You can find your local by continuing through to step 10 to see the ip Metro is using when the expo server is started).
+3. Whilst in `/client` copy `.env.example` to a `.env.local` file and fill in variables (You can find your local by continuing through to step 10 to see the ip Metro is using when the expo server is running).
 
 ```
 cd client
