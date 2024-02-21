@@ -1,7 +1,8 @@
-import jwt, { Secret, JwtPayload } from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-export const SECRET_KEY: Secret = "SECRET_KEY_TOKEN";
+const SECRET_KEY: Secret =
+  process.env.NODE_ENV === 'production' ? '' : process.env.JWT_SECRET_KEY!; //TODO production secret key
 
 export interface CustomRequest extends Request {
   token: string | JwtPayload;
@@ -19,14 +20,14 @@ interface Token {
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
       throw new Error();
     }
 
     const tokenObject = jwt.decode(token) as Token;
     const decoded = jwt.verify(token, SECRET_KEY);
-//NOTE what is quiz id doing here
+    //NOTE what is quiz id doing here
     (req as CustomRequest).userId = tokenObject.id;
     (req as CustomRequest).username = tokenObject.username;
     (req as CustomRequest).token = decoded;
@@ -34,6 +35,6 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 
     next();
   } catch (err) {
-    res.status(401).send("Please authenticate");
+    res.status(401).send('Please authenticate');
   }
 };
