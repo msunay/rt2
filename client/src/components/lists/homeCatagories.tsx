@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import CategoryQuizCard from '../cards/categoryQuizCard';
-import { FlashList } from '@shopify/flash-list';
 
 export default function HomeCatagories() {
   const [topCategories, setTopCategories] = useState([
@@ -28,12 +27,6 @@ export default function HomeCatagories() {
         ))
         }
       </View>
-      {/* <FlatList
-        data={topCategories}
-        renderItem={renderItem}
-        horizontal
-        // estimatedItemSize={187}
-      /> */}
     </View>
   );
 }

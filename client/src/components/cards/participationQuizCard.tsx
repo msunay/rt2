@@ -11,11 +11,17 @@ import { useAppSelector } from '@/utils/hooks';
 import { Link } from 'expo-router';
 
 export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
+  // Fetches the host's details for the quiz using the quiz owner's ID.
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
+  // Retrieves the current user's ID from the Redux state.
   const id = useAppSelector((state) => state.userIdSlice.id);
 
-  const { data: participation } = useGetOneParticipationQuery({userId: id, quizId: quiz.id!})
+  // Fetches participation details for the current user and the specific quiz.
+  const { data: participation } = useGetOneParticipationQuery({
+    userId: id,
+    quizId: quiz.id!,
+  });
 
   return (
     <Link

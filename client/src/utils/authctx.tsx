@@ -8,6 +8,7 @@ import {
 import { LoginCredentials, UserPost } from '@/types/Types';
 import { Alert } from 'react-native';
 
+// Create context to hold session data and functions
 const AuthContext = createContext<{
   signIn?: ({ username, password }: LoginCredentials) => any;
   register?: ({ email, username, password }: UserPost) => any;
@@ -20,13 +21,14 @@ const AuthContext = createContext<{
   isLoading: false,
 });
 
-// This hook can be used to access the user info.
+// This hook can be used to access the user info through the auth context.
 export function useSession() {
   const value = useContext(AuthContext);
 
   return value;
 }
 
+// Provider for session context to be used at root
 export function SessionProvider(props: PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState('session');
   const [sendCredentials] = useLoginUserMutation();
@@ -34,7 +36,7 @@ export function SessionProvider(props: PropsWithChildren) {
 
   const signIn = async ({ username, password }: LoginCredentials) => {
     return await sendCredentials({ username, password })
-      .unwrap()
+      .unwrap() // Use result of sendCredentials mutation
       .then(async (res) => {
         setSession(res.token); // Set session state with token
         return res;
@@ -48,7 +50,7 @@ export function SessionProvider(props: PropsWithChildren) {
 
   const register = async ({ email, username, password }: UserPost) => {
     return await postCredentials({ email, username, password })
-      .unwrap()
+      .unwrap() // Use result of postCredentials mutation
       .then(async (res) => {
         setSession(res.token); // Set session state with token
         return res;

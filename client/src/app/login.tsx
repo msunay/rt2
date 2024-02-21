@@ -19,15 +19,17 @@ import { setUserId } from '@/features/userIdSlice';
 import { btnPressStyle } from '@/utils/helpers';
 
 export default function LoginScreen() {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch(); // Hook to dispatch actions to Redux store.
 
-  const { signIn } = useSession();
+  const { signIn } = useSession(); // Custom hook to access signIn method for authentication.
 
+  // Schema for login form validation using yup.
   let loginSchema = object().shape({
     username: string().required('Please enter username'),
     password: string().required('Please enter password'),
   });
 
+  // Setup useForm hook with yupResolver for schema validation and default form values.
   const {
     control,
     handleSubmit,
@@ -40,16 +42,18 @@ export default function LoginScreen() {
     },
   });
 
+  // Function to handle login form submission.
   const onLogin = (formData: LoginCredentials) => {
     signIn!({
       username: formData.username,
       password: formData.password,
     }).then((res: ResponseUser) => {
-      dispatch(setUserId(res));
-      router.replace('/');
+      dispatch(setUserId(res)); // Dispatch action to store user ID in Redux store.
+      router.replace('/'); // Navigate to home screen upon successful login.
     });
   };
 
+  // Function to dynamically adjust Pressable component style based on press state.
   const pressableStyle = ({ pressed }: { pressed: boolean }) =>
     btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 

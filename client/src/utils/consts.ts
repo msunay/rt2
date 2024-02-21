@@ -1,3 +1,4 @@
+// Object to convert stored category strings to displayed category strings
 export const CATEGORIES: {
   architecture: string;
   culture: string;

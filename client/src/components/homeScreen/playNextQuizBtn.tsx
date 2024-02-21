@@ -8,10 +8,13 @@ import { TILE_IMAGES } from '@/utils/images';
 import { CATEGORIES } from '@/utils/consts';
 
 export default function PlayNextQuizBtn() {
+  // Fetch all quizzes.
   const { data, error, isLoading } = useGetAllQuizzesQuery();
 
+  // Local state to hold the next upcoming quiz.
   const [nextQuiz, setNextQuiz] = useState<Quiz>();
 
+  // Sort all quizzes in chronological order an set the first quiz as next quiz.
   useEffect(() => {
     if (data) {
       const sorted = [...data];
@@ -39,7 +42,9 @@ export default function PlayNextQuizBtn() {
       </View>
       <View style={styles.nextQuizDetails}>
         <Text style={styles.detailsText}>{nextQuiz && nextQuiz.quizName}</Text>
-        <Text style={styles.detailsText}>{nextQuiz && CATEGORIES[nextQuiz.category]}</Text>
+        <Text style={styles.detailsText}>
+          {nextQuiz && CATEGORIES[nextQuiz.category]}
+        </Text>
         <Text style={styles.detailsText}>
           {nextQuiz && format(nextQuiz.dateTime, 'PPPp')}
         </Text>

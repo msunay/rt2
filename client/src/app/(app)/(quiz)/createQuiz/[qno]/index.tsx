@@ -23,26 +23,34 @@ import { useAddFullQuizMutation } from '@/services/backendApi';
 import { btnPressStyle } from '@/utils/helpers';
 
 export default function QuizContent() {
+  // Retrieve the query parameter 'qno' (question number) from the URL.
   const { qno } = useLocalSearchParams<{ qno: string }>();
+  // Convert the question number to an integer for internal logic.
   const questionNum = parseInt(qno!);
 
+  // Use Redux's useDispatch hook for dispatching actions.
   const dispatch = useAppDispatch();
+  // Retrieve the current state of the quiz creation from the Redux store.
   const quizState = useAppSelector((state) => state.quizCreationSlice);
 
+  // Hook to call the mutation for submitting the full quiz.
   const [submitFullQuiz, { isSuccess }] = useAddFullQuizMutation();
 
+  // Refs for input fields to manage focus.
   const ref_input2 = useRef<TextInput>(null);
   const ref_input3 = useRef<TextInput>(null);
   const ref_input4 = useRef<TextInput>(null);
 
+  // Define a schema for question and answer validation using Yup.
   let questionSchema = object().shape({
-    questionText: string().required('Please fill in field'),
-    answer1: string().required('Please fill in field'),
-    answer2: string().required('Please fill in field'),
-    answer3: string().required('Please fill in field'),
-    answer4: string().required('Please fill in field'),
+    questionText: string().required('Please fill in field'), // Validation for question text.
+    answer1: string().required('Please fill in field'), // Validation for answer 1 (correct answer).
+    answer2: string().required('Please fill in field'), // Validation for answer 2.
+    answer3: string().required('Please fill in field'), // Validation for answer 3.
+    answer4: string().required('Please fill in field'), // Validation for answer 4.
   });
 
+  // Setup useForm hook with yupResolver for schema validation and default form values.
   const {
     control,
     handleSubmit,
@@ -58,6 +66,7 @@ export default function QuizContent() {
     },
   });
 
+  // Function to store the current question and its answers in the Redux store.
   const storeQuestion = ({
     questionText,
     answer1,
@@ -74,9 +83,9 @@ export default function QuizContent() {
     dispatch(
       addQuestionWithAnswers({
         questionText,
-        positionInQuiz: questionNum,
+        positionInQuiz: questionNum, // Position of the question within the quiz.
         Answers: [
-          { answerText: answer1, isCorrect: true },
+          { answerText: answer1, isCorrect: true }, // Mark the first answer as correct.
           { answerText: answer2, isCorrect: false },
           { answerText: answer3, isCorrect: false },
           { answerText: answer4, isCorrect: false },
@@ -84,24 +93,26 @@ export default function QuizContent() {
       })
     );
 
+    // Navigate to the next question in the quiz creation process.
     router.navigate({
       pathname: '/createQuiz/[qno]',
       params: { qno: questionNum + 1 },
     });
   };
 
+  // Function to submit the entire quiz.
   const submitQuiz = (e: GestureResponderEvent) => {
     submitFullQuiz(quizState).then(() => {
-      dispatch(resetQuizStore());
-      router.navigate('/');
+      dispatch(resetQuizStore()); // Reset the quiz creation state in the store.
+      router.navigate('/'); // Navigate to the home page after submission.
     });
   };
 
   const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-  btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
+    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
+  // If 10 questions have been created show preview of whole quiz and submit button.
   if (questionNum === 11) {
-    // console.log(console.log(JSON.stringify(quizState, null, 2)));
     return (
       <SafeAreaView edges={['top', 'bottom']} style={styles.background}>
         <ScrollView>
@@ -222,18 +233,9 @@ export default function QuizContent() {
             <Text style={styles.validationError}>{errors.answer4.message}</Text>
           )}
         </View>
-        {/* <Link
-          style={styles.loginBtn}
-          href={{
-            pathname: '/createQuiz/[qno]',
-            params: { qno: questionNum + 1 },
-          }}
-          asChild
-          > */}
         <Pressable style={pressableStyle} onPress={handleSubmit(storeQuestion)}>
           <Text style={styles.btnText}>Next</Text>
         </Pressable>
-        {/* </Link> */}
       </Pressable>
     </SafeAreaView>
   );

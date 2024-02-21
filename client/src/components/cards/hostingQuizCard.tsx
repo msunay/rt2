@@ -9,6 +9,7 @@ import { formatDistance } from 'date-fns';
 import { Link } from 'expo-router';
 
 export default function HostingQuizCard({ quiz }: { quiz: Quiz }) {
+  // Fetches the host's details for the quiz using the quiz owner's ID.
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
   return (

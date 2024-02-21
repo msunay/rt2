@@ -7,31 +7,39 @@ import { useAppSelector } from '@/utils/hooks';
 import HostingQuizCard from '@/components/cards/hostingQuizCard';
 
 export default function HostingScreen() {
+  // Fetch all quizzes.
   const { data, error, isFetching, isSuccess, refetch } =
     useGetAllQuizzesQuery();
+  // Retrieves the current user's ID from the Redux state, to filter quizzes by the quiz owner.
   const id = useAppSelector((state) => state.userIdSlice.id);
 
+  // State to hold the sorted list of quizzes that the current user is hosting.
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
 
+  // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
     return <HostingQuizCard quiz={item} />;
   };
 
+  // Effect hook to sort and filter quizzes once the data is successfully fetched.
+  // It sorts quizzes by dateTime and filters them to include only those hosted by the current user.
   useEffect(() => {
     if (data && isSuccess) {
+      // Copy fetched quizzes to sort as data is immutable.
       const sorted = [...data];
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime()
+          new Date(quizB.dateTime).getTime() // Sorting by ascending date and time.
       );
+      // Filter sorted quizzes to include only those hosted by the current user and update state.
       sorted.forEach((quiz) => {
         if (quiz.quizOwner === id) {
           setSortedList((prevList) => [...prevList, quiz]);
         }
       });
     }
-  }, [data]);
+  }, [data, id, isSuccess]);
 
   return (
     <View style={styles.container}>
@@ -69,6 +77,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   listFooter: {
-    height: 100
-  }
+    height: 100,
+  },
 });

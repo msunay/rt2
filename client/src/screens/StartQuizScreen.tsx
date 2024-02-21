@@ -7,24 +7,31 @@ import { useAppSelector } from '@/utils/hooks';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function StartQuizScreen() {
+  // Selector to retrieve the list of quizzes the user is participating in from the Redux state.
   const participationList = useAppSelector(
     (state) => state.participatingSlice.value
   );
 
+  // State to hold the sorted list of participation quizzes.
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
 
+  // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
     return <ParticipationQuizCard quiz={item} />;
   };
 
+  // Effect hook to sort the participation quizzes by their dateTime in ascending order once the participationList updates.
   useEffect(() => {
     if (participationList) {
+      // Clone the participation list to avoid mutating the original array.
       const sorted = [...participationList];
+      // Sort the cloned array based on the dateTime of each quiz.
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime()
       );
+      // Update the sortedList state with the sorted quizzes.
       setSortedList(sorted);
     }
   }, [participationList]);

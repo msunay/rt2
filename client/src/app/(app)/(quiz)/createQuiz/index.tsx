@@ -20,26 +20,31 @@ import { router } from 'expo-router';
 import { addQuizData } from '@/features/quizCreationSlice';
 import { btnPressStyle } from '@/utils/helpers';
 
-
 export default function CreateQuiz() {
+  // Hook to initiate adding a new quiz, utilizing a mutation function from RTK Query.
   const [addQuiz] = useAddDemoQuizMutation();
+  // Use Redux's useDispatch hook to dispatch actions.
   const dispatch = useAppDispatch();
 
+  // State for managing the selected category image with default set to 'general-knowledge'.
   const [catagoryImage, setCatagoryImage] = useState<ImageSource>(
     CATEGORY_IMAGES['general-knowledge']
   );
 
+  // Retrieve the current user's ID from the Redux store using a selector.
   const id = useAppSelector((state) => state.userIdSlice.id);
 
+  // Define a schema for quiz creation form validation using Yup.
   let quizSchema = object().shape({
-    quizName: string().required('Please fill in field'),
-    category: string().required('Please fill in field'),
+    quizName: string().required('Please fill in field'), // Quiz name is required.
+    category: string().required('Please fill in field'), // Category is required.
     dateTime: date()
-      .required()
-      .default(() => new Date(Date.now() + 120000))
+      .required() // Date and time for the quiz must be set and be in the future.
+      .default(() => new Date(Date.now() + 120000)) // Default to 2 minutes in the future.
       .min(new Date(Date.now()), 'please set a future time'),
   });
 
+  // Setup useForm hook with yupResolver for schema validation and default form values.
   const {
     control,
     handleSubmit,
@@ -51,16 +56,19 @@ export default function CreateQuiz() {
     defaultValues: {
       quizName: '',
       category: 'architecture',
-      dateTime: new Date(Date.now() + 120000),
+      dateTime: new Date(Date.now() + 120000), // Default dateTime set to 2 minutes in the future.
     },
   });
 
+  // Watch the category field in the form to update the category image when it changes.
   const watchCatagory = watch('category');
 
+  // Update category image based on the selected category from the form.
   useEffect(() => {
     setCatagoryImage(CATEGORY_IMAGES[watchCatagory]);
   }, [watchCatagory]);
 
+  // Function to handle quiz creation submission.
   const createQuiz = ({
     quizName,
     category,
@@ -75,9 +83,10 @@ export default function CreateQuiz() {
       category,
       startTime: dateTime,
       ownerId: id,
-    }).then((quiz) => console.log('Create Quiz Response: ', quiz));
+    })
   };
 
+  // Function to store quiz details in the Redux store and navigate to quiz creation page.
   const storeQuizDetails = ({
     quizName,
     category,
@@ -87,11 +96,18 @@ export default function CreateQuiz() {
     category: string;
     dateTime: Date;
   }) => {
-    dispatch(addQuizData({ quizName, category, dateTime: dateTime.toISOString(), quizOwner: id }));
+    dispatch(
+      addQuizData({
+        quizName,
+        category,
+        dateTime: dateTime.toISOString(),
+        quizOwner: id,
+      })
+    );
     router.navigate({
       pathname: '/createQuiz/[qno]',
-      params: { qno: 1 },
-    })
+      params: { qno: 1 }, // Navigate to the first question of the quiz creation process.
+    });
   };
 
   const pressableStyle = ({ pressed }: { pressed: boolean }) =>
@@ -176,7 +192,10 @@ export default function CreateQuiz() {
         <Pressable style={pressableStyle} onPress={handleSubmit(createQuiz)}>
           <Text style={styles.btnText}>Create Demo Quiz</Text>
         </Pressable>
-        <Pressable style={pressableStyle} onPress={handleSubmit(storeQuizDetails)}>
+        <Pressable
+          style={pressableStyle}
+          onPress={handleSubmit(storeQuizDetails)}
+        >
           <Text style={styles.btnText}>Create Full Quiz</Text>
         </Pressable>
       </View>

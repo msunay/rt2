@@ -64,37 +64,47 @@ git clone https://github.com/msunay/rt2.git
 cd rt2/client
 npm install
 ```
+3. Whilst in `/client` copy `.env.example` to a `.env` file and fill in variables (You can find your local by continuing through to step 10 to see the ip Metro is using when the expo server is started).
 
-3. Similarly, set up the backend by going to the backend directory and running `npm install`.
+```
+cd client
+cp .env.example .env
+```
+4. Similarly, set up the backend by going to the backend directory and running `npm install`.
 
 ```
 cd rt2/server
 npm install
 ```
 
-4. Create a PostgreSQL database for the application and update the connection configuration in the backend's `.env` file.
-5. Obtain and set up JWT secret and other environment variables in the backend's `.env` file.
-6. Start the backend server using `npm run dev` in the backend directory.
+5. Create a PostgreSQL database for the application.
+6. Whilst in `/server` copy `.env.example` to a `.env` file and fill in variables.
+
+```
+cd server
+cp .env.example .env
+```
+7. Start the backend server using `npm run dev` in the backend directory.
 
 ```
 cd rt2/server
 npm run dev
 ```
 
-7. Populate the database with mock data by running this command in the `/server` directory.
+8. Populate the database with mock data by running this command in the `/server` directory.
 
 ```
 npm run populate
 ```
-8. Download Expo Go on your device from either the Android Play Store or iOS App Store.
-9. Start the frontend development server using `npx expo start` in the `/client` directory.
+9. Download Expo Go on your device from either the Android Play Store or iOS App Store.
+10. Start the frontend development server using `npx expo start` in the `/client` directory.
 
 ```
 cd rt2/client
 npx expo start
 ```
 
-10. Scan the QR code with either the Expo Go app (on Android) or with your camera (on IOS) to open the app
+11. Scan the QR code with either the Expo Go app (on Android) or with your camera (on IOS) to open the app
 
 
 ## Team Members

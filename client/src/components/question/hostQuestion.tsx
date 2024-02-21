@@ -14,33 +14,41 @@ export default function HostQuestion({
   trigger: number;
   quizId: string;
 }) {
+  // Fetch quiz by its ID, including questions and answers.
   const {
     data: quiz,
     error,
     isLoading,
   } = useGetOneQuizQuestionAnswerQuery(quizId);
 
+  // Access the current question number from the Redux state.
   const currentQuestionNumber = useAppSelector(
     (state) => state.questionSlice.value
   );
 
+  // State to hold the current question object.
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
     {} as QuestionAnswer
   );
+  // State to hold the answers of the current question.
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
 
+  // Effect hook to set the current question based on the quiz data and the current question number.
   useEffect(() => {
     if (quiz) {
+      // Find the question in the quiz data that matches the current question number.
       setCurrentQuestion(
         quiz.Questions.find(
           (question) => question.positionInQuiz === currentQuestionNumber
         )!
       );
     }
-  }, [quiz, trigger]);
+  }, [quiz, currentQuestionNumber]);
 
+  // Effect hook to update the current answers state when the current question changes.
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
+      // Set the current answers to the answers of the current question.
       setCurrentAnswers(currentQuestion.Answers);
     }
   }, [currentQuestion]);

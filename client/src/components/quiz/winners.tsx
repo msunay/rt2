@@ -4,9 +4,12 @@ import { useGetWinnersQuery } from '@/services/backendApi';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Winners({ quizId }: { quizId: string }) {
+  // Fetch all users with the top score
   const { data } = useGetWinnersQuery(quizId);
+  // Local state to hold winners
   const [winnerList, setWinnerList] = useState<Winner[]>([]);
 
+  // Effect hook to set winnerList state
   useEffect(() => {
     if (data) {
       setWinnerList(data);

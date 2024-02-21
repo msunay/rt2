@@ -19,25 +19,30 @@ import { setUserId } from '@/features/userIdSlice';
 import { btnPressStyle } from '@/utils/helpers';
 
 export default function RegistrationScreen() {
+  // Use Redux's useDispatch hook to dispatch actions, customized for the app's store.
   const dispatch = useAppDispatch();
 
+  // Use custom hook to access the register method from the session context.
   const { register } = useSession();
 
+  // Define a schema for registration form validation using Yup.
+  // This includes rules for email, username, password, and password confirmation.
   let registrationSchema = object().shape({
     email: string()
-      .email('Not a valid email address')
-      .required('Email is required'),
+      .email('Not a valid email address') // Validates email format.
+      .required('Email is required'), // Makes email a required field.
     username: string()
-      .min(5, 'Username must contain at least 5 characters')
-      .required('Username is required'),
+      .min(5, 'Username must contain at least 5 characters') // Minimum length for username.
+      .required('Username is required'), // Makes username a required field.
     password: string()
-      .min(8, 'Password must contain at least 8 characters')
-      .required('Password is required'),
+      .min(8, 'Password must contain at least 8 characters') // Minimum length for password.
+      .required('Password is required'), // Makes password a required field.
     repeatPassword: string()
-      .oneOf([ref('password')], 'Passwords must match')
-      .required(),
+      .oneOf([ref('password')], 'Passwords must match') // Ensures this value matches the password.
+      .required(), // Makes repeating the password a required field.
   });
 
+  // Setup useForm hook with yupResolver for schema validation and default form values.
   const {
     control,
     handleSubmit,
@@ -52,25 +57,27 @@ export default function RegistrationScreen() {
     },
   });
 
+  // Function to handle registration form submission.
   const onRegister = (formData: UserPost) => {
     register!({
       email: formData.email,
       username: formData.username,
       password: formData.password,
     }).then((res: any) => {
-      console.log('res: ', res);
+      // Construct a user response object from the registration response.
       const responseUser: ResponseUser = {
-        token: res.token,
-        id: res.dataValues.id,
-        username: res.dataValues.username,
+        token: res.token, // Authentication token received upon registration.
+        id: res.dataValues.id, // User ID from the response.
+        username: res.dataValues.username, // Username from the response.
       };
-      dispatch(setUserId(responseUser));
-      router.replace('/');
+      dispatch(setUserId(responseUser)); // Dispatch action to store user ID and other details in Redux store.
+      router.replace('/'); // Navigate to the home screen after successful registration.
     });
   };
 
+  // Function to dynamically adjust Pressable component style based on press state.
   const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-  btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
+    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>

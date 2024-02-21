@@ -1,25 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { AdvancedImage } from 'cloudinary-react-native';
-import { Cloudinary } from '@cloudinary/url-gen';
 import SignOut from './signOut';
 import { useAppSelector } from '@/utils/hooks';
 import { Image } from 'expo-image';
 import { LOGO } from '@/utils/images';
 
-// const myCld = new Cloudinary({
-//   cloud: {
-//     cloudName: 'rt2',
-//   },
-// });
-
-// let logo = myCld.image('rt2/images/wwhur1ze4imvqw4bveso');
-
 export default function Header() {
+  // Get usename of current user from Redux store.
   const username = useAppSelector((state) => state.userIdSlice.username);
   return (
     <View style={styles.headerContainer}>
       <View style={styles.logoContainer}>
-        {/* <AdvancedImage cldImg={logo} style={styles.logo} /> */}
         <Image style={styles.logo} source={LOGO.logo}/>
         <Text style={styles.h1}>RT2</Text>
       </View>

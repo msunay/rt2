@@ -21,44 +21,53 @@ export default function PlayerQuestion({
   trigger: number;
   participation?: Participation;
 }) {
+  // Fetch quiz details, including questions and answers, for a given participation's QuizId.
   const {
     data: quiz,
     error,
     isLoading,
   } = useGetOneQuizQuestionAnswerQuery(participation!.QuizId!);
 
+  // RTK Query mutation hook for creating a participation answer.
   const [createParticipationAnswer, result] =
     useCreateParticipationAnswerMutation();
 
+  // State to manage the user's selected answer for a quiz participation.
   const [userParticipationAnswer, setUserParticipationAnswer] =
     useState<ParticipationAnswer>({} as ParticipationAnswer);
 
+  // State for the current question being displayed.
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
     {} as QuestionAnswer
   );
 
+  // State for the answers related to the current question.
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
 
+  // Effect hook to call `createHandle` when `trigger` changes and is greater than 0.
   useEffect(() => {
     if (trigger > 0) createHandle();
   }, [trigger]);
 
+  // Effect hook to set the current question based on the quiz data and the current trigger value.
   useEffect(() => {
-    if (!error && !isLoading) {
+    if (!error && !isLoading && quiz) {
       setCurrentQuestion(
-        quiz!.Questions.find(
+        quiz.Questions.find(
           (question) => question.positionInQuiz === trigger + 1
         )!
       );
     }
   }, [quiz, trigger]);
 
+  // Effect hook to update the current answers whenever the current question changes.
   useEffect(() => {
     if (currentQuestion && currentQuestion.Answers) {
       setCurrentAnswers(currentQuestion.Answers);
     }
   }, [currentQuestion]);
 
+  // Updates the state with the selected answer's ID and the participation ID.
   async function handleAnswerClick(index: number) {
     setUserParticipationAnswer({
       AnswerId: currentAnswers[index].id!,
@@ -66,15 +75,17 @@ export default function PlayerQuestion({
     });
   }
 
+  // Function to handle creating a participation answer.
+  // calls the mutation to create a participation answer, and resets the userParticipationAnswer state.
   function createHandle() {
     console.log('userParticipationAnswer2: ', userParticipationAnswer);
     createParticipationAnswer(userParticipationAnswer);
-    setUserParticipationAnswer({} as ParticipationAnswer);
+    setUserParticipationAnswer({} as ParticipationAnswer); // Reset after submission.
   }
 
   const pressableStyle = ({ pressed }: { pressed: boolean }) =>
     btnPressStyle(pressed, ['silver', 'grey'], styles.answerBtn);
-    
+
   return (
     <View style={styles.question_component}>
       {currentQuestion && !hidden && (

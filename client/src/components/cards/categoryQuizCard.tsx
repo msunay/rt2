@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import { CATEGORIES } from '@/utils/consts';
 import { Image } from 'expo-image';

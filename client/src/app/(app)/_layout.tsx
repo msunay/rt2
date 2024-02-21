@@ -3,7 +3,6 @@ import { Redirect, Stack } from 'expo-router';
 import { useSession } from '@/utils/authctx';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { useGetUserQuery } from '@/services/backendApi';
-// import { useStorageState } from '@/utils/useStorageState';
 import { useEffect } from 'react';
 import { setUserId } from '@/features/userIdSlice';
 

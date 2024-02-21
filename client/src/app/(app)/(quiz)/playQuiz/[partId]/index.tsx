@@ -4,8 +4,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { ImageBackground, StyleSheet } from 'react-native';
 
 export default function UserStreamPage() {
+  // Get participation id from route slug.
   const { partId } = useLocalSearchParams<{ partId: string }>();
-  console.log('PARTICIPATION ID IN THE PAGE::', partId);
   return (
     <ImageBackground
       source={QUIZ_BACKGROUND.background}

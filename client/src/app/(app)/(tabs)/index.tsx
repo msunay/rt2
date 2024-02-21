@@ -18,7 +18,7 @@ import HostingScreen from '@/screens/HostingScreen';
 import StartQuizScreen from '@/screens/StartQuizScreen';
 
 export default function TabScreen() {
-  const Tabs = AnimatedTabBarNavigator();
+  const Tabs = AnimatedTabBarNavigator(); // Use Tab component from react-native-animated-nav-tab-bar
 
   const tabBarOptions = {
     activeBackgroundColor: '#25CED1',
