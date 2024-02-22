@@ -7,6 +7,7 @@ import mocks from '../utils/mocks';
 import supertest from 'supertest';
 import dotenv from 'dotenv';
 import moment from 'moment';
+import populateDatabase from '../utils/populateDatabase.ts'
 // import { peerSocket } from '../utils/mockPeersSocketService.ts'
 
 dotenv.config();
@@ -27,57 +28,59 @@ const localTestConnection = [
 
 const sequelize = new Sequelize(...localTestConnection);
 const models = initModels(sequelize);
-async function addMockUsers() {
-  try {
-    await models.User.create(mocks.hosts[0]);
 
-    mocks.players.forEach(async (player) => {
-      await models.User.create(player);
-    });
-    console.log('Successfully added users to database');
-  } catch (err) {
-    console.error('Failed to add users to database::', err);
-  }
-}
-async function populateDatabase() {
-  try {
-    await addMockUsers();
-    // Create the quiz
-    for (let i = 0; i < mocks.quizIdArray.length; i++) {
-      const quiz = await models.Quiz.create({
-        id: mocks.quizIdArray[i],
-        quizName: `Mock Quiz ${i}`,
-        quizOwner: mocks.hosts[0].id,
-        category: 'General Knowledge',
-        dateTime: moment().add(i, 'days').toDate(),
-      });
+populateDatabase()
+// async function addMockUsers() {
+//   try {
+//     await models.User.create(mocks.hosts[0]);
 
-      // Create questions and answers
-      for (let i = 1; i <= 10; i++) {
-        const question = await models.Question.create({
-          questionText: `Question ${i}`,
-          positionInQuiz: i,
-        });
+//     mocks.players.forEach(async (player) => {
+//       await models.User.create(player);
+//     });
+//     console.log('Successfully added users to database');
+//   } catch (err) {
+//     console.error('Failed to add users to database::', err);
+//   }
+// }
+// async function populateDatabase() {
+//   try {
+//     await addMockUsers();
+//     // Create the quiz
+//     for (let i = 0; i < mocks.quizIdArray.length; i++) {
+//       const quiz = await models.Quiz.create({
+//         id: mocks.quizIdArray[i],
+//         quizName: `Mock Quiz ${i}`,
+//         quizOwner: mocks.hosts[0].id,
+//         category: 'General Knowledge',
+//         dateTime: moment().add(i, 'days').toDate(),
+//       });
 
-        // Associate the question with the quiz
-        await quiz.addQuestion(question);
+//       // Create questions and answers
+//       for (let i = 1; i <= 10; i++) {
+//         const question = await models.Question.create({
+//           questionText: `Question ${i}`,
+//           positionInQuiz: i,
+//         });
 
-        // Create 4 answers for each question
-        const correctIndex = Math.floor(Math.random() * 4) + 1;
-        for (let j = 1; j <= 4; j++) {
-          const isCorrect = j === correctIndex;
-          await question.createAnswer({
-            answerText: `Answer ${j} for Question ${i}`,
-            isCorrect,
-          });
-        }
-      }
-    }
-    console.log('Database populated');
-  } catch (err) {
-    console.error('Failed to populate database::', err);
-  }
-}
+//         // Associate the question with the quiz
+//         await quiz.addQuestion(question);
+
+//         // Create 4 answers for each question
+//         const correctIndex = Math.floor(Math.random() * 4) + 1;
+//         for (let j = 1; j <= 4; j++) {
+//           const isCorrect = j === correctIndex;
+//           await question.createAnswer({
+//             answerText: `Answer ${j} for Question ${i}`,
+//             isCorrect,
+//           });
+//         }
+//       }
+//     }
+//     console.log('Database populated');
+//   } catch (err) {
+//     console.error('Failed to populate database::', err);
+//   }
+// }
 
 describe('Socket io (Quiz Namespace)', () => {
   let quizSocket;

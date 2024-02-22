@@ -29,6 +29,8 @@ export interface Quiz {
   quizOwner: string;
   category: string;
   dateTime: Date;
+  isPrivate: boolean;
+  pin?: number;
   createdAt?: Date;
   updatedAt?: Date;
   host_name?: string;
@@ -151,6 +153,8 @@ export interface FullQuizState {
   quizOwner: string;
   category: string;
   dateTime: string;
+  isPrivate: boolean;
+  pin?: number;
   Questions: {
     questionText: string;
     positionInQuiz: number;

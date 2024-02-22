@@ -42,6 +42,8 @@ export class Quiz extends Model<
   declare quizOwner: string;
   declare category: string;
   declare dateTime: Date;
+  declare isPrivate: boolean;
+  declare pin: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -101,6 +103,13 @@ export class Quiz extends Model<
         dateTime: {
           type: DataTypes.DATE,
           allowNull: false,
+        },
+        isPrivate: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
+        pin: {
+          type: DataTypes.INTEGER,
         },
         createdAt: {
           type: DataTypes.DATE,

@@ -1,42 +1,61 @@
-import { RefreshControl, StyleSheet, TextInput, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
-import DiscoverQuizCard from '@/components/cards/discoverQuizCard';
 import { useEffect, useState } from 'react';
+import DiscoverList from '@/components/lists/discoverList';
 
 export default function DiscoverScreen() {
   // Fetch all quizzes.
-  const { data, error, isFetching, refetch } = useGetAllQuizzesQuery();
+  const { data: quizzes, error, isFetching, refetch } = useGetAllQuizzesQuery();
 
-  // State for managing sorted list of quizzes.
-  const [sortedList, setSortedList] = useState<Quiz[]>([]);
+  // State for managing list of public quizzes.
+  const [publicList, setPublicList] = useState<Quiz[]>([]);
+  // State for managing list of private quizzes.
+  const [privateList, setPrivateList] = useState<Quiz[]>([]);
   // State for managing the search query input by the user.
   const [searchQuery, setSearchQuery] = useState<string>('');
   // Parameters to include in the search.
   const [searchParams] = useState(['quizName', 'category']);
-
-  // Function to render a quiz item.
-  const renderItem = ({ item }: { item: Quiz }) => {
-    return <DiscoverQuizCard quiz={item} />;
-  };
+  // Public toggle color
+  const [publicBtnColor, setPublicBtnColor] = useState([
+    { backgroundColor: '#25CED1' },
+    styles.toggleBtnLeft,
+  ]);
+  // Private toggle color
+  const [privateBtnColor, setPrivateBtnColor] = useState([
+    { backgroundColor: '#FFFFFF' },
+    styles.toggleBtnRight,
+  ]);
+  // State of the toggle btns
+  const [privateToggle, setPrivateToggle] = useState(false);
 
   // Sort quizzes by their dateTime on fetch or when data changes.
   useEffect(() => {
-    if (data) {
-      const sorted = [...data]; // Create a copy to as data is immutable.
+    if (quizzes) {
+      const sorted = [...quizzes]; // Create a copy to as quizzes is immutable.
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime() // Sort by ascending date and time.
       );
-      setSortedList(sorted); // Update state with sorted quizzes.
+      setPublicList(
+        sorted.filter(quiz => quiz.isPrivate === false)
+      )
+      setPrivateList(
+        sorted.filter(quiz => quiz.isPrivate)
+      )
     }
-  }, [data]);
+  }, [quizzes]);
 
   // Function to filter quizzes based on the search query.
-  function search(data: Quiz[]) {
-    return data.filter((elem) =>
+  function search(quizzes: Quiz[]) {
+    return quizzes.filter((elem) =>
       searchParams.some((param) => {
         // Check if any of the search parameters in a quiz includes the search query.
         return elem[param]
@@ -47,9 +66,41 @@ export default function DiscoverScreen() {
     );
   }
 
+  // If not already on public set list to public
+  const togglePublic = () => {
+    if (privateToggle) {
+      setPublicBtnColor([{ backgroundColor: '#25CED1' }, styles.toggleBtnLeft]);
+      setPrivateBtnColor([
+        { backgroundColor: '#FFFFFF' },
+        styles.toggleBtnRight,
+      ]);
+      setPrivateToggle(false);
+    }
+  };
+
+  // If not already on private set list to private
+  const togglePrivate = () => {
+    if (!privateToggle) {
+      setPublicBtnColor([{ backgroundColor: '#FFFFFF' }, styles.toggleBtnLeft]);
+      setPrivateBtnColor([
+        { backgroundColor: '#25CED1' },
+        styles.toggleBtnRight,
+      ]);
+      setPrivateToggle(true);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.mainArea}>
+        <View style={styles.toggle}>
+          <Pressable style={publicBtnColor} onPress={togglePublic}>
+            <Text style={styles.btnText}>Public Quizzes</Text>
+          </Pressable>
+          <Pressable style={privateBtnColor} onPress={togglePrivate}>
+            <Text style={styles.btnText}>Private Quizzes</Text>
+          </Pressable>
+        </View>
         <View>
           <TextInput
             style={styles.searchBar}
@@ -58,18 +109,21 @@ export default function DiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        <FlashList
-          data={search(sortedList)}
-          renderItem={renderItem}
-          estimatedItemSize={108}
-          refreshControl={
-            <RefreshControl
-              onRefresh={() => refetch()}
-              refreshing={isFetching}
-            />
-          }
-          ListFooterComponent={<View style={styles.listFooter}></View>}
-        />
+        {privateToggle ? (
+          <DiscoverList
+            search={search}
+            quizList={privateList}
+            refetch={refetch}
+            isFetching={isFetching}
+          />
+        ) : (
+          <DiscoverList
+            search={search}
+            quizList={publicList}
+            refetch={refetch}
+            isFetching={isFetching}
+          />
+        )}
       </View>
     </View>
   );
@@ -99,7 +153,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nunito-Regular',
   },
-  listFooter: {
-    height: 100,
+  toggle: {
+    height: 70,
+    marginBottom: 10,
+    flexDirection: 'row',
+  },
+  toggleBtnLeft: {
+    flex: 1,
+    justifyContent: 'center',
+    // backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  toggleBtnRight: {
+    flex: 1,
+    justifyContent: 'center',
+    // backgroundColor: '#FFFFFF',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  btnText: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });

@@ -8,6 +8,7 @@ export async function addDemoQuiz(req: Request, res: Response) {
       quizOwner: req.body.ownerId,
       category: req.body.category,
       dateTime: req.body.startTime,
+      isPrivate: false,
     });
 
     async function createQuestionWithAnswers(

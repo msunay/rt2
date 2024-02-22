@@ -7,7 +7,8 @@ import {
   View,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { date, object, string } from 'yup';
+import Checkbox from 'expo-checkbox';
+import { boolean, date, number, object, string } from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Picker } from '@react-native-picker/picker';
@@ -42,6 +43,8 @@ export default function CreateQuiz() {
       .required() // Date and time for the quiz must be set and be in the future.
       .default(() => new Date(Date.now() + 120000)) // Default to 2 minutes in the future.
       .min(new Date(Date.now()), 'please set a future time'),
+    isPrivate: boolean().required(),
+    pin: number()
   });
 
   // Setup useForm hook with yupResolver for schema validation and default form values.
@@ -57,6 +60,7 @@ export default function CreateQuiz() {
       quizName: '',
       category: 'architecture',
       dateTime: new Date(Date.now() + 120000), // Default dateTime set to 2 minutes in the future.
+      isPrivate: true,
     },
   });
 
@@ -83,7 +87,7 @@ export default function CreateQuiz() {
       category,
       startTime: dateTime,
       ownerId: id,
-    })
+    });
   };
 
   // Function to store quiz details in the Redux store and navigate to quiz creation page.
@@ -91,10 +95,14 @@ export default function CreateQuiz() {
     quizName,
     category,
     dateTime,
+    isPrivate,
+    pin,
   }: {
     quizName: string;
     category: string;
     dateTime: Date;
+    isPrivate: boolean;
+    pin?: number;
   }) => {
     dispatch(
       addQuizData({
@@ -102,6 +110,8 @@ export default function CreateQuiz() {
         category,
         dateTime: dateTime.toISOString(),
         quizOwner: id,
+        isPrivate,
+        pin,
       })
     );
     router.navigate({
@@ -189,6 +199,13 @@ export default function CreateQuiz() {
         {errors.dateTime && (
           <Text style={styles.validationError}>{errors.dateTime.message}</Text>
         )}
+        <Controller
+          name="isPrivate"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Checkbox value={value} onChange={onChange} />
+          )}
+        />
         <Pressable style={pressableStyle} onPress={handleSubmit(createQuiz)}>
           <Text style={styles.btnText}>Create Demo Quiz</Text>
         </Pressable>

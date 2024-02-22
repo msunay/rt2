@@ -1,6 +1,7 @@
 import models from '../models/index';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
+import { Quiz } from '../models/associations';
 
 async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
   try {
@@ -105,12 +106,25 @@ async function getWinners(req: Request, res: Response) {
 
 async function createFullQuiz(req: Request, res: Response) {
   try {
-    const quiz = await models.Quiz.create({
-      quizName: req.body.quizName,
-      quizOwner: req.body.quizOwner,
-      category: req.body.category,
-      dateTime: req.body.dateTime,
-    });
+    let quiz: Quiz;
+    if (req.body.pin) {
+      quiz = await models.Quiz.create({
+        quizName: req.body.quizName,
+        quizOwner: req.body.quizOwner,
+        category: req.body.category,
+        dateTime: req.body.dateTime,
+        isPrivate: req.body.isPrivate,
+        pin: req.body.pin
+      });
+    } else {
+      quiz = await models.Quiz.create({
+        quizName: req.body.quizName,
+        quizOwner: req.body.quizOwner,
+        category: req.body.category,
+        dateTime: req.body.dateTime,
+        isPrivate: req.body.isPrivate,
+      });
+    }
 
     async function createQuestionWithAnswers(
       questionText: string,

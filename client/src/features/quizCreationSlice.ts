@@ -1,4 +1,4 @@
-import { QuizQuestionAnswer, FullQuizState, SubmitFullQuiz } from '@/types/Types';
+import { FullQuizState } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 import { formatISO } from 'date-fns';
 
@@ -7,6 +7,7 @@ const initialState: FullQuizState = {
   quizOwner: '',
   category: '',
   dateTime: formatISO(new Date()),
+  isPrivate: true,
   Questions: [],
 };
 
@@ -24,6 +25,8 @@ export const quizCreationSlice = createSlice({
           quizOwner: string;
           category: string;
           dateTime: string;
+          isPrivate: boolean;
+          pin?: number;
         };
       }
     ) => {
@@ -31,6 +34,8 @@ export const quizCreationSlice = createSlice({
       state.quizOwner = payload.quizOwner;
       state.category = payload.category;
       state.dateTime = payload.dateTime;
+      state.isPrivate = payload.isPrivate;
+      if (payload.pin) state.pin = payload.pin;
     },
     addQuestionWithAnswers: (
       state,

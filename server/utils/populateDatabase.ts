@@ -40,6 +40,7 @@ async function populateDatabase() {
         quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
         category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
         dateTime: moment().add(i + 1, 'days').toDate(),
+        isPrivate: false
       });
 
       // Create questions and answers
