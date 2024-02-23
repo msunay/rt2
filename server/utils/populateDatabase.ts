@@ -34,13 +34,16 @@ async function populateDatabase() {
     await addMockUsers();
     // Create the quiz
     for (let i = 0; i < mocks.quizIdArray.length; i++) {
+      let isPrivate;
+      if (Math.round(Math.random()) === 0) isPrivate = false
+      else isPrivate = true
       const quiz = await models.Quiz.create({
         id: mocks.quizIdArray[i],
         quizName: `Mock Quiz ${i}`,
         quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
         category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
         dateTime: moment().add(i + 1, 'days').toDate(),
-        isPrivate: false
+        isPrivate
       });
 
       // Create questions and answers

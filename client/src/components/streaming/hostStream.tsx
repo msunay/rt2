@@ -26,7 +26,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
+  const [trigger, setTrigger] = useState(0); 
   const [nextDisabled, setNextDisabled] = useState(false);
   const [startDisabled, setStartDisabled] = useState(false);
 

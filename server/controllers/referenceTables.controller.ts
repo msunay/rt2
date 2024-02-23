@@ -11,10 +11,10 @@ async function createParticipation(req: Request, res: Response) {
       QuizId: req.body.quizId,
       isPaid: true,
     });
-    res.status(201).send(participationInstance);
+    res.status(201).send(true);
   } catch (err) {
     console.error('Could not create participation::', err);
-    res.status(500).send();
+    res.status(500).send(false);
   }
 }
 
@@ -28,10 +28,10 @@ async function deleteParticipation(req: Request, res: Response) {
         ],
       },
     });
-    res.status(200).send('Successfully deleted participation');
+    res.status(200).send(true);
   } catch (err) {
     console.error('Could not delete participation::', err);
-    res.status(500).send();
+    res.status(500).send(false);
   }
 }
 

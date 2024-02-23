@@ -28,7 +28,7 @@ export default function UserStream({ partId }: { partId: string }) {
   // );
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0); // BUG not being updated or passed down properly
+  const [trigger, setTrigger] = useState(0); 
   const [consumerTransportState, setConsumerTransportState] =
     useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
   const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(

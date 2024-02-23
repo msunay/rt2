@@ -88,7 +88,7 @@ export const backendApi = createApi({
     }),
 
     addParticipation: build.mutation<
-      Participation,
+      { data: boolean; status: number },
       { quizId: string; userId: string }
     >({
       query: ({ quizId, userId }) => ({

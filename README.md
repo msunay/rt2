@@ -1,6 +1,6 @@
-# Real Time Trivia - Livestream Quiz Platform
+# Real Time Trivia - Live Quiz Platform
 
-Welcome to Real Time Trivia, a platform that enables users to create, host, and participate in livestream quizzes. This README provides an overview of the project, its key features, the technologies used, and information on the project's deployment.
+Welcome to Real Time Trivia, a platform that enables users to create, host, and participate in live quizzes. This README provides an overview of the project, its key features, the technologies used, and information on the project's deployment.
 
 ## Table of Contents
 
@@ -111,7 +111,7 @@ npx expo start
 
 Real Time Trivia was developed by a dedicated team of developers:
 
-- Thiago Los [LinkedIn](https://www.linkedin.com/in/thiagolos/)
 - Alex Eze [LinkedIn](https://www.linkedin.com/in/alex-eze-dev/)
+- Thiago Los [LinkedIn](https://www.linkedin.com/in/thiagolos/)
 - Atai Ismaiilov [LinkedIn](https://www.linkedin.com/in/atai-ismaiilov-185a0b1a8/)
 - Carlos Bárcena Bescansa [LinkedIn](https://www.linkedin.com/in/carlos-b%C3%A1rcena-bescansa-b0768ab3/)

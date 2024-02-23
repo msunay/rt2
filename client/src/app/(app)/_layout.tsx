@@ -2,7 +2,7 @@ import { Text } from 'react-native';
 import { Redirect, Stack } from 'expo-router';
 import { useSession } from '@/utils/authctx';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
-import { useGetUserQuery } from '@/services/backendApi';
+import { useGetUserParticipationsQuery, useGetUserQuery } from '@/services/backendApi';
 import { useEffect } from 'react';
 import { setUserId } from '@/features/userIdSlice';
 
@@ -11,12 +11,14 @@ export default function AppLayout() {
 
   const dispatch = useAppDispatch();
   const id = useAppSelector((state) => state.userIdSlice.id);
-  const { data } = useGetUserQuery(session!)
+  const { data: user } = useGetUserQuery(session!)
+
+
 
   // On reload of app get ID with authToken (session)
   useEffect(() => {
-    if (!id && data) dispatch(setUserId(data));
-  }, [data]);
+    if (!id && user) dispatch(setUserId(user));
+  }, [user]);
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {

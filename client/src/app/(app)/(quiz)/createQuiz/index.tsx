@@ -199,6 +199,7 @@ export default function CreateQuiz() {
         {errors.dateTime && (
           <Text style={styles.validationError}>{errors.dateTime.message}</Text>
         )}
+        <Text>Private</Text>
         <Controller
           name="isPrivate"
           control={control}

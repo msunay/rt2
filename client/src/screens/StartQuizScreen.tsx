@@ -3,38 +3,53 @@ import { FlashList } from '@shopify/flash-list';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
 import ParticipationQuizCard from '@/components/cards/participationQuizCard';
-import { useAppSelector } from '@/utils/hooks';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useGetUserParticipationsQuery } from '@/services/backendApi';
+import { setParticipationsList } from '@/features/participatingSlice';
 
 export default function StartQuizScreen() {
-  // Selector to retrieve the list of quizzes the user is participating in from the Redux state.
-  const participationList = useAppSelector(
-    (state) => state.participatingSlice.value
+  // Select User ID
+  const id = useAppSelector((state) => state.userIdSlice.id);
+  // Select participations array from store
+  const participatingStore = useAppSelector(
+    (state) => state.participatingSlice
   );
+  // Hook to dispatch actions to Redux store.
+  const dispatch = useAppDispatch();
+
+  // Fetch User Participations if participations array from store has not been set
+  const { data: userParticipations } = useGetUserParticipationsQuery(id);
 
   // State to hold the sorted list of participation quizzes.
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
+
+  // Fetch User Participations if participations array from store has not been set
+  useEffect(() => {
+    if (!participatingStore.initialized) {
+      if (userParticipations) {
+        dispatch(setParticipationsList(userParticipations.quizzes));
+      }
+    }
+  }, []);
+
+  // Effect hook to sort the participation quizzes by their dateTime in ascending order once the participationList updates.
+  useEffect(() => {
+    // Clone the participation list to avoid mutating the original array.
+    const sorted = [...participatingStore.value];
+    // Sort the cloned array based on the dateTime of each quiz.
+    sorted.sort(
+      (quizA, quizB) =>
+        new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime()
+    );
+    // Update the sortedList state with the sorted quizzes.
+    setSortedList(sorted);
+  }, [participatingStore.value]);
 
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
     return <ParticipationQuizCard quiz={item} />;
   };
-
-  // Effect hook to sort the participation quizzes by their dateTime in ascending order once the participationList updates.
-  useEffect(() => {
-    if (participationList) {
-      // Clone the participation list to avoid mutating the original array.
-      const sorted = [...participationList];
-      // Sort the cloned array based on the dateTime of each quiz.
-      sorted.sort(
-        (quizA, quizB) =>
-          new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime()
-      );
-      // Update the sortedList state with the sorted quizzes.
-      setSortedList(sorted);
-    }
-  }, [participationList]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>

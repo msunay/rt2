@@ -1,18 +1,34 @@
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
+  useGetAllQuizzesQuery,
+  useGetUserParticipationsQuery,
+} from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
-import DiscoverList from '@/components/lists/discoverList';
+import DiscoverList from '@/components/lists/discoverPublicList';
+import { useAppDispatch, useAppSelector } from '@/utils/hooks';
+import { setParticipationsList } from '@/features/participatingSlice';
+import DiscoverPublicList from '@/components/lists/discoverPublicList';
+import DiscoverPrivateList from '@/components/lists/discoverPrivateList';
 
 export default function DiscoverScreen() {
+  // Select User Id
+  const id = useAppSelector((state) => state.userIdSlice.id);
+  // Select Participating store
+  const participatingStore = useAppSelector(
+    (state) => state.participatingSlice
+  );
+  // Dispach hook for RTK
+  const dispatch = useAppDispatch();
+
   // Fetch all quizzes.
-  const { data: quizzes, error, isFetching, refetch } = useGetAllQuizzesQuery();
+  const {
+    data: quizzes,
+    isFetching: isFetchingQuizzes,
+    refetch: refetchQuizzes,
+  } = useGetAllQuizzesQuery();
+  // Fetch User Participations if participations array from store has not been set
+  const { data: userParticipations } = useGetUserParticipationsQuery(id);
 
   // State for managing list of public quizzes.
   const [publicList, setPublicList] = useState<Quiz[]>([]);
@@ -35,6 +51,14 @@ export default function DiscoverScreen() {
   // State of the toggle btns
   const [privateToggle, setPrivateToggle] = useState(false);
 
+  // If participatingSlice not initialized add participations to store
+  useEffect(() => {
+    if (!participatingStore.initialized) {
+      if (userParticipations) {
+        dispatch(setParticipationsList(userParticipations.quizzes));
+      }
+    }
+  }, []);
   // Sort quizzes by their dateTime on fetch or when data changes.
   useEffect(() => {
     if (quizzes) {
@@ -44,12 +68,8 @@ export default function DiscoverScreen() {
           new Date(quizA.dateTime).getTime() -
           new Date(quizB.dateTime).getTime() // Sort by ascending date and time.
       );
-      setPublicList(
-        sorted.filter(quiz => quiz.isPrivate === false)
-      )
-      setPrivateList(
-        sorted.filter(quiz => quiz.isPrivate)
-      )
+      setPublicList(sorted.filter((quiz) => quiz.isPrivate === false));
+      setPrivateList(sorted.filter((quiz) => quiz.isPrivate));
     }
   }, [quizzes]);
 
@@ -110,18 +130,20 @@ export default function DiscoverScreen() {
           />
         </View>
         {privateToggle ? (
-          <DiscoverList
+          <DiscoverPrivateList
             search={search}
             quizList={privateList}
-            refetch={refetch}
-            isFetching={isFetching}
+            participations={participatingStore.value}
+            refetchQuizzes={refetchQuizzes}
+            isFetchingQuizzes={isFetchingQuizzes}
           />
         ) : (
-          <DiscoverList
+          <DiscoverPublicList
             search={search}
             quizList={publicList}
-            refetch={refetch}
-            isFetching={isFetching}
+            participations={participatingStore.value}
+            refetchQuizzes={refetchQuizzes}
+            isFetchingQuizzes={isFetchingQuizzes}
           />
         )}
       </View>
@@ -175,5 +197,6 @@ const styles = StyleSheet.create({
   btnText: {
     textAlign: 'center',
     textAlignVertical: 'center',
+    fontFamily: 'Nunito-Bold',
   },
 });

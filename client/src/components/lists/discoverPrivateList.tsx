@@ -11,16 +11,18 @@ import {
   QueryDefinition,
 } from '@reduxjs/toolkit/query';
 
-export default function DiscoverList({
+export default function DiscoverPrivateList({
   quizList,
+  participations,
   search,
-  isFetching,
-  refetch,
+  isFetchingQuizzes,
+  refetchQuizzes,
 }: {
   quizList: Quiz[];
+  participations: Quiz[];
   search: (quizzes: Quiz[]) => Quiz[];
-  isFetching: boolean;
-  refetch: () => QueryActionCreatorResult<
+  isFetchingQuizzes: boolean;
+  refetchQuizzes: () => QueryActionCreatorResult<
     QueryDefinition<
       void,
       BaseQueryFn<
@@ -38,7 +40,7 @@ export default function DiscoverList({
 }) {
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
-    return <DiscoverQuizCard quiz={item} />;
+    return <DiscoverQuizCard quiz={item} participations={participations} />;
   };
 
   return (
@@ -47,7 +49,7 @@ export default function DiscoverList({
       renderItem={renderItem}
       estimatedItemSize={108}
       refreshControl={
-        <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
+        <RefreshControl onRefresh={() => refetchQuizzes()} refreshing={isFetchingQuizzes} />
       }
       ListFooterComponent={<View style={styles.listFooter}></View>}
     />
