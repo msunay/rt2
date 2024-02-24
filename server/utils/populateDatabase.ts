@@ -1,6 +1,7 @@
 import models from '../models/index';
 import moment from 'moment';
 import mocks from './mocks';
+import { Quiz } from '../models/associations';
 /*
   The following function populates the database with 5 users (1 host and 4 players) and 4 quizzes.
   The host user will be the owner of all 4 quizzes and the players are generated without any participations.
@@ -34,17 +35,31 @@ async function populateDatabase() {
     await addMockUsers();
     // Create the quiz
     for (let i = 0; i < mocks.quizIdArray.length; i++) {
-      let isPrivate;
-      if (Math.round(Math.random()) === 0) isPrivate = false
-      else isPrivate = true
-      const quiz = await models.Quiz.create({
-        id: mocks.quizIdArray[i],
-        quizName: `Mock Quiz ${i}`,
-        quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
-        category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
-        dateTime: moment().add(i + 1, 'days').toDate(),
-        isPrivate
-      });
+      let quiz: Quiz;
+      let isPrivate: boolean;
+      if (Math.round(Math.random()) === 0) {
+        isPrivate = false
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          isPrivate
+        });
+      }
+      else {
+        isPrivate = true
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          isPrivate,
+          pin:1111
+        });
+      }
 
       // Create questions and answers
       for (let i = 1; i <= 10; i++) {

@@ -154,7 +154,7 @@ export interface FullQuizState {
   category: string;
   dateTime: string;
   isPrivate: boolean;
-  pin?: number;
+  pin?: string;
   Questions: {
     questionText: string;
     positionInQuiz: number;

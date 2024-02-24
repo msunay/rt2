@@ -26,7 +26,7 @@ export const quizCreationSlice = createSlice({
           category: string;
           dateTime: string;
           isPrivate: boolean;
-          pin?: number;
+          pin?: string;
         };
       }
     ) => {

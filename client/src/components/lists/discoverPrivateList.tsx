@@ -40,7 +40,7 @@ export default function DiscoverPrivateList({
 }) {
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
-    return <DiscoverQuizCard quiz={item} participations={participations} />;
+    return <DiscoverQuizCard quiz={item} participations={participations} privateQuiz={true}/>;
   };
 
   return (

@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { composeWithDevTools } from '@redux-devtools/remote';
 
@@ -11,15 +11,29 @@ import quizCreationSlice from '@/features/quizCreationSlice';
 
 const composeEnhancers = composeWithDevTools({ realtime: true, port: 8000 });
 
+// Define the action type for resetting the store
+const RESET_ACTION_TYPE = 'logout';
+
+const appReducer = combineReducers({
+  [backendApi.reducerPath]: backendApi.reducer,
+  userSlice,
+  userIdSlice,
+  questionSlice,
+  participatingSlice,
+  quizCreationSlice,
+})
+
+// This is the wrapper reducer that checks for the reset action
+const rootReducer = (state: any, action: any) => {
+  if (action.type === RESET_ACTION_TYPE) {
+    // If the reset action is dispatched, return the initial state
+    return appReducer(undefined, action);
+  }
+  return appReducer(state, action);
+};
+
 export const store = configureStore({
-  reducer: {
-    [backendApi.reducerPath]: backendApi.reducer,
-    userSlice,
-    userIdSlice,
-    questionSlice,
-    participatingSlice,
-    quizCreationSlice,
-  },
+  reducer: rootReducer,
 
   devTools: process.env.NODE_ENV !== 'production',
 

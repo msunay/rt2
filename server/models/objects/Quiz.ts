@@ -43,7 +43,7 @@ export class Quiz extends Model<
   declare category: string;
   declare dateTime: Date;
   declare isPrivate: boolean;
-  declare pin: CreationOptional<number>;
+  declare pin: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -109,7 +109,7 @@ export class Quiz extends Model<
           allowNull: false
         },
         pin: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.STRING,
         },
         createdAt: {
           type: DataTypes.DATE,

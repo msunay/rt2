@@ -62,7 +62,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <Entypo name="compass" size={size ? size : 24} color="black" />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -72,7 +72,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: any) => (
             <MaterialIcons name="quiz" size={size ? size : 24} color="black" />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
