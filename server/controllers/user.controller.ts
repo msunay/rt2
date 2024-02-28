@@ -2,11 +2,16 @@ import models from '../models/index';
 import { Request, Response } from 'express';
 import { tokenGenerator } from '../utils/token';
 import { CustomRequest } from '../middleware/auth';
-import { compareSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 
 async function addUser(req: Request, res: Response) {
   try {
-    const response = await models.User.create(req.body);
+    const saltRounds = 10;
+    const { email, username, password } = req.body;
+    const hash = hashSync(password, saltRounds);
+
+    const response = await models.User.create({ email, username, password: hash });
+    
     const token = tokenGenerator(response?.id, response?.username);
     res.status(201).send({ ...response, token });
   } catch (err) {

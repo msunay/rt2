@@ -30,8 +30,8 @@ export class User extends Model<
   declare email: string;
   declare username: string;
   declare password: string;
-  declare isPremiumMember: boolean;
-  declare pointsWon: number;
+  declare isPremiumMember: CreationOptional<boolean>;
+  declare pointsWon: CreationOptional<number>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 

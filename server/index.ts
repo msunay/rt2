@@ -3,12 +3,12 @@ import cors from 'cors';
 import router from './router';
 import http from 'http';
 import { Namespace, Server } from 'socket.io';
-import peersSocketInit from './controllers/peers.socket.controller';
+// import peersSocketInit from './controllers/peers.socket.controller';
 import quizSocketInit from './controllers/quiz.socket.controller';
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from './Types/PeerSocketTypes';
+// import {
+//   PeersClientToServerEvents,
+//   PeersServerToClientEvents,
+// } from './Types/PeerSocketTypes';
 import {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
@@ -43,13 +43,13 @@ export const io = new Server(server, {
   },
 });
 
-export const peers: Namespace<PeersServerToClientEvents, PeersClientToServerEvents> =
-  io.of('/mediasoup');
+// export const peers: Namespace<PeersServerToClientEvents, PeersClientToServerEvents> =
+//   io.of('/mediasoup');
 
 export const quiz: Namespace<QuizServerToClientEvents, QuizClientToServerEvents> =
   io.of('/quizspace');
 
-peers.on('connection', peersSocketInit);
+// peers.on('connection', peersSocketInit);
 
 quiz.on('connection', quizSocketInit);
 

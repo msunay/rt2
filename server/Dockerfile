@@ -1,8 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION and ENV as desired
-ARG NODE_VERSION=20.10.0
-ARG SELECTED_NODE_ENV=development
+ARG NODE_VERSION=20.11.1
 
 # Base Image
 FROM node:${NODE_VERSION}-slim as base
@@ -16,14 +15,18 @@ FROM base as update
 
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python3-pip && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 # Install dev dependencies and compile typescript
-FROM update as build
+FROM update as devdeps
 
-COPY . ./
-RUN npm ci && \
-    npm run build
+COPY package-lock.json package.json ./
+RUN npm ci
+
+FROM devdeps as build
+
+COPY . .
+RUN npm run build
 
 # Install non-dev dependencies
 FROM update as proddeps
@@ -39,8 +42,6 @@ COPY --from=build /app/dist .
 
 # Expose the required ports
 EXPOSE 8080
-EXPOSE 40000-49000/tcp
-EXPOSE 40000-49000/udp
 
 # Define the default command
 ENV PORT=8080

@@ -57,7 +57,7 @@ async function populateDatabase() {
           category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
           dateTime: moment().add(i + 1, 'days').toDate(),
           isPrivate,
-          pin:1111
+          pin: '1111'
         });
       }
 
