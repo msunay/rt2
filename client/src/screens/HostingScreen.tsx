@@ -1,10 +1,11 @@
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/utils/hooks';
 import HostingQuizCard from '@/components/cards/hostingQuizCard';
+import CreateQuizBtn from '@/components/user/createQuizBtn';
 
 export default function HostingScreen() {
   // Fetch all quizzes.
@@ -44,18 +45,24 @@ export default function HostingScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.mainArea}>
+        <View style={styles.listContainer}>
+        <Text style={styles.listTitle}>Your Upcoming Quizzes</Text>
         <FlashList
           data={sortedList}
           renderItem={renderItem}
           estimatedItemSize={108}
           refreshControl={
             <RefreshControl
-              onRefresh={() => refetch()}
-              refreshing={isFetching}
+            onRefresh={() => refetch()}
+            refreshing={isFetching}
             />
           }
           ListFooterComponent={<View style={styles.listFooter}></View>}
-        />
+          />
+          </View>
+          <View style={styles.rightColumn}>
+            <CreateQuizBtn />
+          </View>
       </View>
     </View>
   );
@@ -68,15 +75,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  headerContainer: {
-    flex: 1,
-    width: '100%',
-  },
   mainArea: {
     flex: 10,
     width: '100%',
+    flexDirection: 'column-reverse'
   },
   listFooter: {
     height: 100,
   },
+  listContainer: {
+    flex: 2,
+    // justifyContent: 'center',
+  },
+  listTitle: {
+    textAlign: 'center',
+    fontFamily: 'Nunito-Bold',
+    marginBottom: 10,
+    textDecorationLine: 'underline'
+  },
+  rightColumn: {
+    flex: 1
+  }
 });

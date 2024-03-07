@@ -5,15 +5,17 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
 import { btnPressStyle } from '@/utils/helpers';
 
+interface Props {
+  hidden: boolean;
+  trigger: number;
+  quizId: string;
+}
+
 export default function HostQuestion({
   hidden,
   trigger,
   quizId,
-}: {
-  hidden: boolean;
-  trigger: number;
-  quizId: string;
-}) {
+}: Props) {
   // Fetch quiz by its ID, including questions and answers.
   const {
     data: quiz,

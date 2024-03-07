@@ -12,7 +12,6 @@ import {
   QuizParticipations,
   Winner,
   LoginCredentials,
-  SubmitFullQuiz,
   FullQuizState,
 } from '@/types/Types';
 

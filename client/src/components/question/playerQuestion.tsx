@@ -12,15 +12,17 @@ import {
 } from '@/services/backendApi';
 import { btnPressStyle } from '@/utils/helpers';
 
+interface Props {
+  hidden: boolean;
+  trigger: number;
+  participation?: Participation;
+}
+
 export default function PlayerQuestion({
   hidden,
   trigger,
   participation,
-}: {
-  hidden: boolean;
-  trigger: number;
-  participation?: Participation;
-}) {
+}: Props) {
   // Fetch quiz details, including questions and answers, for a given participation's QuizId.
   const {
     data: quiz,

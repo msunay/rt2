@@ -2,6 +2,7 @@
 
 # Adjust NODE_VERSION and ENV as desired
 ARG NODE_VERSION=20.11.1
+ARG ENV=production
 
 # Base Image
 FROM node:${NODE_VERSION}-slim as base
@@ -37,9 +38,9 @@ RUN npm ci
 
 # Production Image
 FROM proddeps
+ENV NODE_ENV=${ENV}
 
 COPY --from=build /app/dist .
-
 # Expose the required ports
 EXPOSE 8080
 

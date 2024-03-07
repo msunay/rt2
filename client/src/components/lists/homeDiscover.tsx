@@ -1,8 +1,9 @@
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
 import HomeDiscoverCard from '../cards/homeDiscoverCard';
+import { FlashList } from '@shopify/flash-list';
 
 export default function HomeDiscover() {
   // Fetch all quizzes.
@@ -46,8 +47,15 @@ export default function HomeDiscover() {
           data={sortedList}
           renderItem={renderItem}
           horizontal
+          // style={styles.list}
           onRefresh={() => refetch()}
           refreshing={isFetching}
+          contentContainerStyle={{maxHeight: '100%'}}
+          // refreshControl={
+          //   <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
+          // }
+          // estimatedItemSize={198}
+          showsHorizontalScrollIndicator={false}
         />
       </View>
     </View>
@@ -77,11 +85,10 @@ const styles = StyleSheet.create({
     color: '#FF7F50',
   },
   listContainer: {
-    // height: '100%',
+    // flex: 1
     height: '80%',
-    width: Dimensions.get('window').width,
+    // width: Dimensions.get('window').width,
   },
-
   cardContainer: {
     overflow: 'scroll',
     height: '60%',

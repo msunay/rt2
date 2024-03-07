@@ -11,7 +11,7 @@ export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
 const BASE_URL =
   process.env.NODE_ENV === 'production'
     ? process.env.BACKEND_URL
-    : 'http://192.168.0.215:3001/';
+    : process.env.EXPO_PUBLIC_LOCAL_IP!;
 
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
   `${BASE_URL}quizspace`

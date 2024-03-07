@@ -18,15 +18,17 @@ import {
 } from "@/features/participatingSlice";
 import { CATEGORIES } from "@/utils/consts";
 
+interface Props {
+  quiz: Quiz;
+  participations: Quiz[];
+  privateQuiz?: boolean;
+}
+
 export default function DiscoverQuizCard({
   quiz,
   participations,
   privateQuiz,
-}: {
-  quiz: Quiz;
-  participations: Quiz[];
-  privateQuiz?: boolean;
-}) {
+}: Props) {
   // Retrieves the current user's ID from Redux state for participation operations.
   const id = useAppSelector((state) => state.userIdSlice.id);
   // Hook to dispatch actions to Redux store.

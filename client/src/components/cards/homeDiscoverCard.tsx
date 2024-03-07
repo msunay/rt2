@@ -22,6 +22,7 @@ export default function HomeDiscoverCard({ quiz }: { quiz: Quiz }) {
 
 const styles = StyleSheet.create({
   quizCardContainer: {
+    // height: '100%',
     // flex: 1,
     // width: 290,
     shadowColor: '#000000',

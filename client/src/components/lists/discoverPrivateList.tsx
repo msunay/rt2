@@ -1,7 +1,7 @@
-import { Quiz } from '@/types/Types';
-import { FlashList } from '@shopify/flash-list';
-import { RefreshControl, StyleSheet, View } from 'react-native';
-import DiscoverQuizCard from '../cards/discoverQuizCard';
+import { Quiz } from "@/types/Types";
+import { FlashList } from "@shopify/flash-list";
+import { RefreshControl, StyleSheet, View } from "react-native";
+import DiscoverQuizCard from "../cards/discoverQuizCard";
 import {
   BaseQueryFn,
   FetchArgs,
@@ -9,15 +9,9 @@ import {
   FetchBaseQueryMeta,
   QueryActionCreatorResult,
   QueryDefinition,
-} from '@reduxjs/toolkit/query';
+} from "@reduxjs/toolkit/query";
 
-export default function DiscoverPrivateList({
-  quizList,
-  participations,
-  search,
-  isFetchingQuizzes,
-  refetchQuizzes,
-}: {
+interface Props {
   quizList: Quiz[];
   participations: Quiz[];
   search: (quizzes: Quiz[]) => Quiz[];
@@ -34,13 +28,27 @@ export default function DiscoverPrivateList({
       >,
       never,
       Quiz[],
-      'backendApi'
+      "backendApi"
     >
   >;
-}) {
+}
+
+export default function DiscoverPrivateList({
+  quizList,
+  participations,
+  search,
+  isFetchingQuizzes,
+  refetchQuizzes,
+}: Props) {
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
-    return <DiscoverQuizCard quiz={item} participations={participations} privateQuiz={true}/>;
+    return (
+      <DiscoverQuizCard
+        quiz={item}
+        participations={participations}
+        privateQuiz={true}
+      />
+    );
   };
 
   return (
@@ -49,7 +57,10 @@ export default function DiscoverPrivateList({
       renderItem={renderItem}
       estimatedItemSize={108}
       refreshControl={
-        <RefreshControl onRefresh={() => refetchQuizzes()} refreshing={isFetchingQuizzes} />
+        <RefreshControl
+          onRefresh={() => refetchQuizzes()}
+          refreshing={isFetchingQuizzes}
+        />
       }
       ListFooterComponent={<View style={styles.listFooter}></View>}
     />

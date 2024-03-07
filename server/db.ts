@@ -17,7 +17,7 @@ const localConnection = [
 const connection =
   process.env.NODE_ENV === 'production' ? cloudConnection : localConnection;
 
-const HOST = process.env.NODE_ENV === 'production' ? '/var/run/postgresql' : 'host.docker.internal';
+const HOST = process.env.NODE_ENV === 'production' ? '/var/run/postgresql' : undefined;
 export const sequelize = new Sequelize(...connection, {
   dialect: 'postgres',
   host: HOST,

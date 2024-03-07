@@ -22,7 +22,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { RefObject, useRef, useState } from "react";
 import { useAddFullQuizMutation } from "@/services/backendApi";
 import { btnPressStyle } from "@/utils/helpers";
-import { KeyboardAccessoryNavigation } from "react-native-keyboard-accessory";
 
 export default function QuizContent() {
   // Retrieve the query parameter 'qno' (question number) from the URL.
@@ -45,9 +44,11 @@ export default function QuizContent() {
   const ref_input4 = useRef<TextInput>(null);
   const ref_input5 = useRef<TextInput>(null);
 
+  // Track current ref for next/previous btn
   const [currentRef, setCurrentRef] =
     useState<RefObject<TextInput>>(ref_input1);
 
+  // Focus next input
   const focusNextInput = (currentRef: RefObject<TextInput>) => {
     switch (currentRef) {
       case ref_input1:
@@ -67,6 +68,7 @@ export default function QuizContent() {
     }
   };
 
+  // Focus previous input
   const focusPreviousInput = (currentRef: RefObject<TextInput>) => {
     switch (currentRef) {
       // Similar implementation to focusNextInput but in reverse
@@ -190,8 +192,6 @@ export default function QuizContent() {
                 style={styles.questionInput}
                 placeholder="Write yout question here..."
                 multiline
-                returnKeyType="next"
-                // returnKeyLabel='Next'+
                 autoCapitalize="sentences"
                 value={value}
                 onChangeText={onChange}
@@ -300,27 +300,6 @@ export default function QuizContent() {
             <Text style={styles.validationError}>{errors.answer4.message}</Text>
           )}
         </View>
-        <KeyboardAccessoryNavigation
-          accessoryStyle={{
-            position: "absolute",
-            top: Keyboard.metrics()?.height,
-            // right: 0,
-            // zIndex:100,
-            borderColor: "#FF0000",
-            borderWidth: 1,
-          }}
-          // avoidKeyboard
-          // androidAdjustResize
-          doneHidden={true}
-          nextHidden={false}
-          previousHidden={false}
-          onNext={() => {
-            focusNextInput(currentRef);
-          }}
-          onPrevious={() => {
-            focusPreviousInput(currentRef);
-          }}
-        />
         <Pressable style={pressableStyle} onPress={handleSubmit(storeQuestion)}>
           <Text style={styles.btnText}>Next</Text>
         </Pressable>

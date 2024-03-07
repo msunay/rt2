@@ -45,10 +45,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  headerContainer: {
-    flex: 1,
-    width: '100%',
-  },
   mainArea: {
     flex: 10,
     width: '100%',
