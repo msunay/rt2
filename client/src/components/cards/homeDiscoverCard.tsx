@@ -1,8 +1,8 @@
-import { Quiz } from '@/types/Types'
-import { CATEGORIES } from '@/utils/consts'
-import { CATEGORY_IMAGES } from '@/utils/images'
-import { Image } from 'expo-image'
-import { StyleSheet, Text, View } from 'react-native'
+import { Quiz } from '@/types/Types';
+import { CATEGORIES } from '@/utils/consts';
+import { CATEGORY_IMAGES } from '@/utils/images';
+import { Image } from 'expo-image';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function HomeDiscoverCard({ quiz }: { quiz: Quiz }) {
   return (
@@ -17,7 +17,7 @@ export default function HomeDiscoverCard({ quiz }: { quiz: Quiz }) {
         <Text style={styles.cardText}>{CATEGORIES[quiz.category]}</Text>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 10,
   },
-})
+});

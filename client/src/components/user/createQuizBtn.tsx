@@ -1,7 +1,7 @@
-import { TILE_IMAGES } from "@/utils/images";
-import { Image } from "expo-image";
-import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { TILE_IMAGES } from '@/utils/images';
+import { Image } from 'expo-image';
+import { Link } from 'expo-router';
+import { Pressable, StyleSheet } from 'react-native';
 
 export default function CreateQuizBtn() {
   return (
@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     height: 150,
-    width: "60%",
+    width: '60%',
   },
 });

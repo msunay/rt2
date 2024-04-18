@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, Slot } from 'expo-router';
 import { SessionProvider } from '@/utils/authctx';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
@@ -46,6 +46,7 @@ export default function Root() {
     <Provider store={store}>
       <SessionProvider>
         <Stack screenOptions={{ headerShown: false }} />
+        {/* <Slot /> */}
       </SessionProvider>
     </Provider>
   );

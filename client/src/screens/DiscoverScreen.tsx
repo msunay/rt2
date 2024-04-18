@@ -5,7 +5,6 @@ import {
 } from '@/services/backendApi';
 import { Quiz } from '@/types/Types';
 import { useEffect, useState } from 'react';
-import DiscoverList from '@/components/lists/discoverPublicList';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { setParticipationsList } from '@/features/participatingSlice';
 import DiscoverPublicList from '@/components/lists/discoverPublicList';
@@ -13,11 +12,9 @@ import DiscoverPrivateList from '@/components/lists/discoverPrivateList';
 
 export default function DiscoverScreen() {
   // Select User Id
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
   // Select Participating store
-  const participatingStore = useAppSelector(
-    (state) => state.participatingSlice
-  );
+  const participatingStore = useAppSelector(state => state.participatingSlice);
   // Dispach hook for RTK
   const dispatch = useAppDispatch();
 
@@ -66,23 +63,24 @@ export default function DiscoverScreen() {
       sorted.sort(
         (quizA, quizB) =>
           new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime() // Sort by ascending date and time.
+          // eslint-disable-next-line @stylistic/indent-binary-ops
+          new Date(quizB.dateTime).getTime(), // Sort by ascending date and time.
       );
-      setPublicList(sorted.filter((quiz) => quiz.isPrivate === false));
-      setPrivateList(sorted.filter((quiz) => quiz.isPrivate));
+      setPublicList(sorted.filter(quiz => quiz.isPrivate === false));
+      setPrivateList(sorted.filter(quiz => quiz.isPrivate));
     }
   }, [quizzes]);
 
   // Function to filter quizzes based on the search query.
   function search(quizzes: Quiz[]) {
-    return quizzes.filter((elem) =>
+    return quizzes.filter(elem =>
       searchParams.some((param) => {
         // Check if any of the search parameters in a quiz includes the search query.
         return elem[param]
           .toString()
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
-      })
+      }),
     );
   }
 
@@ -129,23 +127,25 @@ export default function DiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        {privateToggle ? (
-          <DiscoverPrivateList
-            search={search}
-            quizList={privateList}
-            participations={participatingStore.value}
-            refetchQuizzes={refetchQuizzes}
-            isFetchingQuizzes={isFetchingQuizzes}
-          />
-        ) : (
-          <DiscoverPublicList
-            search={search}
-            quizList={publicList}
-            participations={participatingStore.value}
-            refetchQuizzes={refetchQuizzes}
-            isFetchingQuizzes={isFetchingQuizzes}
-          />
-        )}
+        {privateToggle
+          ? (
+            <DiscoverPrivateList
+              search={search}
+              quizList={privateList}
+              participations={participatingStore.value}
+              refetchQuizzes={refetchQuizzes}
+              isFetchingQuizzes={isFetchingQuizzes}
+            />
+            )
+          : (
+            <DiscoverPublicList
+              search={search}
+              quizList={publicList}
+              participations={participatingStore.value}
+              refetchQuizzes={refetchQuizzes}
+              isFetchingQuizzes={isFetchingQuizzes}
+            />
+            )}
       </View>
     </View>
   );

@@ -25,7 +25,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0); 
+  const [trigger, setTrigger] = useState(0);
   const [nextDisabled, setNextDisabled] = useState(false);
   const [startDisabled, setStartDisabled] = useState(false);
 
@@ -197,8 +197,15 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   //   // mediaStream.getTracks().forEach((track) => track.stop());
   // };
 
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.next_q_btn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed ? {
+      ...styles.next_q_btn,
+      backgroundColor: '#ffb296'
+    } : {
+      ...styles.next_q_btn,
+      backgroundColor: '#FF7F50'
+    }
+  }
 
   return (
     <View style={styles.unit}>

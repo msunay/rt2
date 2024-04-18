@@ -2,14 +2,14 @@ import { StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Header from '@/components/global/header';
+// import Header from '@/components/global/header';
 
 export default function TabsLayout() {
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View style={styles.headerContainer}>
+      {/* <View style={styles.headerContainer}>
         <Header />
-      </View>
+      </View> */}
       <View style={styles.stackContainer}>
         <Stack screenOptions={{ headerShown: false }} />
       </View>

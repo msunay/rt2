@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     margin: 10,
-    width: 90
+    width: 90,
   },
   cardText: {
     flex: 1,

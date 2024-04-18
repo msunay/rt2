@@ -107,6 +107,59 @@ const mocks = {
     'science',
     'tech',
   ],
+
+  testQuiz: [
+    {
+      question: 'What is the capital city of France?',
+      answers: ['Berlin', 'Madrid', 'Paris', 'Rome'],
+      correctAnswer: 2
+    },
+    {
+      question: 'Who wrote the famous play "Romeo and Juliet"?',
+      answers: ['William Shakespeare', 'Charles Dickens', 'Jane Austen', 'Ernest Hemingway'],
+      correctAnswer: 0
+    },
+    {
+      question: 'Which planet is known as the "Red Planet"?',
+      answers: ['Venus', 'Mars', 'Jupiter', 'Saturn'],
+      correctAnswer: 1
+    },
+    {
+      question: 'What is the chemical symbol for water?',
+      answers: ['O2', 'H2O', 'CO2', 'NaCl'],
+      correctAnswer: 1
+    },
+    {
+      question: 'Who painted the Mona Lisa?',
+      answers: ['Pablo Picasso', 'Leonardo da Vinci', 'Vincent van Gogh', 'Michelangelo'],
+      correctAnswer: 1
+    },
+    {
+      question: 'Which country is known as the Land of the Rising Sun?',
+      answers: ['China', 'Japan', 'South Korea', 'Thailand'],
+      correctAnswer: 1
+    },
+    {
+      question: 'What is the largest mammal in the world?',
+      answers: ['Elephant', 'Blue whale', 'Giraffe', 'Hippopotamus'],
+      correctAnswer: 1
+    },
+    {
+      question: 'Who was the first man to walk on the moon?',
+      answers: ['Neil Armstrong', 'Buzz Aldrin', 'Yuri Gagarin', 'Alan Shepard'],
+      correctAnswer: 0
+    },
+    {
+      question: 'What is the capital city of Australia?',
+      answers: ['Sydney', 'Canberra', 'Melbourne', 'Perth'],
+      correctAnswer: 1
+    },
+    {
+      question: 'What is the chemical symbol for gold?',
+      answers: ['Ag', 'Au', 'Fe', 'Pb'],
+      correctAnswer: 1
+    }
+  ],
 };
 
 export default mocks;

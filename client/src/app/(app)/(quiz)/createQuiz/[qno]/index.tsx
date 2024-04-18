@@ -157,8 +157,15 @@ export default function QuizContent() {
     });
   };
 
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ["#ffb296", "#FF7F50"], styles.loginBtn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed ? {
+      ...styles.loginBtn,
+      backgroundColor: '#ffb296'
+    } : {
+      ...styles.loginBtn,
+      backgroundColor: '#FF7F50'
+    }
+  }
 
   // If 10 questions have been created show preview of whole quiz and submit button.
   if (questionNum === 11) {

@@ -62,23 +62,23 @@ async function populateDatabase() {
       }
 
       // Create questions and answers
-      for (let i = 1; i <= 10; i++) {
+      for (let i = 0; i < 10; i++) {
         const question = await models.Question.create({
-          questionText: `Question ${i}`,
-          positionInQuiz: i,
+          questionText: mocks.testQuiz[i].question,
+          positionInQuiz: i + 1,
         });
 
         // Associate the question with the quiz
         await quiz.addQuestion(question);
 
         // Create 4 answers for each question
-        const correctIndex = Math.floor(Math.random() * 4) + 1;
-        for (let j = 1; j <= 4; j++) {
-          const isCorrect = j === correctIndex;
+        // const correctIndex = Math.floor(Math.random() * 4) + 1;
+        for (let j = 0; j <= 3; j++) {
+          const isCorrect = j === mocks.testQuiz[i].correctAnswer;
           await question.createAnswer({
-            answerText: `Answer ${j} for Question ${i}`,
+            answerText: mocks.testQuiz[i].answers[j],
             isCorrect,
-            answerNumber: j - 1
+            answerNumber: j
           });
         }
       }

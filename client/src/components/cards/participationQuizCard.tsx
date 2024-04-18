@@ -15,7 +15,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
   // Retrieves the current user's ID from the Redux state.
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
 
   // Fetches participation details for the current user and the specific quiz.
   const { data: participation } = useGetOneParticipationQuery({

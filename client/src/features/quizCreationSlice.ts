@@ -28,7 +28,7 @@ export const quizCreationSlice = createSlice({
           isPrivate: boolean;
           pin?: string;
         };
-      }
+      },
     ) => {
       state.quizName = payload.quizName;
       state.quizOwner = payload.quizOwner;
@@ -50,13 +50,14 @@ export const quizCreationSlice = createSlice({
             isCorrect: boolean;
           }[];
         };
-      }
+      },
     ) => {
       state.Questions = [...state.Questions, payload];
     },
-    resetQuizStore: (state => {
+    resetQuizStore: (state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       state = initialState;
-    })
+    },
   },
 });
 

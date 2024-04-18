@@ -1,5 +1,5 @@
 import { Text } from 'react-native';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, Slot } from 'expo-router';
 import { useSession } from '@/utils/authctx';
 import { useAppDispatch, useAppSelector } from '@/utils/hooks';
 import { useGetUserParticipationsQuery, useGetUserQuery } from '@/services/backendApi';
@@ -33,5 +33,6 @@ export default function AppLayout() {
     return <Redirect href="/login" />;
   }
   // This layout can be deferred because it's not the root layout.
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return <Slot />;
+  // return <Stack screenOptions={{ headerShown: false }} />;
 }

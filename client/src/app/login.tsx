@@ -24,7 +24,7 @@ export default function LoginScreen() {
   const { signIn } = useSession(); // Custom hook to access signIn method for authentication.
 
   // Schema for login form validation using yup.
-  let loginSchema = object().shape({
+  const loginSchema = object().shape({
     username: string().required('Please enter username'),
     password: string().required('Please enter password'),
   });
@@ -54,8 +54,15 @@ export default function LoginScreen() {
   };
 
   // Function to dynamically adjust Pressable component style based on press state.
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed ? {
+      ...styles.loginBtn,
+      backgroundColor: '#ffb296'
+    } : {
+      ...styles.loginBtn,
+      backgroundColor: '#FF7F50'
+    }
+  }
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>

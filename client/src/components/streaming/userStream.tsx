@@ -28,7 +28,7 @@ export default function UserStream({ partId }: { partId: string }) {
   // );
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0); 
+  const [trigger, setTrigger] = useState(0);
   const [consumerTransportState, setConsumerTransportState] =
     useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
   const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
@@ -126,7 +126,7 @@ export default function UserStream({ partId }: { partId: string }) {
   };
 */
   return (
-    <View>
+    <View style={styles.unitContainer}>
       <View style={styles.unit}>
         {/* <Link href="/" style={styles.close_btn}>
           <FontAwesome name="close" size={24} color="black" />
@@ -173,8 +173,13 @@ export default function UserStream({ partId }: { partId: string }) {
 }
 
 const styles = StyleSheet.create({
+  unitContainer: {
+    flex: 1,
+    height: '100%',
+  },
   unit: {
     // flex: 1,
+    height: '100%',
     // justifyContent: 'center',
     // alignItems: 'center',
   },
@@ -183,11 +188,13 @@ const styles = StyleSheet.create({
     // width: 10
   },
   count_down: {},
-  video_container: {},
+  video_container: {
+    flex: 1,
+  },
   video: {},
   question_component_container: {
     // flex: 1,
-    height: '60%',
+    height: '100%',
     // borderColor: '#FF0000',
     // borderWidth: 1,
   },

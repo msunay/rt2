@@ -6,13 +6,13 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/utils/hooks';
 import HostingQuizCard from '@/components/cards/hostingQuizCard';
 import CreateQuizBtn from '@/components/user/createQuizBtn';
+import Header from '@/components/global/header';
 
 export default function HostingScreen() {
   // Fetch all quizzes.
-  const { data, error, isFetching, isSuccess, refetch } =
-    useGetAllQuizzesQuery();
+  const { data, isFetching, isSuccess, refetch } = useGetAllQuizzesQuery();
   // Retrieves the current user's ID from the Redux state, to filter quizzes by the quiz owner.
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
 
   // State to hold the sorted list of quizzes that the current user is hosting.
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
@@ -30,41 +30,44 @@ export default function HostingScreen() {
       const sorted = [...data];
       sorted.sort(
         (quizA, quizB) =>
-          new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime() // Sorting by ascending date and time.
+        // Sorting by ascending date and time.
+          new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime(),
       );
       // Filter sorted quizzes to include only those hosted by the current user and update state.
       sorted.forEach((quiz) => {
         if (quiz.quizOwner === id) {
-          setSortedList((prevList) => [...prevList, quiz]);
+          setSortedList(prevList => [...prevList, quiz]);
         }
       });
     }
   }, [data, id, isSuccess]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.mainArea}>
-        <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>Your Upcoming Quizzes</Text>
-        <FlashList
-          data={sortedList}
-          renderItem={renderItem}
-          estimatedItemSize={108}
-          refreshControl={
-            <RefreshControl
-            onRefresh={() => refetch()}
-            refreshing={isFetching}
+    <>
+      <Header />
+      <View style={styles.container}>
+        <View style={styles.mainArea}>
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Your Upcoming Quizzes</Text>
+            <FlashList
+              data={sortedList}
+              renderItem={renderItem}
+              estimatedItemSize={108}
+              refreshControl={(
+                <RefreshControl
+                  onRefresh={() => refetch()}
+                  refreshing={isFetching}
+                />
+              )}
+              ListFooterComponent={<View style={styles.listFooter}></View>}
             />
-          }
-          ListFooterComponent={<View style={styles.listFooter}></View>}
-          />
           </View>
           <View style={styles.rightColumn}>
             <CreateQuizBtn />
           </View>
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
   mainArea: {
     flex: 10,
     width: '100%',
-    flexDirection: 'column-reverse'
+    flexDirection: 'column-reverse',
   },
   listFooter: {
     height: 100,
@@ -91,9 +94,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Nunito-Bold',
     marginBottom: 10,
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
   rightColumn: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });

@@ -3,19 +3,16 @@ import {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/types/QuizSocketTypes';
-import CanvasCircularCountdown from 'canvas-circular-countdown';
 
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 200000;
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
     ? process.env.BACKEND_URL
     : process.env.EXPO_PUBLIC_LOCAL_IP!;
 
-const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
-  `${BASE_URL}quizspace`
-);
+const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(`${BASE_URL}quizspace`);
 
 export const quizSocketService = {
   successListener: () =>
@@ -23,17 +20,13 @@ export const quizSocketService = {
       console.log('quiz socket connected: ', socketId);
     }),
 
-  startTimerListener: (
-    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>
-  ) =>
+  startTimerListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>) =>
     quiz.on('start_question_timer', () => {
       setQuestionHidden(false);
       // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
-  startQuizListener: (
-    setQuizStarted: React.Dispatch<React.SetStateAction<boolean>>
-  ) =>
+  startQuizListener: (setQuizStarted: React.Dispatch<React.SetStateAction<boolean>>) =>
     quiz.on('start_quiz', () => {
       setQuizStarted(true);
       // document.getElementById('countdown-canvas')!.hidden = false;
@@ -42,7 +35,7 @@ export const quizSocketService = {
 
   revealListener: (
     setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
-    setTrigger: React.Dispatch<React.SetStateAction<number>>
+    setTrigger: React.Dispatch<React.SetStateAction<number>>,
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
@@ -52,7 +45,7 @@ export const quizSocketService = {
       //   .forEach((btn, i) => (btn.disabled = true));
 
       setTimeout(() => {
-        setTrigger((trigger) => trigger + 1);
+        setTrigger(trigger => trigger + 1);
         setQuestionHidden(true);
         // document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
@@ -65,9 +58,7 @@ export const quizSocketService = {
 
   emitShowWinners: () => quiz.emit('show_winners'),
 
-  revealAnswerHostListener: (
-    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>
-  ) => {
+  revealAnswerHostListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>) => {
     quiz.on('reveal_answers_host', () => {
       console.log('reveal');
 
@@ -78,18 +69,14 @@ export const quizSocketService = {
     });
   },
 
-  hostWinnersListener: (
-    setTrigger: React.Dispatch<React.SetStateAction<number>>
-  ) => {
+  hostWinnersListener: (setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
     quiz.on('host_winners', () => {
       console.log('HOST WINNERS RECEIVED');
-      setTrigger((num) => num + 1);
+      setTrigger(num => num + 1);
     });
   },
 
-  playerWinnersListener: (
-    setTrigger: React.Dispatch<React.SetStateAction<number>>
-  ) => {
+  playerWinnersListener: (setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
     quiz.on('player_winners', () => {
       console.log('PLAYER WINNERS RECEIVED');
       setTrigger((num) => {

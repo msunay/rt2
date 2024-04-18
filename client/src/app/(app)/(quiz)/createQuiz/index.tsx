@@ -131,8 +131,15 @@ export default function CreateQuiz() {
     });
   };
 
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ["#ffb296", "#FF7F50"], styles.loginBtn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed ? {
+      ...styles.loginBtn,
+      backgroundColor: '#ffb296'
+    } : {
+      ...styles.loginBtn,
+      backgroundColor: '#FF7F50'
+    }
+  }
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">

@@ -10,11 +10,9 @@ import { setParticipationsList } from '@/features/participatingSlice';
 
 export default function StartQuizScreen() {
   // Select User ID
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
   // Select participations array from store
-  const participatingStore = useAppSelector(
-    (state) => state.participatingSlice
-  );
+  const participatingStore = useAppSelector(state => state.participatingSlice);
   // Hook to dispatch actions to Redux store.
   const dispatch = useAppDispatch();
 
@@ -38,9 +36,8 @@ export default function StartQuizScreen() {
     // Clone the participation list to avoid mutating the original array.
     const sorted = [...participatingStore.value];
     // Sort the cloned array based on the dateTime of each quiz.
-    sorted.sort(
-      (quizA, quizB) =>
-        new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime()
+    sorted.sort((quizA, quizB) =>
+      new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime(),
     );
     // Update the sortedList state with the sorted quizzes.
     setSortedList(sorted);
@@ -55,18 +52,20 @@ export default function StartQuizScreen() {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.container}>
         <View style={styles.mainArea}>
-          {sortedList.length ? (
-            <FlashList
-              data={sortedList}
-              renderItem={renderItem}
-              estimatedItemSize={108}
-              ListFooterComponent={<View style={styles.listFooter}></View>}
-            />
-          ) : (
-            <View style={styles.emptyList}>
-              <Text>You're not signed up to any Quizzes</Text>
-            </View>
-          )}
+          {sortedList.length
+            ? (
+              <FlashList
+                data={sortedList}
+                renderItem={renderItem}
+                estimatedItemSize={108}
+                ListFooterComponent={<View style={styles.listFooter}></View>}
+              />
+              )
+            : (
+              <View style={styles.emptyList}>
+                <Text>You're not signed up to any Quizzes</Text>
+              </View>
+              )}
         </View>
       </View>
     </SafeAreaView>

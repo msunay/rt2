@@ -27,7 +27,7 @@ export default function RegistrationScreen() {
 
   // Define a schema for registration form validation using Yup.
   // This includes rules for email, username, password, and password confirmation.
-  let registrationSchema = object().shape({
+  const registrationSchema = object().shape({
     email: string()
       .email('Not a valid email address') // Validates email format.
       .required('Email is required'), // Makes email a required field.
@@ -63,7 +63,7 @@ export default function RegistrationScreen() {
       email: formData.email,
       username: formData.username,
       password: formData.password,
-    }).then((res: any) => {
+    }).then((res) => {
       // Construct a user response object from the registration response.
       const responseUser: ResponseUser = {
         token: res.token, // Authentication token received upon registration.
@@ -76,8 +76,15 @@ export default function RegistrationScreen() {
   };
 
   // Function to dynamically adjust Pressable component style based on press state.
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed ? {
+      ...styles.loginBtn,
+      backgroundColor: '#ffb296'
+    } : {
+      ...styles.loginBtn,
+      backgroundColor: '#FF7F50'
+    }
+  }
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
