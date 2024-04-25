@@ -43,6 +43,7 @@ export class Quiz extends Model<
   declare category: string;
   declare dateTime: Date;
   declare isPrivate: boolean;
+  declare hasVideo: boolean;
   declare pin: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -105,6 +106,10 @@ export class Quiz extends Model<
           allowNull: false,
         },
         isPrivate: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
+        },
+        hasVideo: {
           type: DataTypes.BOOLEAN,
           allowNull: false
         },

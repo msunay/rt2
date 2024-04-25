@@ -37,7 +37,18 @@ async function populateDatabase() {
     for (let i = 0; i < mocks.quizIdArray.length; i++) {
       let quiz: Quiz;
       let isPrivate: boolean;
-      if (Math.round(Math.random()) === 0) {
+      // One video quiz
+      if (i === 0) {
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          hasVideo: true,
+          isPrivate: false,
+        });
+      } else if (Math.round(Math.random()) === 0) {
         isPrivate = false
         quiz = await models.Quiz.create({
           id: mocks.quizIdArray[i],
@@ -45,10 +56,10 @@ async function populateDatabase() {
           quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
           category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
           dateTime: moment().add(i + 1, 'days').toDate(),
-          isPrivate
+          hasVideo: false,
+          isPrivate,
         });
-      }
-      else {
+      } else {
         isPrivate = true
         quiz = await models.Quiz.create({
           id: mocks.quizIdArray[i],
@@ -56,6 +67,7 @@ async function populateDatabase() {
           quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))].id,
           category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))],
           dateTime: moment().add(i + 1, 'days').toDate(),
+          hasVideo: false,
           isPrivate,
           pin: '1111'
         });
