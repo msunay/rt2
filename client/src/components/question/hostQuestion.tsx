@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
-import { QuestionAnswer, Answer } from '@/types/Types';
-import { useAppSelector } from '@/utils/hooks';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
-import { btnPressStyle } from '@/utils/helpers';
+import { useState, useEffect } from "react";
+import { QuestionAnswer, Answer } from "@/types/Types";
+import { useAppSelector } from "@/utils/hooks";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { useGetOneQuizQuestionAnswerQuery } from "@/services/backendApi";
+import { btnPressStyle } from "@/utils/helpers";
+import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { QUESTION_TIME } from "@/services/quizSocketService";
+import Animated from "react-native-reanimated";
 
 interface Props {
   hidden: boolean;
@@ -11,17 +14,9 @@ interface Props {
   quizId: string;
 }
 
-export default function HostQuestion({
-  hidden,
-  trigger,
-  quizId,
-}: Props) {
+export default function HostQuestion({ hidden, trigger, quizId }: Props) {
   // Fetch quiz by its ID, including questions and answers.
-  const {
-    data: quiz,
-    error,
-    isLoading,
-  } = useGetOneQuizQuestionAnswerQuery(quizId);
+  const { data: quiz } = useGetOneQuizQuestionAnswerQuery(quizId);
 
   // Access the current question number from the Redux state.
   const currentQuestionNumber = useAppSelector(
@@ -68,9 +63,7 @@ export default function HostQuestion({
             {currentAnswers?.map((answer, index) => (
               <Pressable
                 key={index}
-                style={({ pressed }) =>
-                  btnPressStyle(pressed, ['silver', 'grey'], styles.answerBtn)
-                }
+                style={styles.answerBtn}
               >
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
@@ -88,28 +81,34 @@ const styles = StyleSheet.create({
   },
   host_question_container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   questionTextContainer: {
     flex: 1,
   },
   question_text: {
-    fontFamily: 'Nunito-Black',
+    flex: 1,
+    fontFamily: "Nunito-Black",
+    fontSize: 20,
+    textAlign: "center",
   },
   answer_container: {
-    flex: 4,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
-    alignContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-evenly",
+    alignContent: "space-between",
   },
   answerText: {
-    fontFamily: 'Nunito-Regular',
-    textAlign: 'center',
+    fontFamily: "Nunito-Regular",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "white",
   },
   answerBtn: {
-    justifyContent: 'center',
-    width: '50%',
-    height: '50%',
+    justifyContent: "center",
+    width: "50%",
+    height: "50%",
+    backgroundColor: 'grey',
   },
 });

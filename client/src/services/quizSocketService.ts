@@ -5,7 +5,7 @@ import {
 } from '@/types/QuizSocketTypes';
 
 
-export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 200000;
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
@@ -88,18 +88,18 @@ export const quizSocketService = {
 };
 
 export function startTimer() {
-  const pickColorByPercentage = (percentage: any, time: any) => {
-    switch (true) {
-      case percentage >= 75:
-        return '#28a745'; // green
-      case percentage >= 50 && percentage < 75:
-        return '#17a2b8'; // blue
-      case percentage >= 25 && percentage < 50:
-        return '#ffc107'; // orange
-      default:
-        return '#dc3545'; // red
-    }
-  };
+  // const pickColorByPercentage = (percentage: any, time: any) => {
+  //   switch (true) {
+  //     case percentage >= 75:
+  //       return '#28a745'; // green
+  //     case percentage >= 50 && percentage < 75:
+  //       return '#17a2b8'; // blue
+  //     case percentage >= 25 && percentage < 50:
+  //       return '#ffc107'; // orange
+  //     default:
+  //       return '#dc3545'; // red
+  //   }
+  // };
   // new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
   //   duration: QUESTION_TIME,
   //   radius: 40,
