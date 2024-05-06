@@ -1,7 +1,7 @@
 import UserStream from '@/components/streaming/userStream';
 import { QUIZ_BACKGROUND } from '@/utils/images';
 import { useLocalSearchParams } from 'expo-router';
-import { ImageBackground, StyleSheet } from 'react-native';
+import { ImageBackground, StyleSheet, Text } from 'react-native';
 
 export default function UserStreamPage() {
   // Get participation id from route slug.
@@ -16,7 +16,8 @@ export default function UserStreamPage() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover',
+    // resizeMode: 'cover',
     justifyContent: 'center',
+    zIndex: -1
   },
 });

@@ -1,8 +1,11 @@
+import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
 import type {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
 } from '@/types/PeerSocketTypes';
 import type { types as mediasoupTypes } from 'mediasoup-client';
+import type { Dispatch } from 'react';
+// import { MediaStream } from 'react-native-webrtc';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 
@@ -153,7 +156,7 @@ export const peersSocketService = {
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
     consumer: mediasoupTypes.Consumer,
-    remoteVideo: React.RefObject<HTMLVideoElement>,
+    dispatchUserState: Dispatch<UserStreamStateAction>,
   ) => {
     peers.emit(
       'consume',
@@ -180,11 +183,11 @@ export const peersSocketService = {
         const { track } = consumer;
 
         const producerTrack = new MediaStream([track]);
-        // producerTrack.getTracks()[0]
-        console.log('remote vid ref: ', remoteVideo.current);
+        producerTrack.getTracks()[0]
         console.log('producerTrack: ', producerTrack);
         // biome-ignore lint: <explanation>
-        remoteVideo.current!.srcObject = producerTrack; // BUG
+        // remoteVideo.current!.srcObject = producerTrack; // BUG
+        dispatchUserState({type: 'SET_US_MEDIA_STREAM', payload: producerTrack})
 
         peers.emit('consumer_resume');
       },
@@ -196,12 +199,12 @@ export const peersSocketService = {
   },
 
   producerClosedListener: (
-    // consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-    // consumer: mediasoupTypes.Consumer
+    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+    consumer: mediasoupTypes.Consumer
   ) =>
     peers.on('producer_closed', () => {
       // Server notified when producer is closed
-      // consumerTransport.close();
-      // consumer.close();
+      consumerTransport.close();
+      consumer.close();
     }),
 };

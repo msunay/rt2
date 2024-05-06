@@ -48,7 +48,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     quizSocketService.startTimerListener(dispatchState);
     quizSocketService.revealAnswerHostListener(dispatchState);
     quizSocketService.hostWinnersListener(dispatchState);
-    // peersSocketService.successListener();
+    peersSocketService.successListener();
   }, []);
 
   function startQuiz() {
@@ -62,9 +62,9 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     // setQuestionHidden(false);
 
     // if (currentQuestionNumber < 9) {
-      //   setTimeout(() => {
+    //   setTimeout(() => {
 
-        //   }, QUESTION_TIME + 2000);
+    //   }, QUESTION_TIME + 2000);
     // }
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
@@ -218,63 +218,61 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   };
 
   return (
-    <>
-      <RTCView
-        streamURL={state.mediaStream?.toURL()}
-        mirror={true}
-        objectFit='cover'
-        style={{ flex: 1 }}
-      >
-        <View style={styles.unit}>
-          <View style={styles.video_container}>
-            <View style={styles.question_component_container}>
-              {state.quizStarted && (
-                <HostQuestion
-                  quizId={quizId}
-                  trigger={state.trigger}
-                  hidden={state.questionHidden}
-                />
-              )}
-            </View>
-          </View>
-
-          <View style={styles.btn_holder}>
-            <View style={styles.quiz_controls}>
-              {state.quizStarted ? (
-                currentQuestionNumber === 10 ? (
-                  <Pressable
-                    style={pressableStyle}
-                    onPress={() => {
-                      handleWinners();
-                      dispatch(incrementQuestionNumber());
-                    }}
-                  >
-                    <Text style={styles.next_q_btnText}>Reveal Winners</Text>
-                  </Pressable>
-                ) : (
-                  <Pressable ref={nextQBtn} onPress={nextQuestion} style={pressableStyle}>
-                    <Text style={styles.next_q_btnText}>Next Question</Text>
-                  </Pressable>
-                )
-              ) : (
-                <Pressable ref={startBtn} style={pressableStyle} onPress={startQuiz}>
-                  <Text style={styles.next_q_btnText}>Start Quiz</Text>
-                </Pressable>
-              )}
-            </View>
-            <Pressable style={pressableStyle} onPress={getLocalStream}>
-              <Text>Start Video</Text>
-            </Pressable>
-            <Pressable style={pressableStyle} onPress={stream}>
-              <Text>Stream</Text>
-            </Pressable>
-            <Pressable style={pressableStyle} onPress={endStream}>
-              <Text>End Stream</Text>
-            </Pressable>
+    <RTCView
+      streamURL={state.mediaStream?.toURL()}
+      mirror={true}
+      objectFit='cover'
+      style={{ flex: 1 }}
+    >
+      <View style={styles.unit}>
+        <View style={styles.video_container}>
+          <View style={styles.question_component_container}>
+            {state.quizStarted && (
+              <HostQuestion
+                quizId={quizId}
+                trigger={state.trigger}
+                hidden={state.questionHidden}
+              />
+            )}
           </View>
         </View>
-      </RTCView>
-    </>
+
+        <View style={styles.btn_holder}>
+          <View style={styles.quiz_controls}>
+            {state.quizStarted ? (
+              currentQuestionNumber === 10 ? (
+                <Pressable
+                  style={pressableStyle}
+                  onPress={() => {
+                    handleWinners();
+                    dispatch(incrementQuestionNumber());
+                  }}
+                >
+                  <Text style={styles.next_q_btnText}>Reveal Winners</Text>
+                </Pressable>
+              ) : (
+                <Pressable ref={nextQBtn} onPress={nextQuestion} style={pressableStyle}>
+                  <Text style={styles.next_q_btnText}>Next Question</Text>
+                </Pressable>
+              )
+            ) : (
+              <Pressable ref={startBtn} style={pressableStyle} onPress={startQuiz}>
+                <Text style={styles.next_q_btnText}>Start Quiz</Text>
+              </Pressable>
+            )}
+          </View>
+          <Pressable style={pressableStyle} onPress={getLocalStream}>
+            <Text>Start Video</Text>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={stream}>
+            <Text>Stream</Text>
+          </Pressable>
+          <Pressable style={pressableStyle} onPress={endStream}>
+            <Text>End Stream</Text>
+          </Pressable>
+        </View>
+      </View>
+    </RTCView>
   );
 }
 

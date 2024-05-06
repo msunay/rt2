@@ -182,7 +182,7 @@ const createWebRtcTransport = async (callback: ({ transportParams }: { transport
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
-        iceServers
+        // iceServers
       },
     });
     return transport;

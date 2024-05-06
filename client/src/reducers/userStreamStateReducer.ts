@@ -1,5 +1,6 @@
 import type { AVPlaybackStatus } from 'expo-av';
 import type { types as mediasoupTypes } from 'mediasoup-client';
+import type { MediaStream } from 'react-native-webrtc';
 
 interface UserStreamState {
   quizStarted: boolean;
@@ -8,6 +9,7 @@ interface UserStreamState {
   consumerTransportState: mediasoupTypes.Transport;
   consumerState: mediasoupTypes.Consumer;
   avStatus: AVPlaybackStatus;
+  mediaStream: MediaStream | undefined;
 }
 
 export const defaultUserStreamState: UserStreamState = {
@@ -17,6 +19,7 @@ export const defaultUserStreamState: UserStreamState = {
   consumerTransportState: {} as mediasoupTypes.Transport,
   consumerState: {} as mediasoupTypes.Consumer,
   avStatus: {} as AVPlaybackStatus,
+  mediaStream: undefined,
 };
 
 const userStreamStateActions = {
@@ -26,6 +29,7 @@ const userStreamStateActions = {
   SET_US_CONSUMER_TS: 'SET_US_CONSUMER_TS',
   SET_US_CONSUMER_STATE: 'SET_US_CONSUMER_STATE',
   SET_US_AV_STATUS: 'SET_US_AV_STATUS',
+  SET_US_MEDIA_STREAM: 'SET_US_MEDIA_STREAM',
 };
 
 type UserStreamStateActionKey = keyof typeof userStreamStateActions;
@@ -37,6 +41,7 @@ export interface UserStreamStateAction {
     | mediasoupTypes.Transport
     | mediasoupTypes.Consumer
     | AVPlaybackStatus
+    | MediaStream
     | undefined;
 }
 
@@ -49,19 +54,25 @@ export const userStreamStateReducer = (
       return { ...state, quizStarted: action.payload as boolean };
 
     case 'SET_US_Q_HIDDEN':
-      return { ...state, questionHidden: action.payload as boolean }
+      return { ...state, questionHidden: action.payload as boolean };
 
     case 'INCREMENT_US_TRIGGER':
-      return { ...state, trigger: state.trigger++ }
+      return { ...state, trigger: state.trigger++ };
 
     case 'SET_US_CONSUMER_TS':
-      return { ...state, consumerTransportState: action.payload as mediasoupTypes.Transport }
+      return {
+        ...state,
+        consumerTransportState: action.payload as mediasoupTypes.Transport,
+      };
 
     case 'SET_US_CONSUMER_STATE':
-      return { ...state, consumerState: action.payload as mediasoupTypes.Consumer }
+      return { ...state, consumerState: action.payload as mediasoupTypes.Consumer };
 
     case 'SET_US_AV_STATUS':
-      return { ...state, avStatus: action.payload as AVPlaybackStatus}
+      return { ...state, avStatus: action.payload as AVPlaybackStatus };
+
+    case 'SET_US_MEDIA_STREAM':
+      return { ...state, mediaStream: action.payload as MediaStream };
 
     default:
       return state;
