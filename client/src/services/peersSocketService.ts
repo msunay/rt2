@@ -1,18 +1,21 @@
-import { Socket, io } from 'socket.io-client';
-import { types as mediasoupTypes } from 'mediasoup-client';
-import {
+import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
+import type {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
 } from '@/types/PeerSocketTypes';
+import type { types as mediasoupTypes } from 'mediasoup-client';
+import type { Dispatch } from 'react';
+// import { MediaStream } from 'react-native-webrtc';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-const BASE_URL =
-process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BACKEND_URL
-  : 'http://localhost:3001/';
-
+const BASE_URL: string =
+  process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_BACKEND_URL || ''
+    : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
-  `${BASE_URL}mediasoup`
+  `${BASE_URL}mediasoup`,
 );
 
 interface parameters {
@@ -29,98 +32,86 @@ export const peersSocketService = {
     }),
 
   emitCreateRoom: (
-    createDevice: (
-      rtpCapabilities: mediasoupTypes.RtpCapabilities
-    ) => Promise<void>
+    createDevice: (rtpCapabilities: mediasoupTypes.RtpCapabilities) => Promise<void>,
   ) => {
     peers.emit(
       'create_room',
       ({ rtpCapabilities }: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
         console.log('Router RTP Capabilities: ', rtpCapabilities);
-        //assign to local variable
+        // assign to local variable
         createDevice(rtpCapabilities);
-      }
+      },
     );
   },
 
   emitcreateProducerWebRtcTransport: (
     producerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
-    connectSendTransport: (
-      producerTransport: mediasoupTypes.Transport
-    ) => Promise<void>
+    connectSendTransport: (producerTransport: mediasoupTypes.Transport) => Promise<void>,
   ) => {
-    peers.emit(
-      'createWebRtcTransport',
-      { sender: true },
-      ({ transportParams }) => {
-        if (transportParams.error) {
-          console.log('transportParams.error: ', transportParams.error);
-          return;
-        }
-        console.log('transportParams: ', transportParams);
-
-        producerTransport = device.createSendTransport(transportParams);
-
-        console.log(
-          'CreateSendTransport producerTransport: ',
-          producerTransport
-        );
-
-        producerTransport.on(
-          'connect',
-          async (
-            {
-              dtlsParameters,
-            }: { dtlsParameters: mediasoupTypes.DtlsParameters },
-            callback: () => void,
-            errback: (error: Error) => void
-          ) => {
-            try {
-              // Singnal local DTLS parameters to the server side transport
-              peers.emit('transport_connect', {
-                dtlsParameters: dtlsParameters,
-              });
-
-              // Tell the transport that parameters were transmitted.
-              callback();
-            } catch (error: any) {
-              errback(error);
-            }
-          }
-        );
-
-        producerTransport.on(
-          'produce',
-          async (
-            parameters: parameters,
-            callback: callback,
-            errback: (error: Error) => void
-          ) => {
-            console.log('producer.on produce params: ', parameters);
-
-            try {
-              peers.emit(
-                'transport_produce',
-                {
-                  kind: parameters.kind,
-                  rtpParameters: parameters.rtpParameters,
-                  appData: parameters.appData,
-                },
-                ({ id }) => {
-                  // Tell the transport that parameters were transmitted and provide it with the
-                  // server side producers's id
-                  callback({ id });
-                }
-              );
-            } catch (err: any) {
-              errback(err);
-            }
-          }
-        );
-        connectSendTransport(producerTransport);
+    peers.emit('createWebRtcTransport', { sender: true }, ({ transportParams }) => {
+      if (transportParams.error) {
+        console.log('transportParams.error: ', transportParams.error);
+        return;
       }
-    );
+      console.log('transportParams: ', transportParams);
+
+      // biome-ignore lint: <explanation>
+      producerTransport = device.createSendTransport(transportParams);
+
+      console.log('CreateSendTransport producerTransport: ', producerTransport);
+
+      producerTransport.on(
+        'connect',
+        async (
+          { dtlsParameters }: { dtlsParameters: mediasoupTypes.DtlsParameters },
+          callback: () => void,
+          errback: (error: Error) => void,
+        ) => {
+          try {
+            // Singnal local DTLS parameters to the server side transport
+            peers.emit('transport_connect', {
+              dtlsParameters,
+            });
+
+            // Tell the transport that parameters were transmitted.
+            callback();
+          } catch (error) {
+            errback(error as Error);
+          }
+        },
+      );
+
+      producerTransport.on(
+        'produce',
+        async (
+          parameters: parameters,
+          callback: callback,
+          errback: (error: Error) => void,
+        ) => {
+          console.log('producer.on produce params: ', parameters);
+
+          try {
+            peers.emit(
+              'transport_produce',
+              {
+                kind: parameters.kind,
+                rtpParameters: parameters.rtpParameters,
+                appData: parameters.appData,
+              },
+              ({ id }) => {
+                // Tell the transport that parameters were transmitted and provide it with the
+                // server side producers's id
+                callback({ id });
+              },
+            );
+          } catch (err) {
+            errback(err as Error);
+          }
+        },
+      );
+      connectSendTransport(producerTransport);
+    });
   },
 
   emitcreateConsumerWebRtcTransport: (
@@ -128,53 +119,44 @@ export const peersSocketService = {
     device: mediasoupTypes.Device,
     connectRecvTransport: (
       consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-      device: mediasoupTypes.Device
-    ) => Promise<void>
+      device: mediasoupTypes.Device,
+    ) => Promise<void>,
   ) => {
-    peers.emit(
-      'createWebRtcTransport',
-      { sender: false },
-      ({ transportParams }) => {
-        if (transportParams.error) {
-          console.log(transportParams.error);
-          return;
-        }
-        console.log('transportParams: ', transportParams);
-        // Create recv transport
-        consumerTransport = device.createRecvTransport(transportParams);
-
-        console.log(
-          'CreateRecvTransport consumerTransport: ',
-          consumerTransport
-        );
-
-        consumerTransport.on(
-          'connect',
-          async ({ dtlsParameters }, callback, errback) => {
-            try {
-              // Signal local DTLS parameters to the server side transport
-              peers.emit('transport_recv_connect', {
-                // transportId: consumerTransport.id,
-                dtlsParameters,
-              });
-              // Tell the transport that parameters were transmitted
-              callback();
-            } catch (err: any) {
-              errback(err);
-            }
-          }
-        );
-
-        connectRecvTransport(consumerTransport, device);
+    peers.emit('createWebRtcTransport', { sender: false }, ({ transportParams }) => {
+      if (transportParams.error) {
+        console.log(transportParams.error);
+        return;
       }
-    );
+      console.log('transportParams: ', transportParams);
+      // Create recv transport
+      // biome-ignore lint: <explanation>
+      consumerTransport = device.createRecvTransport(transportParams);
+
+      console.log('CreateRecvTransport consumerTransport: ', consumerTransport);
+
+      consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+        try {
+          // Signal local DTLS parameters to the server side transport
+          peers.emit('transport_recv_connect', {
+            // transportId: consumerTransport.id,
+            dtlsParameters,
+          });
+          // Tell the transport that parameters were transmitted
+          callback();
+        } catch (err) {
+          errback(err as Error);
+        }
+      });
+
+      connectRecvTransport(consumerTransport, device);
+    });
   },
 
   emitConsume: (
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
     consumer: mediasoupTypes.Consumer,
-    remoteVideo: React.RefObject<HTMLVideoElement>
+    dispatchUserState: Dispatch<UserStreamStateAction>,
   ) => {
     peers.emit(
       'consume',
@@ -188,6 +170,7 @@ export const peersSocketService = {
         }
 
         console.log(params);
+        // biome-ignore lint: <explanation>
         consumer = await consumerTransport.consume({
           id: params.id,
           producerId: params.producerId,
@@ -200,26 +183,28 @@ export const peersSocketService = {
         const { track } = consumer;
 
         const producerTrack = new MediaStream([track]);
-        // producerTrack.getTracks()[0]
-        console.log('remote vid ref: ', remoteVideo.current);
+        producerTrack.getTracks()[0]
         console.log('producerTrack: ', producerTrack);
-        remoteVideo.current!.srcObject = producerTrack;
+        // biome-ignore lint: <explanation>
+        // remoteVideo.current!.srcObject = producerTrack; // BUG
+        dispatchUserState({type: 'SET_US_MEDIA_STREAM', payload: producerTrack})
 
         peers.emit('consumer_resume');
-      }
+      },
     );
     return {
       consumerTransport,
-      consumer
-    }
+      consumer,
+    };
   },
 
   producerClosedListener: (
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     consumer: mediasoupTypes.Consumer
-  ) => peers.on('producer_closed', () => {
-    // Server notified when producer is closed
-    // consumerTransport.close();
-    // consumer.close();
-  })
+  ) =>
+    peers.on('producer_closed', () => {
+      // Server notified when producer is closed
+      consumerTransport.close();
+      consumer.close();
+    }),
 };

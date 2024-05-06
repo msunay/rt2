@@ -1,4 +1,4 @@
-import { FullQuizState } from '@/types/Types';
+import type { FullQuizState } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 import { formatISO } from 'date-fns';
 
@@ -26,9 +26,9 @@ export const quizCreationSlice = createSlice({
           category: string;
           dateTime: string;
           isPrivate: boolean;
-          pin?: number;
+          pin?: string;
         };
-      }
+      },
     ) => {
       state.quizName = payload.quizName;
       state.quizOwner = payload.quizOwner;
@@ -50,13 +50,14 @@ export const quizCreationSlice = createSlice({
             isCorrect: boolean;
           }[];
         };
-      }
+      },
     ) => {
       state.Questions = [...state.Questions, payload];
     },
-    resetQuizStore: (state => {
+    resetQuizStore: state => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       state = initialState;
-    })
+    },
   },
 });
 

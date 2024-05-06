@@ -1,5 +1,7 @@
 // Database model types
 
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta, QueryActionCreatorResult, QueryDefinition } from "@reduxjs/toolkit/query";
+
 export interface User {
   id?: string;
   email: string;
@@ -29,12 +31,13 @@ export interface Quiz {
   quizOwner: string;
   category: string;
   dateTime: Date;
+  hasVideo: boolean;
   isPrivate: boolean;
   pin?: number;
   createdAt?: Date;
   updatedAt?: Date;
   host_name?: string;
-  [key: string]: any
+  [key: string]: string | Date | boolean | number | undefined;
 }
 
 export interface Question {
@@ -154,7 +157,7 @@ export interface FullQuizState {
   category: string;
   dateTime: string;
   isPrivate: boolean;
-  pin?: number;
+  pin?: string;
   Questions: {
     questionText: string;
     positionInQuiz: number;
@@ -207,10 +210,18 @@ export interface ParticipationAndAnswers {
 
 // Authentication types
 
-export interface ResponseUser {
+export interface ResponseLoginUser {
+  token: string;
   id: string;
   username: string;
+}
+
+export interface ResponseRegisterUser {
   token: string;
+  dataValues: {
+    id: string;
+    username: string;
+  }
 }
 
 export interface UserPost {
@@ -223,3 +234,21 @@ export interface LoginCredentials {
   username: string;
   password: string;
 }
+
+
+// RTK Types
+export type RefetchQuizzes = () => QueryActionCreatorResult<
+    QueryDefinition<
+      void,
+      BaseQueryFn<
+        string | FetchArgs,
+        unknown,
+        FetchBaseQueryError,
+        Record<string, never>,
+        FetchBaseQueryMeta
+      >,
+      never,
+      Quiz[],
+      "backendApi"
+    >
+  >;

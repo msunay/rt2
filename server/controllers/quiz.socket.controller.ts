@@ -4,7 +4,7 @@ import {
 } from '../Types/QuizSocketTypes';
 import { Socket } from 'socket.io';
 
-const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 2000;
+const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>

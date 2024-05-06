@@ -23,5 +23,5 @@ export const CATEGORIES: {
   music: 'Music',
   nature: 'Nature',
   science: 'Science',
-  tech: 'Tech'
-}
+  tech: 'Tech',
+};

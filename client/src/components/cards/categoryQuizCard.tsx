@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { CATEGORY_IMAGES } from '@/utils/images';
 import { CATEGORIES } from '@/utils/consts';
+import { CATEGORY_IMAGES } from '@/utils/images';
 import { Image } from 'expo-image';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function CategoryQuizCard({ category }: { category: string }) {
   return (
@@ -10,7 +10,7 @@ export default function CategoryQuizCard({ category }: { category: string }) {
         <Image
           style={styles.images}
           source={CATEGORY_IMAGES[category]}
-          contentFit="cover"
+          contentFit='cover'
         />
         <Text style={styles.cardText}>{CATEGORIES[category]}</Text>
       </View>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     margin: 10,
-    width: 90
+    width: 90,
   },
   cardText: {
     flex: 1,

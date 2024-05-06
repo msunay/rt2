@@ -1,4 +1,4 @@
-import { ImageSource } from 'expo-image';
+import type { ImageSource } from 'expo-image';
 
 export const CATEGORY_IMAGES: {
   architecture: ImageSource;
@@ -39,3 +39,7 @@ export const TILE_IMAGES = {
 };
 
 export const LOGO = { logo: require('../../assets/logo.png') };
+
+export const PROFILE_PLACEHOLDER = {
+  icon: require('../../assets/images/blank-profile-picture.png'),
+};

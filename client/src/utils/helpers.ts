@@ -1,11 +1,19 @@
-// Helper for adding button on press colors
-export const btnPressStyle = (
+import type { Quiz } from '@/types/Types';
+
+export const inputDisabledStyle = (
   pressed: boolean,
   [color1, color2]: string[],
-  style: any
+  style: { [key: string]: number | string },
 ) => [
+  style, // adds the rest of the btn stlyes
   {
     backgroundColor: pressed ? color1 : color2,
   },
-  style, // adds the rest of the btn stlyes
 ];
+
+export const sortQuizzes = (quizzes: Quiz[]) => {
+  return quizzes.sort(
+    (quizA, quizB) =>
+      new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime(), // Sort by ascending date and time.
+  );
+};

@@ -1,26 +1,26 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Quiz } from '@/types/Types';
-import { Image } from 'expo-image';
-import { CATEGORY_IMAGES } from '@/utils/images';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import {
   useGetOneParticipationQuery,
   useGetUserDetailsQuery,
 } from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
+import { CATEGORY_IMAGES } from '@/utils/images';
 import { formatDistance } from 'date-fns';
-import { useAppSelector } from '@/utils/hooks';
+import { Image } from 'expo-image';
 import { Link } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
   // Fetches the host's details for the quiz using the quiz owner's ID.
   const { data: host } = useGetUserDetailsQuery(quiz.quizOwner);
 
   // Retrieves the current user's ID from the Redux state.
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
 
   // Fetches participation details for the current user and the specific quiz.
   const { data: participation } = useGetOneParticipationQuery({
     userId: id,
-    quizId: quiz.id!,
+    quizId: quiz.id || '',
   });
 
   return (
@@ -36,7 +36,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
           <Image
             source={CATEGORY_IMAGES[quiz.category]}
             style={styles.image}
-            contentFit="cover"
+            contentFit='cover'
           />
         </View>
         <View style={styles.detailsContainer}>

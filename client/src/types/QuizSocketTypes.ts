@@ -18,8 +18,3 @@ export interface QuizServerToClientEvents {
   host_winners: () => void;
   player_winners: () => void;
 }
-
-interface nextQuestion {
-  currentQuestionNumber: number;
-  quizStarted: boolean;
-}

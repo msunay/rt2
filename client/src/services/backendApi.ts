@@ -1,39 +1,39 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {
-  User,
-  ResponseUser,
-  UserPost,
-  Quiz,
-  QuizQuestionAnswer,
+import type {
+  FullQuizState,
+  LoginCredentials,
   Participation,
   ParticipationAndAnswers,
   ParticipationAnswer,
-  UserParticipations,
+  Quiz,
   QuizParticipations,
+  QuizQuestionAnswer,
+  ResponseLoginUser,
+  ResponseRegisterUser,
+  User,
+  UserParticipations,
+  UserPost,
   Winner,
-  LoginCredentials,
-  SubmitFullQuiz,
-  FullQuizState,
 } from '@/types/Types';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BACKEND_URL!
-    : process.env.EXPO_PUBLIC_LOCAL_IP!;
+    ? process.env.BACKEND_URL || ''
+    : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 export const backendApi = createApi({
   reducerPath: 'backendApi',
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
-  endpoints: (build) => ({
-    postUser: build.mutation<ResponseUser, UserPost>({
-      query: (user) => ({
+  endpoints: build => ({
+    postUser: build.mutation<ResponseRegisterUser, UserPost>({
+      query: user => ({
         url: 'user',
         method: 'POST',
         body: user,
       }),
     }),
 
-    loginUser: build.mutation<ResponseUser, LoginCredentials>({
+    loginUser: build.mutation<ResponseLoginUser, LoginCredentials>({
       query: ({ username, password }) => ({
         url: 'login',
         method: 'POST',
@@ -41,15 +41,15 @@ export const backendApi = createApi({
       }),
     }),
 
-    getUser: build.query<ResponseUser, string>({
-      query: (authToken) => ({
+    getUser: build.query<ResponseLoginUser, string>({
+      query: authToken => ({
         url: 'userId',
         headers: { Authorization: `Bearer ${authToken}` },
       }),
     }),
 
     getUserDetails: build.query<User, string>({
-      query: (userId) => `userDetails/${userId}`,
+      query: userId => `userDetails/${userId}`,
     }),
 
     addDemoQuiz: build.mutation<
@@ -64,7 +64,7 @@ export const backendApi = createApi({
     }),
 
     addFullQuiz: build.mutation<Quiz, FullQuizState>({
-      query: (quiz) => ({
+      query: quiz => ({
         url: 'quiz',
         method: 'POST',
         body: { ...quiz, dateTime: new Date(quiz.dateTime) },
@@ -72,7 +72,7 @@ export const backendApi = createApi({
     }),
 
     getOneQuiz: build.query<Quiz, string>({
-      query: (quizId) => `quiz/${quizId}`,
+      query: quizId => `quiz/${quizId}`,
     }),
 
     getAllQuizzes: build.query<Quiz[], void>({
@@ -80,11 +80,11 @@ export const backendApi = createApi({
     }),
 
     getOneQuizQuestionAnswer: build.query<QuizQuestionAnswer, string>({
-      query: (quizId) => `quizQuestionAnswer/${quizId}`,
+      query: quizId => `quizQuestionAnswer/${quizId}`,
     }),
 
     getWinners: build.query<Winner[], string>({
-      query: (quizId) => `winners/${quizId}`,
+      query: quizId => `winners/${quizId}`,
     }),
 
     addParticipation: build.mutation<
@@ -99,22 +99,19 @@ export const backendApi = createApi({
     }),
 
     getQuizParticipations: build.query<QuizParticipations, string>({
-      query: (quizId) => `quizParticipations/${quizId}`,
+      query: quizId => `quizParticipations/${quizId}`,
     }),
 
     getUserParticipations: build.query<UserParticipations, string>({
-      query: (userId) => `participations/${userId}`,
+      query: userId => `participations/${userId}`,
     }),
 
-    getOneParticipation: build.query<
-      Participation,
-      { userId: string; quizId: string }
-    >({
+    getOneParticipation: build.query<Participation, { userId: string; quizId: string }>({
       query: ({ userId, quizId }) => `participation/${userId}/${quizId}`,
     }),
 
     getOneParticipationByPartId: build.query<Participation, string>({
-      query: (partId) => `participationByPartId/${partId}`,
+      query: partId => `participationByPartId/${partId}`,
     }),
 
     deleteParticipation: build.mutation<
@@ -139,7 +136,7 @@ export const backendApi = createApi({
     }),
 
     getParticipationAnswers: build.query<ParticipationAndAnswers, string>({
-      query: (participationId) => `participationAnswers/${participationId}`,
+      query: participationId => `participationAnswers/${participationId}`,
     }),
   }),
 });

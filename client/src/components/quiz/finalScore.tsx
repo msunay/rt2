@@ -1,7 +1,7 @@
-import { Participation, ParticipationAndAnswers } from '@/types/Types';
-import { useState, useEffect } from 'react';
 import { useGetParticipationAnswersQuery } from '@/services/backendApi';
-import { View, Text } from 'react-native';
+import type { Participation, ParticipationAndAnswers } from '@/types/Types';
+import { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 
 export default function FinalScore({
   userParticipation,
@@ -9,7 +9,7 @@ export default function FinalScore({
   userParticipation: Participation;
 }) {
   // Fetch participation answers for a specific user's participation using its ID.
-  const { data } = useGetParticipationAnswersQuery(userParticipation.id!);
+  const { data } = useGetParticipationAnswersQuery(userParticipation.id || '');
 
   // State to keep track of the player's score.
   const [playerScore, setPlayerScore] = useState(0);

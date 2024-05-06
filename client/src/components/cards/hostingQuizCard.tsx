@@ -1,12 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Quiz } from '@/types/Types';
-import { Image } from 'expo-image';
+import { useGetUserDetailsQuery } from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
 import { CATEGORY_IMAGES } from '@/utils/images';
-import {
-  useGetUserDetailsQuery,
-} from '@/services/backendApi';
 import { formatDistance } from 'date-fns';
+import { Image } from 'expo-image';
 import { Link } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function HostingQuizCard({ quiz }: { quiz: Quiz }) {
   // Fetches the host's details for the quiz using the quiz owner's ID.
@@ -25,7 +23,7 @@ export default function HostingQuizCard({ quiz }: { quiz: Quiz }) {
           <Image
             source={CATEGORY_IMAGES[quiz.category]}
             style={styles.image}
-            contentFit="cover"
+            contentFit='cover'
           />
         </View>
         <View style={styles.detailsContainer}>

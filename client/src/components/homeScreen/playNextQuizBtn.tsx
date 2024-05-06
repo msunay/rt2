@@ -1,31 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
-import { useEffect, useState } from 'react';
-import { Quiz } from '@/types/Types';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import type { Quiz } from '@/types/Types';
+import { CATEGORIES } from '@/utils/consts';
+import { TILE_IMAGES } from '@/utils/images';
 import { format } from 'date-fns';
 import { Image, ImageBackground } from 'expo-image';
-import { TILE_IMAGES } from '@/utils/images';
-import { CATEGORIES } from '@/utils/consts';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function PlayNextQuizBtn() {
   // Fetch all quizzes.
-  const { data, error, isLoading } = useGetAllQuizzesQuery();
+  const quizzes = useAppSelector(state => state.quizzesSlice.allQuizzes);
 
   // Local state to hold the next upcoming quiz.
   const [nextQuiz, setNextQuiz] = useState<Quiz>();
 
   // Sort all quizzes in chronological order an set the first quiz as next quiz.
   useEffect(() => {
-    if (data) {
-      const sorted = [...data];
-      sorted.sort(
-        (quizA, quizB) =>
-          new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime()
-      );
-      setNextQuiz(sorted[0]);
-    }
-  }, [data]);
+    setNextQuiz(quizzes[0]);
+  }, [quizzes]);
 
   return (
     <ImageBackground
@@ -35,13 +27,13 @@ export default function PlayNextQuizBtn() {
       <Image
         source={TILE_IMAGES.questionBubbles}
         style={styles.questionBubbles}
-        contentFit="contain"
+        contentFit='contain'
       />
       <View style={styles.textContainer}>
         <Text style={styles.h1Text}>Play Next Quiz!</Text>
       </View>
       <View style={styles.nextQuizDetails}>
-        <Text style={styles.detailsText}>{nextQuiz && nextQuiz.quizName}</Text>
+        <Text style={styles.detailsText}>{nextQuiz?.quizName}</Text>
         <Text style={styles.detailsText}>
           {nextQuiz && CATEGORIES[nextQuiz.category]}
         </Text>

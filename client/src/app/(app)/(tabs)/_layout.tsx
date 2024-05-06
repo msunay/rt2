@@ -1,38 +1,42 @@
-import { StyleSheet, View } from 'react-native';
+import { setIsFetching, setQuizzes /* setRefetch */ } from '@/features/quizzesSlice';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import { useGetAllQuizzesQuery } from '@/services/backendApi';
+import type { RefetchQuizzes } from '@/types/Types';
 import { Stack } from 'expo-router';
+import { createContext, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Header from '@/components/global/header';
-import { useAppDispatch, useAppSelector } from '@/utils/hooks';
-import { useGetAllQuizzesQuery, useGetUserParticipationsQuery } from '@/services/backendApi';
-import { useEffect } from 'react';
-import { setParticipationsList } from '@/features/participatingSlice';
+export const RefetchQuizzesContext = createContext<RefetchQuizzes | null>(null);
 
 export default function TabsLayout() {
-  const id = useAppSelector((state) => state.userIdSlice.id);
-
   const dispatch = useAppDispatch();
 
-  // Fetch all quizzes.
-  const { data: quizzes, error, isFetching, refetch } = useGetAllQuizzesQuery();
-  // Fetch user participations
-  const { data: userParticipations } = useGetUserParticipationsQuery(id);
+  const {
+    data: quizzes,
+    refetch: refetchAllQuizzes,
+    isFetching: isFetchingQuizzes,
+  } = useGetAllQuizzesQuery();
 
   useEffect(() => {
-    if (userParticipations)
-      dispatch(setParticipationsList(userParticipations.quizzes));
-    if (quizzes) dispatch()
-  }, []);
+    if (quizzes) {
+      // dispatch(setRefetch(refetchAllQuizzes))
+      dispatch(setQuizzes([...quizzes]));
+    }
+  }, [dispatch, quizzes /*refetchAllQuizzes*/]);
+
+  useEffect(() => {
+    dispatch(setIsFetching(isFetchingQuizzes));
+  }, [isFetchingQuizzes, dispatch]);
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <Header />
-      </View>
-      <View style={styles.stackContainer}>
-        <Stack screenOptions={{ headerShown: false }} />
-      </View>
-    </SafeAreaView>
+    <RefetchQuizzesContext.Provider value={refetchAllQuizzes}>
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        <View style={styles.stackContainer}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </View>
+      </SafeAreaView>
+    </RefetchQuizzesContext.Provider>
   );
 }
 
@@ -44,8 +48,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
     width: '100%',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
   },
   stackContainer: {
     flex: 10,

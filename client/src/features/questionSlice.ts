@@ -12,7 +12,7 @@ export const questionNumberSlice = createSlice({
   name: 'questionNumber',
   initialState,
   reducers: {
-    incrementQuestionNumber: (state) => {
+    incrementQuestionNumber: state => {
       state.value += 1;
     },
   },

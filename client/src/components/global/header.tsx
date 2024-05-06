@@ -1,16 +1,16 @@
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { LOGO } from '@/utils/images';
+import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import SignOut from './signOut';
-import { useAppSelector } from '@/utils/hooks';
-import { Image } from 'expo-image';
-import { LOGO } from '@/utils/images';
 
 export default function Header() {
   // Get usename of current user from Redux store.
-  const username = useAppSelector((state) => state.userIdSlice.username);
+  const username = useAppSelector(state => state.userIdSlice.username);
   return (
     <View style={styles.headerContainer}>
       <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={LOGO.logo}/>
+        <Image style={styles.logo} source={LOGO.logo} />
         <Text style={styles.h1}>RT2</Text>
       </View>
       <View style={styles.greetingContainer}>
@@ -24,9 +24,10 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    flex: 1,
+    // flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+    marginBottom: 10,
   },
   logoContainer: {
     flexDirection: 'row',

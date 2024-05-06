@@ -1,10 +1,14 @@
-import { useAppDispatch, useAppSelector } from '@/utils/hooks';
+import { addQuestionWithAnswers, resetQuizStore } from '@/features/quizCreationSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { useAddFullQuizMutation } from '@/services/backendApi';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  GestureResponderEvent,
   Keyboard,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,37 +16,81 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { object, string } from 'yup';
-import {
-  addQuestionWithAnswers,
-  resetQuizStore,
-} from '@/features/quizCreationSlice';
+import type { GestureResponderEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRef } from 'react';
-import { useAddFullQuizMutation } from '@/services/backendApi';
-import { btnPressStyle } from '@/utils/helpers';
+import { object, string } from 'yup';
 
 export default function QuizContent() {
   // Retrieve the query parameter 'qno' (question number) from the URL.
   const { qno } = useLocalSearchParams<{ qno: string }>();
+
+  if (!qno) throw new Error('qno not in params');
+
   // Convert the question number to an integer for internal logic.
-  const questionNum = parseInt(qno!);
+  const questionNum = Number.parseInt(qno);
 
   // Use Redux's useDispatch hook for dispatching actions.
   const dispatch = useAppDispatch();
   // Retrieve the current state of the quiz creation from the Redux store.
-  const quizState = useAppSelector((state) => state.quizCreationSlice);
+  const quizState = useAppSelector(state => state.quizCreationSlice);
 
   // Hook to call the mutation for submitting the full quiz.
   const [submitFullQuiz, { isSuccess }] = useAddFullQuizMutation();
 
   // Refs for input fields to manage focus.
+  const ref_input1 = useRef<TextInput>(null);
   const ref_input2 = useRef<TextInput>(null);
   const ref_input3 = useRef<TextInput>(null);
   const ref_input4 = useRef<TextInput>(null);
+  const ref_input5 = useRef<TextInput>(null);
+
+  // Track current ref for next/previous btn
+  const [currentRef, setCurrentRef] = useState<RefObject<TextInput>>(ref_input1);
+
+  // Focus next input
+  const focusNextInput = (currentRef: RefObject<TextInput>) => {
+    switch (currentRef) {
+      case ref_input1:
+        ref_input2.current?.focus();
+        break;
+      case ref_input2:
+        ref_input3.current?.focus();
+        break;
+      case ref_input3:
+        ref_input4.current?.focus();
+        break;
+      case ref_input4:
+        ref_input5.current?.focus();
+        break;
+      default:
+        Keyboard.dismiss(); // Dismiss the keyboard if we're at the last input
+    }
+  };
+
+  // Focus previous input
+  const focusPreviousInput = (currentRef: RefObject<TextInput>) => {
+    switch (currentRef) {
+      // Similar implementation to focusNextInput but in reverse
+      case ref_input5:
+        ref_input4.current?.focus();
+        break;
+      case ref_input4:
+        ref_input3.current?.focus();
+        break;
+      case ref_input3:
+        ref_input2.current?.focus();
+        break;
+      case ref_input2:
+        ref_input1.current?.focus();
+        break;
+      // Continue for other inputs
+      default:
+        Keyboard.dismiss();
+    }
+  };
 
   // Define a schema for question and answer validation using Yup.
-  let questionSchema = object().shape({
+  const questionSchema = object().shape({
     questionText: string().required('Please fill in field'), // Validation for question text.
     answer1: string().required('Please fill in field'), // Validation for answer 1 (correct answer).
     answer2: string().required('Please fill in field'), // Validation for answer 2.
@@ -90,7 +138,7 @@ export default function QuizContent() {
           { answerText: answer3, isCorrect: false },
           { answerText: answer4, isCorrect: false },
         ],
-      })
+      }),
     );
 
     // Navigate to the next question in the quiz creation process.
@@ -108,8 +156,17 @@ export default function QuizContent() {
     });
   };
 
-  const pressableStyle = ({ pressed }: { pressed: boolean }) =>
-    btnPressStyle(pressed, ['#ffb296', '#FF7F50'], styles.loginBtn);
+  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+    return pressed
+      ? {
+          ...styles.loginBtn,
+          backgroundColor: '#ffb296',
+        }
+      : {
+          ...styles.loginBtn,
+          backgroundColor: '#FF7F50',
+        };
+  };
 
   // If 10 questions have been created show preview of whole quiz and submit button.
   if (questionNum === 11) {
@@ -128,114 +185,131 @@ export default function QuizContent() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Pressable style={styles.background} onPress={Keyboard.dismiss}>
-        <Text style={styles.title}>{`Question ${questionNum}`}</Text>
-        <View style={styles.form}>
-          <Text>Question</Text>
-          <Controller
-            name="questionText"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <TextInput
-                style={styles.questionInput}
-                placeholder="Write yout question here..."
-                multiline
-                returnKeyType="next"
-                // returnKeyLabel='Next'+
-                autoCapitalize="sentences"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={() => ref_input2.current!.focus()}
-              />
+        <KeyboardAvoidingView style={styles.keyboardAvoid} behavior='padding'>
+          <Text style={styles.title}>{`Question ${questionNum}`}</Text>
+          <View style={styles.form}>
+            <View>
+              <Text>Question</Text>
+            </View>
+            <Controller
+              name='questionText'
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextInput
+                  ref={ref_input1}
+                  style={styles.questionInput}
+                  placeholder='Write yout question here...'
+                  multiline
+                  autoCapitalize='sentences'
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onFocus={() => setCurrentRef(ref_input1)}
+                  onSubmitEditing={() => focusNextInput(ref_input1)}
+                />
+              )}
+            />
+            {errors.questionText && (
+              <Text style={styles.validationError}>{errors.questionText.message}</Text>
             )}
-          />
-          {errors.questionText && (
-            <Text style={styles.validationError}>
-              {errors.questionText.message}
-            </Text>
-          )}
-          <Text>Correct Answer</Text>
-          <Controller
-            name="answer1"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <TextInput
-                ref={ref_input2}
-                style={styles.answerInput}
-                placeholder="Write an answer here..."
-                multiline
-                autoCapitalize="sentences"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={() => ref_input3.current!.focus()}
-              />
+            <View>
+              <Text>Correct Answer</Text>
+            </View>
+            <Controller
+              name='answer1'
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextInput
+                  ref={ref_input2}
+                  style={styles.answerInput}
+                  placeholder='Write an answer here...'
+                  multiline
+                  autoCapitalize='sentences'
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onFocus={() => setCurrentRef(ref_input2)}
+                  onSubmitEditing={() => focusNextInput(ref_input2)}
+                />
+              )}
+            />
+            <View>
+              <Text>Answer 2</Text>
+            </View>
+            <Controller
+              name='answer2'
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextInput
+                  ref={ref_input3}
+                  style={styles.answerInput}
+                  placeholder='Write an answer here...'
+                  multiline
+                  autoCapitalize='sentences'
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onFocus={() => setCurrentRef(ref_input3)}
+                  onSubmitEditing={() => focusNextInput(ref_input3)}
+                />
+              )}
+            />
+            {errors.answer2 && (
+              <Text style={styles.validationError}>{errors.answer2.message}</Text>
             )}
-          />
-          <Text>Answer 2</Text>
-          <Controller
-            name="answer2"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <TextInput
-                ref={ref_input3}
-                style={styles.answerInput}
-                placeholder="Write an answer here..."
-                multiline
-                autoCapitalize="sentences"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={() => ref_input4.current!.focus()}
-              />
+            <View>
+              <Text>Answer 3</Text>
+            </View>
+            <Controller
+              name='answer3'
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextInput
+                  ref={ref_input4}
+                  style={styles.answerInput}
+                  placeholder='Write an answer here...'
+                  multiline
+                  autoCapitalize='sentences'
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onFocus={() => setCurrentRef(ref_input4)}
+                  onSubmitEditing={() => focusNextInput(ref_input4)}
+                />
+              )}
+            />
+            {errors.answer3 && (
+              <Text style={styles.validationError}>{errors.answer3.message}</Text>
             )}
-          />
-          {errors.answer2 && (
-            <Text style={styles.validationError}>{errors.answer2.message}</Text>
-          )}
-          <Text>Answer 3</Text>
-          <Controller
-            name="answer3"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <TextInput
-                ref={ref_input4}
-                style={styles.answerInput}
-                placeholder="Write an answer here..."
-                multiline
-                autoCapitalize="sentences"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
+            <View>
+              <Text>Answer 4</Text>
+            </View>
+            <Controller
+              name='answer4'
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextInput
+                  ref={ref_input5}
+                  style={styles.answerInput}
+                  placeholder='Write an answer here...'
+                  multiline
+                  autoCapitalize='sentences'
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onFocus={() => setCurrentRef(ref_input5)}
+                  onSubmitEditing={() => focusNextInput(ref_input5)}
+                />
+              )}
+            />
+            {errors.answer4 && (
+              <Text style={styles.validationError}>{errors.answer4.message}</Text>
             )}
-          />
-          {errors.answer3 && (
-            <Text style={styles.validationError}>{errors.answer3.message}</Text>
-          )}
-          <Text>Answer 4</Text>
-          <Controller
-            name="answer4"
-            control={control}
-            render={({ field: { onChange, value, onBlur } }) => (
-              <TextInput
-                style={styles.answerInput}
-                placeholder="Write an answer here..."
-                multiline
-                autoCapitalize="sentences"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
-          />
-          {errors.answer4 && (
-            <Text style={styles.validationError}>{errors.answer4.message}</Text>
-          )}
-        </View>
-        <Pressable style={pressableStyle} onPress={handleSubmit(storeQuestion)}>
-          <Text style={styles.btnText}>Next</Text>
-        </Pressable>
+          </View>
+          <Pressable style={pressableStyle} onPress={handleSubmit(storeQuestion)}>
+            <Text style={styles.btnText}>Next</Text>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </SafeAreaView>
   );
@@ -245,12 +319,20 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  keyboardAvoid: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    // marginHorizontal: "3%",
+    width: '100%',
+  },
   background: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
-    marginHorizontal: '3%',
+    marginHorizontal: '5%',
   },
   title: {
     fontFamily: 'Nunito-Black',
