@@ -1,12 +1,16 @@
 import { incrementQuestionNumber } from '@/features/questionSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import {
+  defaultHostVideoStreamState,
+  hostVideoStreamStateReducer,
+} from '@/reducers/hostVideoStreamStateReducer';
 import { peersSocketService } from '@/services/peersSocketService';
 import { quizSocketService, startTimer } from '@/services/quizSocketService';
 import { QUESTION_TIME } from '@/services/quizSocketService';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
 import type { MediaStream } from 'react-native-webrtc';
@@ -20,14 +24,17 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
   const currentQuestionNumber = useAppSelector(state => state.questionSlice.value);
 
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0);
+  const [state, dispatchState] = useReducer(
+    hostVideoStreamStateReducer,
+    defaultHostVideoStreamState,
+  );
+  // const [quizStarted, setQuizStarted] = useState(false);
+  // const [questionHidden, setQuestionHidden] = useState(false);
+  // const [trigger, setTrigger] = useState(0);
   // const [nextDisabled, setNextDisabled] = useState(false);
   // const [startDisabled, setStartDisabled] = useState(false);
-  const [mediaStream, setMediaStream] = useState<MediaStream>();
+  // const [mediaStream, setMediaStream] = useState<MediaStream>();
 
-  const localVideo = useRef(null);
   const nextQBtn = useRef(null);
   const startBtn = useRef(null);
   // const { push } = useRouter();
@@ -35,31 +42,33 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupClient.types.Transport;
   let producer: mediasoupTypes.Producer;
-  // let mediaStream: MediaStream;
 
   useEffect(() => {
     quizSocketService.successListener();
-    quizSocketService.startTimerListener(setQuestionHidden);
-    quizSocketService.revealAnswerHostListener(setQuestionHidden);
-    quizSocketService.hostWinnersListener(setTrigger);
+    quizSocketService.startTimerListener(dispatchState);
+    quizSocketService.revealAnswerHostListener(dispatchState);
+    quizSocketService.hostWinnersListener(dispatchState);
     // peersSocketService.successListener();
   }, []);
 
   function startQuiz() {
-    setQuizStarted(true);
+    dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
+    // setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
     dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
-    setQuestionHidden(false);
+    dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
+    // setQuestionHidden(false);
 
     if (currentQuestionNumber < 9) {
       setTimeout(() => {}, QUESTION_TIME + 2000);
     }
     dispatch(incrementQuestionNumber());
     quizSocketService.emitNextQ();
-    setTrigger(trigger => trigger + 1);
+    dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
+    // setTrigger(trigger => trigger + 1);
   }
 
   function handleWinners() {
@@ -95,7 +104,8 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   };
 
   const streamSuccess = (mediaStream: MediaStream) => {
-    setMediaStream(mediaStream);
+    dispatchState({ type: 'SET_HVS_MEDIA_STREAM', payload: mediaStream });
+    // setMediaStream(mediaStream);
     const track = mediaStream.getVideoTracks()[0];
 
     params = {
@@ -119,7 +129,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
         },
       },
     };
-    if (!mediaStream) {
+    if (!state.mediaStream) {
       mediaDevices
         .getUserMedia(constraints)
         .then(s => {
@@ -173,15 +183,15 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
     producer.on('trackended', () => {
       console.log('Track ended');
-      if (mediaStream) {
-        for (const track of mediaStream.getTracks()) track.stop();
+      if (state.mediaStream) {
+        state.mediaStream.getTracks().map(track => track.stop());
       }
     });
 
     producer.on('transportclose', () => {
       console.log('transport ended');
-      if (mediaStream) {
-        for (const track of mediaStream.getTracks()) track.stop();
+      if (state.mediaStream) {
+        state.mediaStream.getTracks().map(track => track.stop());
       }
     });
   };
@@ -208,7 +218,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   return (
     <>
       <RTCView
-        streamURL={mediaStream?.toURL()}
+        streamURL={state.mediaStream?.toURL()}
         mirror={true}
         objectFit='cover'
         style={{ flex: 1 }}
@@ -216,15 +226,19 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
         <View style={styles.unit}>
           <View style={styles.video_container}>
             <View style={styles.question_component_container}>
-              {quizStarted && (
-                <HostQuestion quizId={quizId} trigger={trigger} hidden={questionHidden} />
+              {state.quizStarted && (
+                <HostQuestion
+                  quizId={quizId}
+                  trigger={state.trigger}
+                  hidden={state.questionHidden}
+                />
               )}
             </View>
           </View>
 
           <View style={styles.btn_holder}>
             <View style={styles.quiz_controls}>
-              {quizStarted ? (
+              {state.quizStarted ? (
                 currentQuestionNumber === 10 ? (
                   <Pressable
                     style={pressableStyle}

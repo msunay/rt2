@@ -1,7 +1,9 @@
+import type { HostVideoStreamStateAction } from '@/reducers/hostVideoStreamStateReducer';
 import type {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/types/QuizSocketTypes';
+import type { Dispatch } from 'react';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 
@@ -23,10 +25,11 @@ export const quizSocketService = {
     }),
 
   startTimerListener: (
-    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
+    dispatchState: Dispatch<HostVideoStreamStateAction>,
   ) =>
     quiz.on('start_question_timer', () => {
-      setQuestionHidden(false);
+      dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: false})
+      // setQuestionHidden(false);
       // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
@@ -63,22 +66,24 @@ export const quizSocketService = {
   emitShowWinners: () => quiz.emit('show_winners'),
 
   revealAnswerHostListener: (
-    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
+    dispatchState: Dispatch<HostVideoStreamStateAction>,
   ) => {
     quiz.on('reveal_answers_host', () => {
       console.log('reveal');
 
       setTimeout(() => {
-        setQuestionHidden(true);
+        dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: true})
+        // setQuestionHidden(true);
         // document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
     });
   },
 
-  hostWinnersListener: (setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
+  hostWinnersListener: (dispatchState: Dispatch<HostVideoStreamStateAction>) => {
     quiz.on('host_winners', () => {
       console.log('HOST WINNERS RECEIVED');
-      setTrigger(num => num + 1);
+      dispatchState({type: 'INCREMENT_HVS_TRIGGER', payload: undefined})
+      // setTrigger(num => num + 1);
     });
   },
 
