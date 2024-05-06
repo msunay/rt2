@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import type { Quiz } from '@/types/Types';
+import { CATEGORIES } from '@/utils/consts';
+import { TILE_IMAGES } from '@/utils/images';
 import { format } from 'date-fns';
 import { Image, ImageBackground } from 'expo-image';
-import { TILE_IMAGES } from '@/utils/images';
-import { CATEGORIES } from '@/utils/consts';
-import { useAppSelector } from '@/hooks/reduxHooks';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function PlayNextQuizBtn() {
   // Fetch all quizzes.

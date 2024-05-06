@@ -1,15 +1,14 @@
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import type { Quiz } from '@/types/Types';
-import { useContext, useEffect, useState } from 'react';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import HostingQuizCard from '@/components/cards/hostingQuizCard';
-import CreateQuizBtn from '@/components/user/createQuizBtn';
-import Header from '@/components/global/header';
 import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
+import HostingQuizCard from '@/components/cards/hostingQuizCard';
+import Header from '@/components/global/header';
+import CreateQuizBtn from '@/components/user/createQuizBtn';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import type { Quiz } from '@/types/Types';
+import { FlashList } from '@shopify/flash-list';
+import { useContext, useEffect, useState } from 'react';
+import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 export default function HostingScreen() {
-
   const refetchAllQuizzes = useContext(RefetchQuizzesContext);
   // Fetch all quizzes.
   const { allQuizzes, isFetchingQuizzes } = useAppSelector(store => store.quizzesSlice);

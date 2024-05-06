@@ -1,4 +1,4 @@
-import { FullQuizState } from '@/types/Types';
+import type { FullQuizState } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 import { formatISO } from 'date-fns';
 
@@ -54,7 +54,7 @@ export const quizCreationSlice = createSlice({
     ) => {
       state.Questions = [...state.Questions, payload];
     },
-    resetQuizStore: (state) => {
+    resetQuizStore: state => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       state = initialState;
     },

@@ -1,3 +1,11 @@
+import { setUserId } from '@/features/userIdSlice';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import type { LoginCredentials } from '@/types/Types';
+import { useSession } from '@/utils/authctx';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Button,
   Keyboard,
@@ -7,15 +15,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import { useSession } from '@/utils/authctx';
 import { object, string } from 'yup';
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import type { LoginCredentials } from '@/types/Types';
-import { useAppDispatch } from '@/hooks/reduxHooks';
-import { setUserId } from '@/features/userIdSlice';
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch(); // Hook to dispatch actions to Redux store.
@@ -47,8 +47,7 @@ export default function LoginScreen() {
       signIn({
         username: formData.username,
         password: formData.password,
-      }).then((res) => {
-
+      }).then(res => {
         dispatch(setUserId(res)); // Dispatch action to store user ID in Redux store.
         router.replace('/'); // Navigate to home screen upon successful login.
       });

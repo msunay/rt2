@@ -1,8 +1,8 @@
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { LOGO } from '@/utils/images';
+import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import SignOut from './signOut';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { Image } from 'expo-image';
-import { LOGO } from '@/utils/images';
 
 export default function Header() {
   // Get usename of current user from Redux store.

@@ -1,11 +1,13 @@
-import { createContext, useContext } from 'react';
-import type { PropsWithChildren } from 'react'
 import { useStorageState } from '@/hooks/useStorageState';
-import {
-  useLoginUserMutation,
-  usePostUserMutation,
-} from '@/services/backendApi';
-import type { LoginCredentials, ResponseLoginUser, ResponseRegisterUser, UserPost } from '@/types/Types';
+import { useLoginUserMutation, usePostUserMutation } from '@/services/backendApi';
+import type {
+  LoginCredentials,
+  ResponseLoginUser,
+  ResponseRegisterUser,
+  UserPost,
+} from '@/types/Types';
+import { createContext, useContext } from 'react';
+import type { PropsWithChildren } from 'react';
 import { Alert } from 'react-native';
 
 // Create context to hold session data and functions
@@ -35,13 +37,14 @@ export function SessionProvider(props: PropsWithChildren) {
 
   const signIn = async ({ username, password }: LoginCredentials) => {
     try {
-      const responseUser: ResponseLoginUser = await sendCredentials({ username, password }).unwrap() // Use result of sendCredentials mutation
+      const responseUser: ResponseLoginUser = await sendCredentials({
+        username,
+        password,
+      }).unwrap(); // Use result of sendCredentials mutation
 
       setSession(responseUser.token); // Set session state with token
       return responseUser;
-
     } catch (error) {
-
       setSession(null); // Reset session state on failure
       console.error('Login failed:', error);
       Alert.alert('Login failed');
@@ -52,13 +55,15 @@ export function SessionProvider(props: PropsWithChildren) {
 
   const register = async ({ email, username, password }: UserPost) => {
     try {
-      const responseUser: ResponseRegisterUser = await postCredentials({ email, username, password }).unwrap() // Use result of postCredentials mutation
+      const responseUser: ResponseRegisterUser = await postCredentials({
+        email,
+        username,
+        password,
+      }).unwrap(); // Use result of postCredentials mutation
 
-      setSession(responseUser.token)
+      setSession(responseUser.token);
       return responseUser;
-
     } catch (error) {
-
       setSession(null); // Reset session state on failure
       console.error('Sign-Up failed:', error);
       Alert.alert('Sign-Up failed');

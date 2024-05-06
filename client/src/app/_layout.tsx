@@ -1,10 +1,10 @@
-import { Stack } from 'expo-router';
-import { SessionProvider } from '@/utils/authctx';
-import { Provider } from 'react-redux';
 import { store } from '@/store';
+import { SessionProvider } from '@/utils/authctx';
 import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 
 // Prevents the splash screen from hiding automatically.
 SplashScreen.preventAutoHideAsync();

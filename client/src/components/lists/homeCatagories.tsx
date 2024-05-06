@@ -22,10 +22,9 @@ export default function HomeCatagories() {
         </View>
       </View>
       <View style={styles.listContainer}>
-        {topCategories.map((cat) => (
+        {topCategories.map(cat => (
           <CategoryQuizCard key={cat} category={cat} />
-        ))
-        }
+        ))}
       </View>
     </View>
   );
@@ -54,5 +53,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // borderColor: '#FF0000',
     // borderWidth: 1
-  }
+  },
 });

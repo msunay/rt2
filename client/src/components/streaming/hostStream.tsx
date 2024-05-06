@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/hooks/reduxHooks';
 import { incrementQuestionNumber } from '@/features/questionSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { quizSocketService } from '@/services/quizSocketService';
+import { QUESTION_TIME } from '@/services/quizSocketService';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import HostQuestion from '../question/hostQuestion';
-import { QUESTION_TIME } from '@/services/quizSocketService';
 
 export default function HostStream({ quizId }: { quizId: string }) {
   const currentQuestionNumber = useAppSelector(state => state.questionSlice.value);

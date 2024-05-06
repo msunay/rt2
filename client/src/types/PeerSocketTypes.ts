@@ -1,4 +1,4 @@
-import { types as mediasoupTypes } from 'mediasoup-client';
+import type { types as mediasoupTypes } from 'mediasoup-client';
 
 export interface PeersClientToServerEvents {
   create_room: (cb: any) => void;

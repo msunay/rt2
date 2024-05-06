@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import {
-  QuestionAnswer,
-  Answer,
-  Participation,
-  ParticipationAnswer,
-} from "@/types/Types";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import {
   useCreateParticipationAnswerMutation,
   useGetOneQuizQuestionAnswerQuery,
-} from "@/services/backendApi";
-import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import { QUESTION_TIME } from "@/services/quizSocketService";
-import Animated from "react-native-reanimated";
+} from '@/services/backendApi';
+import { QUESTION_TIME } from '@/services/quizSocketService';
+import type {
+  Answer,
+  Participation,
+  ParticipationAnswer,
+  QuestionAnswer,
+} from '@/types/Types';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+import Animated from 'react-native-reanimated';
 
 interface Props {
   hidden: boolean;
@@ -20,21 +20,16 @@ interface Props {
   participation?: Participation;
 }
 
-export default function PlayerQuestion({
-  hidden,
-  trigger,
-  participation,
-}: Props) {
+export default function PlayerQuestion({ hidden, trigger, participation }: Props) {
   // Fetch quiz details, including questions and answers, for a given participation's QuizId.
   const {
     data: quiz,
     error,
     isLoading,
-  } = useGetOneQuizQuestionAnswerQuery(participation!.QuizId!);
+  } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
 
   // RTK Query mutation hook for creating a participation answer.
-  const [createParticipationAnswer, result] =
-    useCreateParticipationAnswerMutation();
+  const [createParticipationAnswer, result] = useCreateParticipationAnswerMutation();
 
   // State to manage the user's selected answer for a quiz participation.
   const [userParticipationAnswer, setUserParticipationAnswer] =
@@ -42,7 +37,7 @@ export default function PlayerQuestion({
 
   // State for the current question being displayed.
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
-    {} as QuestionAnswer
+    {} as QuestionAnswer,
   );
 
   // State for the selected btn
@@ -54,83 +49,86 @@ export default function PlayerQuestion({
   // Effect hook to call `createHandle` when `trigger` changes and is greater than 0.
   useEffect(() => {
     if (trigger > 0) createHandle();
-    setSelectedBtn(null)
+    setSelectedBtn(null);
   }, [trigger]);
 
   // Effect hook to set the current question based on the quiz data and the current trigger value.
   useEffect(() => {
     if (!error && !isLoading && quiz) {
-      setCurrentQuestion(
-        quiz.Questions.find(
-          (question) => question.positionInQuiz === trigger + 1
-        )!
+      const foundQuestion = quiz.Questions.find(
+        question => question.positionInQuiz === trigger + 1,
       );
+
+      if (foundQuestion) {
+        setCurrentQuestion(foundQuestion);
+      }
     }
-  }, [quiz, trigger]);
+  }, [quiz, trigger, error, isLoading]);
 
   // Effect hook to update the current answers whenever the current question changes.
   useEffect(() => {
-    if (currentQuestion && currentQuestion.Answers) {
+    if (currentQuestion.Answers) {
       setCurrentAnswers(currentQuestion.Answers);
     }
   }, [currentQuestion]);
 
   // Updates the state with the selected answer's ID and the participation ID.
   function handleAnswerClick(index: number) {
-    setUserParticipationAnswer({
-      AnswerId: currentAnswers[index].id!,
-      ParticipationId: participation!.id!,
-    });
-    setSelectedBtn(index);
+    if (currentAnswers[index].id && participation?.id) {
+      const AnswerId = currentAnswers[index]?.id || '';
+      const ParticipationId = participation.id;
+      setUserParticipationAnswer({
+        AnswerId,
+        ParticipationId,
+      });
+      setSelectedBtn(index);
+    }
   }
 
   // Function to handle creating a participation answer.
   // calls the mutation to create a participation answer, and resets the userParticipationAnswer state.
   function createHandle() {
-    console.log("userParticipationAnswer2: ", userParticipationAnswer);
+    console.log('userParticipationAnswer2: ', userParticipationAnswer);
     createParticipationAnswer(userParticipationAnswer);
     setUserParticipationAnswer({} as ParticipationAnswer); // Reset after submission.
   }
 
-  const pressableStyle = (index: number) => ({ pressed }: { pressed: boolean }) => ({
-    ...styles.answerBtn,
-    backgroundColor: index === selectedBtn
-      ? "rgba(255, 127, 80, 0.5)"
-      : "rgba(110, 110, 110, 0.5)",
-    borderColor: pressed ? "yellow" : "black",
-  });
+  const pressableStyle =
+    (index: number) =>
+    ({ pressed }: { pressed: boolean }) => ({
+      ...styles.answerBtn,
+      backgroundColor:
+        index === selectedBtn ? 'rgba(255, 127, 80, 0.5)' : 'rgba(110, 110, 110, 0.5)',
+      borderColor: pressed ? 'yellow' : 'black',
+    });
 
   return (
     <View style={styles.question_component}>
       {currentQuestion && !hidden && (
         <View style={styles.question_container}>
           <View style={styles.questionTextContainer}>
-            <Text style={styles.question_text}>
-              {currentQuestion.questionText}
-            </Text>
+            <Text style={styles.question_text}>{currentQuestion.questionText}</Text>
           </View>
-          <View style={{marginBottom: 'auto', marginTop: 10}}>
+          <View style={{ marginBottom: 'auto', marginTop: 10 }}>
             <CountdownCircleTimer
               isPlaying
               duration={QUESTION_TIME / 1000}
-              colors={["#01aa04", "#ede100", "#ff7f00", "#A30000"]}
+              colors={['#01aa04', '#ede100', '#ff7f00', '#A30000']}
               colorsTime={[7, 5, 2, 0]}
               size={130}
             >
               {({ remainingTime, color }) => (
-                  <Animated.Text
-                    style={{ ...styles.countdownNum, color }}
-                  >
-                    {remainingTime}
-                  </Animated.Text>
+                <Animated.Text style={{ ...styles.countdownNum, color }}>
+                  {remainingTime}
+                </Animated.Text>
               )}
             </CountdownCircleTimer>
           </View>
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
-              <View style={styles.answerBtnContainer} key={index}>
+              <View style={styles.answerBtnContainer} key={answer.QuestionId}>
                 <Pressable
-                  key={index}
+                  // key={index}
                   style={pressableStyle(index)}
                   onPress={() => handleAnswerClick(index)}
                 >
@@ -151,44 +149,44 @@ const styles = StyleSheet.create({
   },
   question_container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   questionTextContainer: {
-    justifyContent: "center",
+    justifyContent: 'center',
     marginTop: 60,
   },
   question_text: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 25,
-    fontFamily: "Nunito-Black",
+    fontFamily: 'Nunito-Black',
   },
   countdownNum: {
     fontSize: 50,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   answer_container: {
     height: 250,
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     marginBottom: 30,
   },
   answerText: {
-    fontFamily: "Nunito-Bold",
-    textAlign: "center",
+    fontFamily: 'Nunito-Bold',
+    textAlign: 'center',
     fontSize: 16,
   },
   answerBtnContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: "50%",
-    height: "50%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '50%',
+    height: '50%',
   },
   answerBtn: {
     flex: 0.7,
     width: 160,
     borderRadius: 12,
-    justifyContent: "center",
+    justifyContent: 'center',
     borderWidth: 2.5,
   },
 });

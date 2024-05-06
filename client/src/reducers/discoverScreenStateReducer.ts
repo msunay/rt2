@@ -1,4 +1,3 @@
-import { styles } from '@/screens/DiscoverScreen';
 import type { Quiz } from '@/types/Types';
 
 interface DiscoverScreenState {

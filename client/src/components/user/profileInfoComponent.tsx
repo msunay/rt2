@@ -1,11 +1,11 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Fontisto, Feather, AntDesign } from '@expo/vector-icons';
-import { Controller, useForm } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
-import { object, ref, string } from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { inputDisabledStyle } from '@/utils/helpers';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import { inputDisabledStyle } from '@/utils/helpers';
+import { AntDesign, Feather, Fontisto } from '@expo/vector-icons';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { object, ref, string } from 'yup';
 
 export default function ProfileInfoComponent() {
   const userDetails = useAppSelector(state => state.userSlice);
@@ -15,15 +15,15 @@ export default function ProfileInfoComponent() {
 
   const [disabled, setDisabled] = useState(true);
   const [formInputStyles, setFormInputStyles] = useState<
-  {
-    [key: string]: string | number;
-  }[]
+    {
+      [key: string]: string | number;
+    }[]
   >([styles.formItem]);
 
   const [formControlsStyle, setFormControlStyle] = useState<
-  {
-    [key: string]: string | number;
-  }[]
+    {
+      [key: string]: string | number;
+    }[]
   >([styles.formControls, { opacity: 0 }]);
 
   useEffect(() => {

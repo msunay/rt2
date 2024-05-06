@@ -2,14 +2,13 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import type { Action, EnhancedStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
-import { backendApi } from '@/services/backendApi';
-import userSlice from '@/features/userSlice';
-import userIdSlice from '@/features/userIdSlice';
-import questionSlice from '@/features/questionSlice';
 import participatingSlice from '@/features/participatingSlice';
+import questionSlice from '@/features/questionSlice';
 import quizCreationSlice from '@/features/quizCreationSlice';
-import quizzesSlice from './features/quizzesSlice';
-
+import quizzesSlice from '@/features/quizzesSlice';
+import userIdSlice from '@/features/userIdSlice';
+import userSlice from '@/features/userSlice';
+import { backendApi } from '@/services/backendApi';
 
 // Define the action type for resetting the store
 const RESET_ACTION_TYPE = 'logout';
@@ -40,9 +39,7 @@ export const store: EnhancedStore = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
 
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware().concat(
-      backendApi.middleware,
-    ),
+    getDefaultMiddleware().concat(backendApi.middleware),
 });
 
 setupListeners(store.dispatch);

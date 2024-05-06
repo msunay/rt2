@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Image } from 'expo-image';
-import { PROFILE_PLACEHOLDER } from '@/utils/images';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import { PROFILE_PLACEHOLDER } from '@/utils/images';
+import { Image } from 'expo-image';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function ProfileTitleComponent() {
   const userDetails = useAppSelector(state => state.userSlice);

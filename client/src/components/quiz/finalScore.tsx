@@ -1,7 +1,7 @@
-import type { Participation, ParticipationAndAnswers } from '@/types/Types';
-import { useState, useEffect } from 'react';
 import { useGetParticipationAnswersQuery } from '@/services/backendApi';
-import { View, Text } from 'react-native';
+import type { Participation, ParticipationAndAnswers } from '@/types/Types';
+import { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 
 export default function FinalScore({
   userParticipation,

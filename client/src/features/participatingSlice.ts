@@ -25,12 +25,17 @@ export const participatingSlice = createSlice({
     removeFromParticipatingList: (state, { payload }: { payload: Quiz }) => {
       state.value = state.value.filter(quiz => quiz.id !== payload.id);
     },
-    popFromParticipatingList: (state) => {
+    popFromParticipatingList: state => {
       state.value.pop();
     },
   },
 });
 
-export const { popFromParticipatingList, setParticipationsList, addToParticipatingList, removeFromParticipatingList } = participatingSlice.actions;
+export const {
+  popFromParticipatingList,
+  setParticipationsList,
+  addToParticipatingList,
+  removeFromParticipatingList,
+} = participatingSlice.actions;
 
 export default participatingSlice.reducer;

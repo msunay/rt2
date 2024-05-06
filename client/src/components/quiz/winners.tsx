@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import type { Winner } from '@/types/Types';
 import { useGetWinnersQuery } from '@/services/backendApi';
+import type { Winner } from '@/types/Types';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Winners({ quizId }: { quizId: string }) {
@@ -20,7 +20,7 @@ export default function Winners({ quizId }: { quizId: string }) {
     <View style={styles.container}>
       <Text>Winners</Text>
       <View>
-        {winnerList.map((winner) => (
+        {winnerList.map(winner => (
           <View key={winner.username}>
             <Text>{winner.username}</Text>
             <Text>{winner.userScore}</Text>

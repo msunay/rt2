@@ -1,10 +1,9 @@
-import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 import type {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/types/QuizSocketTypes';
-
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
@@ -13,7 +12,9 @@ const BASE_URL: string =
     ? process.env.BACKEND_URL || ''
     : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
-const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(`${BASE_URL}quizspace`);
+const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
+  `${BASE_URL}quizspace`,
+);
 
 export const quizSocketService = {
   successListener: () =>
@@ -21,7 +22,9 @@ export const quizSocketService = {
       console.log('quiz socket connected: ', socketId);
     }),
 
-  startTimerListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>) =>
+  startTimerListener: (
+    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
+  ) =>
     quiz.on('start_question_timer', () => {
       setQuestionHidden(false);
       // document.getElementById('countdown-canvas')!.hidden = false;
@@ -59,7 +62,9 @@ export const quizSocketService = {
 
   emitShowWinners: () => quiz.emit('show_winners'),
 
-  revealAnswerHostListener: (setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>) => {
+  revealAnswerHostListener: (
+    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
     quiz.on('reveal_answers_host', () => {
       console.log('reveal');
 
@@ -80,7 +85,7 @@ export const quizSocketService = {
   playerWinnersListener: (setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
     quiz.on('player_winners', () => {
       console.log('PLAYER WINNERS RECEIVED');
-      setTrigger((num) => {
+      setTrigger(num => {
         console.log('TRIGGER BEFORE +1::', num);
         return num + 1;
       });

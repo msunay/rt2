@@ -1,9 +1,9 @@
-import type { Quiz } from "@/types/Types";
+import type { Quiz } from '@/types/Types';
 
 export const inputDisabledStyle = (
   pressed: boolean,
   [color1, color2]: string[],
-  style: { [key: string]: number | string }
+  style: { [key: string]: number | string },
 ) => [
   style, // adds the rest of the btn stlyes
   {

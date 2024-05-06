@@ -1,16 +1,16 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import DiscoverPrivateList from '@/components/lists/discoverPrivateList';
-import { useGetUserParticipationsQuery } from '@/services/backendApi';
-import type { Quiz } from '@/types/Types';
-import { useContext, useEffect, useReducer } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { setParticipationsList } from '@/features/participatingSlice';
-import DiscoverPublicList from '@/components/lists/discoverPublicList';
 import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
+import DiscoverPrivateList from '@/components/lists/discoverPrivateList';
+import DiscoverPublicList from '@/components/lists/discoverPublicList';
+import { setParticipationsList } from '@/features/participatingSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import {
   defaultDiscoverScreenState,
   discoverScreenStateReducer,
 } from '@/reducers/discoverScreenStateReducer';
+import { useGetUserParticipationsQuery } from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
+import { useContext, useEffect, useReducer } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function DiscoverScreen() {
   // Dispach typed hook for RTK

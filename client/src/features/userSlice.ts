@@ -1,7 +1,7 @@
+import type { RootState } from '@/store';
+import type { User } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { User } from '@/types/Types';
-import type { RootState } from '@/store';
 
 interface UserState {
   id?: string;

@@ -1,19 +1,20 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
-  User,
-  ResponseUser,
-  UserPost,
-  Quiz,
-  QuizQuestionAnswer,
+  FullQuizState,
+  LoginCredentials,
   Participation,
   ParticipationAndAnswers,
   ParticipationAnswer,
-  UserParticipations,
+  Quiz,
   QuizParticipations,
+  QuizQuestionAnswer,
+  ResponseLoginUser,
+  ResponseRegisterUser,
+  User,
+  UserParticipations,
+  UserPost,
   Winner,
-  LoginCredentials,
-  FullQuizState,
 } from '@/types/Types';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const BASE_URL: string =
   process.env.NODE_ENV === 'production'
@@ -24,7 +25,7 @@ export const backendApi = createApi({
   reducerPath: 'backendApi',
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: build => ({
-    postUser: build.mutation<ResponseUser, UserPost>({
+    postUser: build.mutation<ResponseRegisterUser, UserPost>({
       query: user => ({
         url: 'user',
         method: 'POST',
@@ -32,7 +33,7 @@ export const backendApi = createApi({
       }),
     }),
 
-    loginUser: build.mutation<ResponseUser, LoginCredentials>({
+    loginUser: build.mutation<ResponseLoginUser, LoginCredentials>({
       query: ({ username, password }) => ({
         url: 'login',
         method: 'POST',
@@ -40,7 +41,7 @@ export const backendApi = createApi({
       }),
     }),
 
-    getUser: build.query<ResponseUser, string>({
+    getUser: build.query<ResponseLoginUser, string>({
       query: authToken => ({
         url: 'userId',
         headers: { Authorization: `Bearer ${authToken}` },
@@ -105,10 +106,7 @@ export const backendApi = createApi({
       query: userId => `participations/${userId}`,
     }),
 
-    getOneParticipation: build.query<
-      Participation,
-      { userId: string; quizId: string }
-    >({
+    getOneParticipation: build.query<Participation, { userId: string; quizId: string }>({
       query: ({ userId, quizId }) => `participation/${userId}/${quizId}`,
     }),
 

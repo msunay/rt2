@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-import { QuestionAnswer, Answer } from '@/types/Types';
 import { useAppSelector } from '@/hooks/reduxHooks';
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
-import { btnPressStyle } from '@/utils/helpers';
+import type { Answer, QuestionAnswer } from '@/types/Types';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
-import { QUESTION_TIME } from '@/services/quizSocketService';
 import Animated from 'react-native-reanimated';
 
 interface Props {
@@ -32,17 +30,19 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
   useEffect(() => {
     if (quiz) {
       // Find the question in the quiz data that matches the current question number.
-      setCurrentQuestion(
-        quiz.Questions.find(
-          question => question.positionInQuiz === currentQuestionNumber,
-        )!,
+      const foundQuestion = quiz.Questions.find(
+        question => question.positionInQuiz === currentQuestionNumber,
       );
+
+      if (foundQuestion) {
+        setCurrentQuestion(foundQuestion);
+      }
     }
   }, [quiz, currentQuestionNumber]);
 
   // Effect hook to update the current answers state when the current question changes.
   useEffect(() => {
-    if (currentQuestion && currentQuestion.Answers) {
+    if (currentQuestion.Answers) {
       // Set the current answers to the answers of the current question.
       setCurrentAnswers(currentQuestion.Answers);
     }
@@ -56,8 +56,8 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
             <Text style={styles.question_text}>{currentQuestion.questionText}</Text>
           </View>
           <View style={styles.answer_container}>
-            {currentAnswers?.map((answer, index) => (
-              <Pressable key={index} style={styles.answerBtn}>
+            {currentAnswers?.map(answer => (
+              <Pressable key={answer.QuestionId} style={styles.answerBtn}>
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
             ))}

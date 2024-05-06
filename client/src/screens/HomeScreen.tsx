@@ -1,13 +1,13 @@
-import { Dimensions, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
 
 import Header from '@/components/global/header';
 import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import HomeCatagories from '@/components/lists/homeCatagories';
 import HomeDiscover from '@/components/lists/homeDiscover';
 import { setCurrentUser } from '@/features/userSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { useGetUserDetailsQuery } from '@/services/backendApi';
 
 export default function HomeScreen() {

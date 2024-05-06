@@ -1,16 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import type { Quiz } from '@/types/Types';
-import { useEffect, useState } from 'react';
 import ParticipationQuizCard from '@/components/cards/participationQuizCard';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useGetUserParticipationsQuery } from '@/services/backendApi';
 import { setParticipationsList } from '@/features/participatingSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { useGetUserParticipationsQuery } from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
 import { sortQuizzes } from '@/utils/helpers';
+import { FlashList } from '@shopify/flash-list';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function StartQuizScreen() {
-
   // Typed Hook to dispatch actions to Redux store.
   const dispatch = useAppDispatch();
   // Select User ID

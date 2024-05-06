@@ -1,22 +1,16 @@
-import React, { ReactComponentElement, useEffect, useRef, useState } from 'react';
+import { incrementQuestionNumber } from '@/features/questionSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { peersSocketService } from '@/services/peersSocketService';
+import { quizSocketService, startTimer } from '@/services/quizSocketService';
+import { QUESTION_TIME } from '@/services/quizSocketService';
+import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import { peersSocketService } from '@/services/peersSocketService';
-import { useAppSelector, useAppDispatch } from '@/hooks/reduxHooks';
-import { incrementQuestionNumber } from '@/features/questionSlice';
-import { router } from 'expo-router';
-import { quizSocketService, startTimer } from '@/services/quizSocketService';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Video, VideoProps, VideoState } from 'expo-av';
-import HostQuestion from '../question/hostQuestion';
-import { QUESTION_TIME } from '@/services/quizSocketService';
-import {
-  registerGlobals,
-  mediaDevices,
-  RTCView,
-  MediaStreamTrack,
-} from 'react-native-webrtc';
+import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
 import type { MediaStream } from 'react-native-webrtc';
+import HostQuestion from '../question/hostQuestion';
 
 export default function HostVideoStream({ quizId }: { quizId: string }) {
   // Register Globals for Mediasoup
@@ -124,7 +118,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
           max: 1080,
         },
       },
-    }
+    };
     if (!mediaStream) {
       mediaDevices
         .getUserMedia(constraints)

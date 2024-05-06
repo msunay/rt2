@@ -1,22 +1,22 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
-import type { Quiz } from '@/types/Types';
-import { Image } from 'expo-image';
-import { CATEGORY_IMAGES } from '@/utils/images';
-import {
-  useAddParticipationMutation,
-  useDeleteParticipationMutation,
-  useGetUserDetailsQuery,
-} from '@/services/backendApi';
-import { formatDistance } from 'date-fns';
-import { Entypo, AntDesign } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import {
   addToParticipatingList,
   popFromParticipatingList,
   removeFromParticipatingList,
 } from '@/features/participatingSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import {
+  useAddParticipationMutation,
+  useDeleteParticipationMutation,
+  useGetUserDetailsQuery,
+} from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
 import { CATEGORIES } from '@/utils/consts';
+import { CATEGORY_IMAGES } from '@/utils/images';
+import { AntDesign, Entypo } from '@expo/vector-icons';
+import { formatDistance } from 'date-fns';
+import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
   quiz: Quiz;
@@ -41,9 +41,8 @@ export default function DiscoverQuizCard({ quiz, participations, privateQuiz }: 
 
   // Effect hook to set the participating state based on the participatingList from Redux on mount.
   useEffect(() => {
-    const parts = participations.filter(q => q.id === quiz.id)
+    const parts = participations.filter(q => q.id === quiz.id);
     if (parts.length) setParticipating(true); // If the quiz is in the participating list, set participating to true.
-
   }, [participations, quiz]);
 
   // Optimistically create participation
@@ -53,16 +52,16 @@ export default function DiscoverQuizCard({ quiz, participations, privateQuiz }: 
       setParticipating(prev => !prev);
       dispatch(addToParticipatingList(quiz));
       createParticipation({ quizId: quiz.id, userId: id })
-      .unwrap()
-      .then()
-      .catch(err => {
-        // If creation fails update Redux state to reflect this
-        if (!err.data) {
-          dispatch(popFromParticipatingList());
-          // Toggle the local participating state to reflect change.
-          setParticipating(prev => !prev);
-        }
-      });
+        .unwrap()
+        .then()
+        .catch(err => {
+          // If creation fails update Redux state to reflect this
+          if (!err.data) {
+            dispatch(popFromParticipatingList());
+            // Toggle the local participating state to reflect change.
+            setParticipating(prev => !prev);
+          }
+        });
     }
   };
 
@@ -73,16 +72,16 @@ export default function DiscoverQuizCard({ quiz, participations, privateQuiz }: 
       setParticipating(prev => !prev);
       dispatch(removeFromParticipatingList(quiz));
       deleteParticipation({ quizId: quiz.id, userId: id })
-      .unwrap()
-      .then()
-      .catch(err => {
-        // If deletion fails update Redux state to reflect this
-        if (!err.data) {
-          dispatch(addToParticipatingList(quiz));
-          // Toggle the local participating state to reflect change.
-          setParticipating(prev => !prev);
-        }
-      });
+        .unwrap()
+        .then()
+        .catch(err => {
+          // If deletion fails update Redux state to reflect this
+          if (!err.data) {
+            dispatch(addToParticipatingList(quiz));
+            // Toggle the local participating state to reflect change.
+            setParticipating(prev => !prev);
+          }
+        });
     }
   };
 

@@ -5,11 +5,11 @@ import { Pressable, StyleSheet } from 'react-native';
 
 export default function CreateQuizBtn() {
   return (
-    <Link href="/createQuiz" asChild>
+    <Link href='/createQuiz' asChild>
       <Pressable style={styles.imageContainer}>
         <Image
           style={styles.image}
-          contentFit="contain"
+          contentFit='contain'
           source={TILE_IMAGES.createQuiz}
         />
       </Pressable>

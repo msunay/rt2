@@ -1,3 +1,11 @@
+import { setUserId } from '@/features/userIdSlice';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import type { ResponseLoginUser, UserPost } from '@/types/Types';
+import { useSession } from '@/utils/authctx';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Button,
   Keyboard,
@@ -7,15 +15,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import { useSession } from '@/utils/authctx';
 import { object, ref, string } from 'yup';
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import type { ResponseLoginUser, UserPost } from '@/types/Types';
-import { useAppDispatch } from '@/hooks/reduxHooks';
-import { setUserId } from '@/features/userIdSlice';
 
 export default function RegistrationScreen() {
   // Use Redux's useDispatch hook to dispatch actions, customized for the app's store.
@@ -58,20 +58,21 @@ export default function RegistrationScreen() {
 
   // Function to handle registration form submission.
   const onRegister = (formData: UserPost) => {
-    if (register) register({
-      email: formData.email,
-      username: formData.username,
-      password: formData.password,
-    }).then(res => {
-      // Construct a user response object from the registration response.
-      const responseUser: ResponseLoginUser = {
-        token: res.token, // Authentication token received upon registration.
-        id: res.dataValues.id, // User ID from the response.
-        username: res.dataValues.username, // Username from the response.
-      };
-      dispatch(setUserId(responseUser)); // Dispatch action to store user ID and other details in Redux store.
-      router.replace('/'); // Navigate to the home screen after successful registration.
-    });
+    if (register)
+      register({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      }).then(res => {
+        // Construct a user response object from the registration response.
+        const responseUser: ResponseLoginUser = {
+          token: res.token, // Authentication token received upon registration.
+          id: res.dataValues.id, // User ID from the response.
+          username: res.dataValues.username, // Username from the response.
+        };
+        dispatch(setUserId(responseUser)); // Dispatch action to store user ID and other details in Redux store.
+        router.replace('/'); // Navigate to the home screen after successful registration.
+      });
   };
 
   // Function to dynamically adjust Pressable component style based on press state.

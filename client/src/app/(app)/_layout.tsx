@@ -1,10 +1,10 @@
-import { Text } from 'react-native';
-import { Redirect, Slot } from 'expo-router';
-import { useSession } from '@/utils/authctx';
+import { setUserId } from '@/features/userIdSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { useGetUserQuery } from '@/services/backendApi';
+import { useSession } from '@/utils/authctx';
+import { Redirect, Slot } from 'expo-router';
 import { useEffect } from 'react';
-import { setUserId } from '@/features/userIdSlice';
+import { Text } from 'react-native';
 
 export default function AppLayout() {
   const dispatch = useAppDispatch();
@@ -30,7 +30,6 @@ export default function AppLayout() {
   useEffect(() => {
     if (!id && user) dispatch(setUserId(user));
   }, [user, dispatch, id]);
-
 
   // This layout can be deferred because it's not the root layout.
   return <Slot />;

@@ -1,14 +1,14 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Quiz } from '@/types/Types';
-import { Image } from 'expo-image';
-import { CATEGORY_IMAGES } from '@/utils/images';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import {
   useGetOneParticipationQuery,
   useGetUserDetailsQuery,
 } from '@/services/backendApi';
+import type { Quiz } from '@/types/Types';
+import { CATEGORY_IMAGES } from '@/utils/images';
 import { formatDistance } from 'date-fns';
-import { useAppSelector } from '@/hooks/reduxHooks';
+import { Image } from 'expo-image';
 import { Link } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
   // Fetches the host's details for the quiz using the quiz owner's ID.

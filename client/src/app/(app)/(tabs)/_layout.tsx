@@ -1,11 +1,11 @@
-import { StyleSheet, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
-import { useAppDispatch } from '@/hooks/reduxHooks';
-import { createContext, useEffect } from 'react';
 import { setIsFetching, setQuizzes /* setRefetch */ } from '@/features/quizzesSlice';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import { useGetAllQuizzesQuery } from '@/services/backendApi';
 import type { RefetchQuizzes } from '@/types/Types';
+import { Stack } from 'expo-router';
+import { createContext, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const RefetchQuizzesContext = createContext<RefetchQuizzes | null>(null);
 

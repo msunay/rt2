@@ -1,6 +1,10 @@
+import { addQuestionWithAnswers, resetQuizStore } from '@/features/quizCreationSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { useAddFullQuizMutation } from '@/services/backendApi';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Keyboard,
@@ -13,19 +17,15 @@ import {
   View,
 } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
-import { object, string } from 'yup';
-import { addQuestionWithAnswers, resetQuizStore } from '@/features/quizCreationSlice';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRef, useState } from 'react';
-import type { RefObject } from 'react';
-import { useAddFullQuizMutation } from '@/services/backendApi';
+import { object, string } from 'yup';
 
 export default function QuizContent() {
   // Retrieve the query parameter 'qno' (question number) from the URL.
   const { qno } = useLocalSearchParams<{ qno: string }>();
 
-  if (!qno) throw new Error("qno not in params");
-    
+  if (!qno) throw new Error('qno not in params');
+
   // Convert the question number to an integer for internal logic.
   const questionNum = Number.parseInt(qno);
 

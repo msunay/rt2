@@ -1,20 +1,20 @@
 import {
+  AntDesign,
+  Entypo,
+  FontAwesome5,
+  MaterialIcons,
+  Octicons,
+} from '@expo/vector-icons';
+import {
   AnimatedTabBarNavigator,
   DotSize,
   TabElementDisplayOptions,
 } from 'react-native-animated-nav-tab-bar';
-import {
-  AntDesign,
-  Entypo,
-  MaterialIcons,
-  Octicons,
-  FontAwesome5,
-} from '@expo/vector-icons';
 
-import HomeScreen from '@/screens/HomeScreen';
 import DiscoverScreen from '@/screens/DiscoverScreen';
-import ProfileScreen from '@/screens/ProfileScreen';
+import HomeScreen from '@/screens/HomeScreen';
 import HostingScreen from '@/screens/HostingScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
 import StartQuizScreen from '@/screens/StartQuizScreen';
 
 export default function TabScreen() {
@@ -41,56 +41,56 @@ export default function TabScreen() {
   };
   return (
     <Tabs.Navigator
-      initialRouteName="Home"
+      initialRouteName='Home'
       tabBarOptions={tabBarOptions}
       appearance={appearanceOptions}
     >
       <Tabs.Screen
-        name="Home"
+        name='Home'
         component={HomeScreen}
         options={{
           tabBarIcon: ({ size }: { size: number }) => (
-            <AntDesign name="home" size={size ? size : 24} color="black" />
+            <AntDesign name='home' size={size ? size : 24} color='black' />
           ),
           unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
-        name="Discover"
+        name='Discover'
         component={DiscoverScreen}
         options={{
           tabBarIcon: ({ size }: { size: number }) => (
-            <Entypo name="compass" size={size ? size : 24} color="black" />
+            <Entypo name='compass' size={size ? size : 24} color='black' />
           ),
           unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
-        name="Start Quiz"
+        name='Start Quiz'
         component={StartQuizScreen}
         options={{
           tabBarIcon: ({ size }: { size: number }) => (
-            <MaterialIcons name="quiz" size={size ? size : 24} color="black" />
+            <MaterialIcons name='quiz' size={size ? size : 24} color='black' />
           ),
           unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
-        name="Host Quiz"
+        name='Host Quiz'
         component={HostingScreen}
         options={{
           tabBarIcon: ({ size }: { size: number }) => (
-            <Octicons name="gear" size={size ? size : 24} color="black" />
+            <Octicons name='gear' size={size ? size : 24} color='black' />
           ),
           unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
-        name="Profile"
+        name='Profile'
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ size }: { size: number }) => (
-            <FontAwesome5 name="user" size={size ? size : 24} color="black" />
+            <FontAwesome5 name='user' size={size ? size : 24} color='black' />
           ),
           unmountOnBlur: true,
         }}

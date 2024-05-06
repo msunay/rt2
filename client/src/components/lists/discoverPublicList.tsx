@@ -1,9 +1,9 @@
-import type { Quiz, RefetchQuizzes } from "@/types/Types";
-import { FlashList } from "@shopify/flash-list";
-import { RefreshControl, StyleSheet, View } from "react-native";
-import DiscoverQuizCard from "../cards/discoverQuizCard";
-import { useContext } from "react";
-import { RefetchQuizzesContext } from "@/app/(app)/(tabs)/_layout";
+import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
+import type { Quiz } from '@/types/Types';
+import { FlashList } from '@shopify/flash-list';
+import { useContext } from 'react';
+import { RefreshControl, StyleSheet, View } from 'react-native';
+import DiscoverQuizCard from '../cards/discoverQuizCard';
 
 interface Props {
   quizList: Quiz[];
@@ -18,15 +18,15 @@ export default function DiscoverPublicList({
   search,
   isFetchingQuizzes,
 }: Props) {
+  const refetchAllQuizzes = useContext(RefetchQuizzesContext);
 
-  const refetchAllQuizzes = useContext(RefetchQuizzesContext)
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
     return <DiscoverQuizCard quiz={item} participations={participations} />;
   };
 
   return (
-    refetchAllQuizzes &&
+    refetchAllQuizzes && (
       <FlashList
         data={search(quizList)}
         renderItem={renderItem}
@@ -37,8 +37,9 @@ export default function DiscoverPublicList({
             refreshing={isFetchingQuizzes}
           />
         }
-        ListFooterComponent={<View style={styles.listFooter}/>}
+        ListFooterComponent={<View style={styles.listFooter} />}
       />
+    )
   );
 }
 

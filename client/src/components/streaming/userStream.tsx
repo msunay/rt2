@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
-import { types as mediasoupTypes } from 'mediasoup-client';
+import type { types as mediasoupTypes } from 'mediasoup-client';
 import { Participation } from '@/types/Types';
 import { quizSocketService } from '@/services/quizSocketService';
 import { peersSocketService } from '@/services/peersSocketService';
@@ -136,7 +136,7 @@ export default function UserStream({ partId }: { partId: string }) {
         {trigger < 11 ? (
           trigger === 10 ? (
             //BUG last question not sent to backend before final score registered
-            <FinalScore userParticipation={participation!} />
+            participation && <FinalScore userParticipation={participation} />
           ) : (
             <View style={styles.question_component_container}>
               {quizStarted && (
@@ -149,7 +149,7 @@ export default function UserStream({ partId }: { partId: string }) {
             </View>
           )
         ) : (
-          <Winners quizId={participation?.QuizId!} />
+          participation?.QuizId && <Winners quizId={participation.QuizId} />
         )}
 
         {/* <div className="current-question"></div> */}

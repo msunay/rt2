@@ -1,3 +1,16 @@
+import { addQuizData } from '@/features/quizCreationSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { useAddDemoQuizMutation } from '@/services/backendApi';
+import { CATEGORY_IMAGES } from '@/utils/images';
+import { yupResolver } from '@hookform/resolvers/yup';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import Checkbox from 'expo-checkbox';
+import { Image } from 'expo-image';
+import type { ImageSource } from 'expo-image';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -7,20 +20,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import Checkbox from 'expo-checkbox';
 import { boolean, date, object, string } from 'yup';
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Picker } from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useAddDemoQuizMutation } from '@/services/backendApi';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { CATEGORY_IMAGES } from '@/utils/images';
-import { Image } from 'expo-image';
-import type { ImageSource } from 'expo-image';
-import { router } from 'expo-router';
-import { addQuizData } from '@/features/quizCreationSlice';
 
 export default function CreateQuiz() {
   // Hook to initiate adding a new quiz, utilizing a mutation function from RTK Query.

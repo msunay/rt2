@@ -11,7 +11,7 @@ export default function HomeDiscoverCard({ quiz }: { quiz: Quiz }) {
         <Image
           style={styles.images}
           source={CATEGORY_IMAGES[quiz.category]}
-          contentFit="cover"
+          contentFit='cover'
         />
         <Text style={styles.cardTextTitle}>{quiz.quizName}</Text>
         <Text style={styles.cardText}>{CATEGORIES[quiz.category]}</Text>
