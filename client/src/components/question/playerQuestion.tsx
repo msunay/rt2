@@ -1,3 +1,4 @@
+import { defaultPlayerQuestionState, playerQuestionStateReducer } from '@/reducers/playerQuestionStateReducer';
 import {
   useCreateParticipationAnswerMutation,
   useGetOneQuizQuestionAnswerQuery,
@@ -9,7 +10,7 @@ import type {
   ParticipationAnswer,
   QuestionAnswer,
 } from '@/types/Types';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import Animated from 'react-native-reanimated';
@@ -31,25 +32,14 @@ export default function PlayerQuestion({ hidden, trigger, participation }: Props
   // RTK Query mutation hook for creating a participation answer.
   const [createParticipationAnswer, result] = useCreateParticipationAnswerMutation();
 
-  // State to manage the user's selected answer for a quiz participation.
-  const [userParticipationAnswer, setUserParticipationAnswer] =
-    useState<ParticipationAnswer>({} as ParticipationAnswer);
 
-  // State for the current question being displayed.
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
-    {} as QuestionAnswer,
-  );
-
-  // State for the selected btn
-  const [selectedBtn, setSelectedBtn] = useState<number | null>(null);
-
-  // State for the answers related to the current question.
-  const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
+  const [state, dispatchState] = useReducer(playerQuestionStateReducer, defaultPlayerQuestionState);
 
   // Effect hook to call `createHandle` when `trigger` changes and is greater than 0.
   useEffect(() => {
     if (trigger > 0) createHandle();
-    setSelectedBtn(null);
+    dispatchState({type: 'SET_PQ_SEL_BTN', payload: null})
+    // setSelectedBtn(null);
   }, [trigger]);
 
   // Effect hook to set the current question based on the quiz data and the current trigger value.
@@ -60,37 +50,41 @@ export default function PlayerQuestion({ hidden, trigger, participation }: Props
       );
 
       if (foundQuestion) {
-        setCurrentQuestion(foundQuestion);
+        dispatchState({type: 'SET_PQ_CURR_Q', payload: foundQuestion})
+        // setCurrentQuestion(foundQuestion);
       }
     }
   }, [quiz, trigger, error, isLoading]);
 
   // Effect hook to update the current answers whenever the current question changes.
   useEffect(() => {
-    if (currentQuestion.Answers) {
-      setCurrentAnswers(currentQuestion.Answers);
+    if (state.currentQuestion.Answers) {
+      dispatchState({type: 'SET_PQ_CURR_ANS', payload: state.currentQuestion.Answers})
+      // setCurrentAnswers(currentQuestion.Answers);
     }
-  }, [currentQuestion]);
+  }, [state.currentQuestion]);
 
   // Updates the state with the selected answer's ID and the participation ID.
   function handleAnswerClick(index: number) {
-    if (currentAnswers[index].id && participation?.id) {
-      const AnswerId = currentAnswers[index]?.id || '';
+    if (state.currentAnswers[index].id && participation?.id) {
+      const AnswerId = state.currentAnswers[index]?.id || '';
       const ParticipationId = participation.id;
-      setUserParticipationAnswer({
-        AnswerId,
-        ParticipationId,
-      });
-      setSelectedBtn(index);
+      // setUserParticipationAnswer({
+      //   AnswerId,
+      //   ParticipationId,
+      // });
+      // setSelectedBtn(index);
+      dispatchState({type: 'SET_PQ_PART_ANS', payload: {AnswerId, ParticipationId}})
     }
   }
 
   // Function to handle creating a participation answer.
   // calls the mutation to create a participation answer, and resets the userParticipationAnswer state.
   function createHandle() {
-    console.log('userParticipationAnswer2: ', userParticipationAnswer);
-    createParticipationAnswer(userParticipationAnswer);
-    setUserParticipationAnswer({} as ParticipationAnswer); // Reset after submission.
+    console.log('userParticipationAnswer2: ', state.userParticipationAnswer);
+    createParticipationAnswer(state.userParticipationAnswer);
+    dispatchState({type: 'SET_PQ_PART_ANS', payload: {} as ParticipationAnswer})
+    // setUserParticipationAnswer({} as ParticipationAnswer); // Reset after submission.
   }
 
   const pressableStyle =
@@ -98,16 +92,16 @@ export default function PlayerQuestion({ hidden, trigger, participation }: Props
     ({ pressed }: { pressed: boolean }) => ({
       ...styles.answerBtn,
       backgroundColor:
-        index === selectedBtn ? 'rgba(255, 127, 80, 0.5)' : 'rgba(110, 110, 110, 0.5)',
+        index === state.selectedBtn ? 'rgba(255, 127, 80, 0.5)' : 'rgba(110, 110, 110, 0.5)',
       borderColor: pressed ? 'yellow' : 'black',
     });
 
   return (
     <View style={styles.question_component}>
-      {currentQuestion && !hidden && (
+      {state.currentQuestion && !hidden && (
         <View style={styles.question_container}>
           <View style={styles.questionTextContainer}>
-            <Text style={styles.question_text}>{currentQuestion.questionText}</Text>
+            <Text style={styles.question_text}>{state.currentQuestion.questionText}</Text>
           </View>
           <View style={{ marginBottom: 'auto', marginTop: 10 }}>
             <CountdownCircleTimer
@@ -125,7 +119,7 @@ export default function PlayerQuestion({ hidden, trigger, participation }: Props
             </CountdownCircleTimer>
           </View>
           <View style={styles.answer_container}>
-            {currentAnswers?.map((answer, index) => (
+            {state.currentAnswers?.map((answer, index) => (
               <View style={styles.answerBtnContainer} key={answer.QuestionId}>
                 <Pressable
                   // key={index}
