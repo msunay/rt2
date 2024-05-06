@@ -1,36 +1,15 @@
-import { Quiz } from "@/types/Types";
+import type { Quiz, RefetchQuizzes } from "@/types/Types";
 import { FlashList } from "@shopify/flash-list";
 import { RefreshControl, StyleSheet, View } from "react-native";
 import DiscoverQuizCard from "../cards/discoverQuizCard";
-import {
-  BaseQueryFn,
-  FetchArgs,
-  FetchBaseQueryError,
-  FetchBaseQueryMeta,
-  QueryActionCreatorResult,
-  QueryDefinition,
-} from "@reduxjs/toolkit/query";
+import { useContext } from "react";
+import { RefetchQuizzesContext } from "@/app/(app)/(tabs)/_layout";
 
 interface Props {
   quizList: Quiz[];
   participations: Quiz[];
   search: (quizzes: Quiz[]) => Quiz[];
   isFetchingQuizzes: boolean;
-  refetchQuizzes: () => QueryActionCreatorResult<
-    QueryDefinition<
-      void,
-      BaseQueryFn<
-        string | FetchArgs,
-        unknown,
-        FetchBaseQueryError,
-        {},
-        FetchBaseQueryMeta
-      >,
-      never,
-      Quiz[],
-      "backendApi"
-    >
-  >;
 }
 
 export default function DiscoverPublicList({
@@ -38,26 +17,28 @@ export default function DiscoverPublicList({
   participations,
   search,
   isFetchingQuizzes,
-  refetchQuizzes,
 }: Props) {
+
+  const refetchAllQuizzes = useContext(RefetchQuizzesContext)
   // Function to render a quiz item.
   const renderItem = ({ item }: { item: Quiz }) => {
     return <DiscoverQuizCard quiz={item} participations={participations} />;
   };
 
   return (
-    <FlashList
-      data={search(quizList)}
-      renderItem={renderItem}
-      estimatedItemSize={108}
-      refreshControl={
-        <RefreshControl
-          onRefresh={() => refetchQuizzes()}
-          refreshing={isFetchingQuizzes}
-        />
-      }
-      ListFooterComponent={<View style={styles.listFooter}></View>}
-    />
+    refetchAllQuizzes &&
+      <FlashList
+        data={search(quizList)}
+        renderItem={renderItem}
+        estimatedItemSize={108}
+        refreshControl={
+          <RefreshControl
+            onRefresh={() => refetchAllQuizzes()}
+            refreshing={isFetchingQuizzes}
+          />
+        }
+        ListFooterComponent={<View style={styles.listFooter}/>}
+      />
   );
 }
 

@@ -1,27 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Winner } from '@/types/Types';
+import type { Winner } from '@/types/Types';
 import { useGetWinnersQuery } from '@/services/backendApi';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Winners({ quizId }: { quizId: string }) {
   // Fetch all users with the top score
-  const { data } = useGetWinnersQuery(quizId);
+  const { data: winners } = useGetWinnersQuery(quizId);
   // Local state to hold winners
   const [winnerList, setWinnerList] = useState<Winner[]>([]);
 
   // Effect hook to set winnerList state
   useEffect(() => {
-    if (data) {
-      setWinnerList(data);
+    if (winners) {
+      setWinnerList(winners);
     }
-  }, [data]);
+  }, [winners]);
 
   return (
     <View style={styles.container}>
       <Text>Winners</Text>
       <View>
-        {winnerList.map((winner, index) => (
-          <View key={index}>
+        {winnerList.map((winner) => (
+          <View key={winner.username}>
             <Text>{winner.username}</Text>
             <Text>{winner.userScore}</Text>
           </View>

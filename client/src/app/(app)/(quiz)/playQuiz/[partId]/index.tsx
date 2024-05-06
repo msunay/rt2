@@ -11,7 +11,7 @@ export default function UserStreamPage() {
       source={QUIZ_BACKGROUND.background}
       style={styles.background}
     >
-      <UserStream partId={partId!} />
+      {partId && <UserStream partId={partId} />}
     </ImageBackground>
   );
 }

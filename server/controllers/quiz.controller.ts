@@ -113,6 +113,7 @@ async function createFullQuiz(req: Request, res: Response) {
         quizOwner: req.body.quizOwner,
         category: req.body.category,
         dateTime: req.body.dateTime,
+        hasVideo: req.body.hasVideo,
         isPrivate: req.body.isPrivate,
         pin: req.body.pin
       });
@@ -122,6 +123,7 @@ async function createFullQuiz(req: Request, res: Response) {
         quizOwner: req.body.quizOwner,
         category: req.body.category,
         dateTime: req.body.dateTime,
+        hasVideo: req.body.hasVideo,
         isPrivate: req.body.isPrivate,
       });
     }

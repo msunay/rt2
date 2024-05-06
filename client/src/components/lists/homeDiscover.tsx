@@ -1,33 +1,36 @@
 import { Dimensions, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useGetAllQuizzesQuery } from '@/services/backendApi';
-import { Quiz } from '@/types/Types';
-import { useEffect, useState } from 'react';
+import type { Quiz } from '@/types/Types';
+import { useContext, useEffect, useState } from 'react';
 import HomeDiscoverCard from '../cards/homeDiscoverCard';
 import { FlashList } from '@shopify/flash-list';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
 
 export default function HomeDiscover() {
   // Fetch all quizzes.
-  const { data, error, isFetching, isLoading, refetch } =
-    useGetAllQuizzesQuery();
+  const { allQuizzes, isFetchingQuizzes } = useAppSelector(store => store.quizzesSlice)
+
+  const refetchAllQuizzes = useContext(RefetchQuizzesContext);
 
   // State to hold the sorted list of quizzes.
   const [sortedList, setSortedList] = useState<Quiz[]>([]);
 
   // Effect hook to sort quizzes by their dateTime when the data is fetched or updated.
-  useEffect(() => {
-    if (data) {
-      // Copy the fetched data to a new array as data from RTK is immutable.
-      const sorted = [...data];
-      // Sort the quizzes by dateTime in ascending order.
-      sorted.sort(
-        (quizA, quizB) =>
-          new Date(quizA.dateTime).getTime() -
-          new Date(quizB.dateTime).getTime()
-      );
-      // Update the state with the sorted quiz list.
-      setSortedList(sorted);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (allQuizzes) {
+  //     // Copy the fetched data to a new array as data from RTK is immutable.
+  //     const sorted = [...data];
+  //     // Sort the quizzes by dateTime in ascending order.
+  //     sorted.sort(
+  //       (quizA, quizB) =>
+  //         new Date(quizA.dateTime).getTime() -
+  //         new Date(quizB.dateTime).getTime()
+  //     );
+  //     // Update the state with the sorted quiz list.
+  //     setSortedList(sorted);
+  //   }
+  // }, [data]);
 
   // Function to render each item in the list, utilizing a custom card component.
   const renderItem = ({ item }: { item: Quiz }) => (
@@ -43,20 +46,23 @@ export default function HomeDiscover() {
         </View>
       </View>
       <View style={styles.listContainer}>
-        <FlatList
-          data={sortedList}
-          renderItem={renderItem}
-          horizontal
-          // style={styles.list}
-          onRefresh={() => refetch()}
-          refreshing={isFetching}
-          contentContainerStyle={{maxHeight: '100%'}}
+      {
+        refetchAllQuizzes &&
+          <FlatList
+            data={allQuizzes}
+            renderItem={renderItem}
+            horizontal
+            // style={styles.list}
+            onRefresh={() => refetchAllQuizzes()}
+            refreshing={isFetchingQuizzes}
+            contentContainerStyle={{maxHeight: '100%'}}
           // refreshControl={
-          //   <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
-          // }
-          // estimatedItemSize={198}
-          showsHorizontalScrollIndicator={false}
-        />
+            //   <RefreshControl onRefresh={() => refetch()} refreshing={isFetching} />
+            // }
+            // estimatedItemSize={198}
+            showsHorizontalScrollIndicator={false}
+          />
+      }
       </View>
     </View>
   );

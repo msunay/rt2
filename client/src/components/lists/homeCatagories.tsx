@@ -22,8 +22,8 @@ export default function HomeCatagories() {
         </View>
       </View>
       <View style={styles.listContainer}>
-        {topCategories.map((cat, i) => (
-          <CategoryQuizCard key={i} category={cat} />
+        {topCategories.map((cat) => (
+          <CategoryQuizCard key={cat} category={cat} />
         ))
         }
       </View>

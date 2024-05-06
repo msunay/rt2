@@ -1,16 +1,18 @@
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useGetAllQuizzesQuery } from '@/services/backendApi';
-import { Quiz } from '@/types/Types';
-import { useEffect, useState } from 'react';
-import { useAppSelector } from '@/utils/hooks';
+import type { Quiz } from '@/types/Types';
+import { useContext, useEffect, useState } from 'react';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import HostingQuizCard from '@/components/cards/hostingQuizCard';
 import CreateQuizBtn from '@/components/user/createQuizBtn';
 import Header from '@/components/global/header';
+import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
 
 export default function HostingScreen() {
+
+  const refetchAllQuizzes = useContext(RefetchQuizzesContext);
   // Fetch all quizzes.
-  const { data, isFetching, isSuccess, refetch } = useGetAllQuizzesQuery();
+  const { allQuizzes, isFetchingQuizzes } = useAppSelector(store => store.quizzesSlice);
   // Retrieves the current user's ID from the Redux state, to filter quizzes by the quiz owner.
   const id = useAppSelector(state => state.userIdSlice.id);
 
@@ -25,22 +27,13 @@ export default function HostingScreen() {
   // Effect hook to sort and filter quizzes once the data is successfully fetched.
   // It sorts quizzes by dateTime and filters them to include only those hosted by the current user.
   useEffect(() => {
-    if (data && isSuccess) {
+    if (allQuizzes) {
       // Copy fetched quizzes to sort as data is immutable.
-      const sorted = [...data];
-      sorted.sort(
-        (quizA, quizB) =>
-        // Sorting by ascending date and time.
-          new Date(quizA.dateTime).getTime() - new Date(quizB.dateTime).getTime(),
-      );
       // Filter sorted quizzes to include only those hosted by the current user and update state.
-      sorted.forEach((quiz) => {
-        if (quiz.quizOwner === id) {
-          setSortedList(prevList => [...prevList, quiz]);
-        }
-      });
+      const userHostingQuizzes = allQuizzes.filter(quiz => quiz.quizOwner === id);
+      setSortedList(userHostingQuizzes);
     }
-  }, [data, id, isSuccess]);
+  }, [allQuizzes, id]);
 
   return (
     <>
@@ -49,18 +42,20 @@ export default function HostingScreen() {
         <View style={styles.mainArea}>
           <View style={styles.listContainer}>
             <Text style={styles.listTitle}>Your Upcoming Quizzes</Text>
-            <FlashList
-              data={sortedList}
-              renderItem={renderItem}
-              estimatedItemSize={108}
-              refreshControl={(
-                <RefreshControl
-                  onRefresh={() => refetch()}
-                  refreshing={isFetching}
-                />
-              )}
-              ListFooterComponent={<View style={styles.listFooter}></View>}
-            />
+            {refetchAllQuizzes && (
+              <FlashList
+                data={sortedList}
+                renderItem={renderItem}
+                estimatedItemSize={108}
+                refreshControl={
+                  <RefreshControl
+                    onRefresh={() => refetchAllQuizzes()}
+                    refreshing={isFetchingQuizzes}
+                  />
+                }
+                ListFooterComponent={<View style={styles.listFooter} />}
+              />
+            )}
           </View>
           <View style={styles.rightColumn}>
             <CreateQuizBtn />

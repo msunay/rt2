@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Quiz } from '@/types/Types';
+import type { Quiz } from '@/types/Types';
 import { Image } from 'expo-image';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import {

@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 
-import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
-import HomeDiscover from '@/components/lists/homeDiscover';
-import HomeCatagories from '@/components/lists/homeCatagories';
-import { useGetUserDetailsQuery } from '@/services/backendApi';
-import { useAppDispatch, useAppSelector } from '@/utils/hooks';
-import { setCurrentUser } from '@/features/userSlice';
 import Header from '@/components/global/header';
+import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import HomeCatagories from '@/components/lists/homeCatagories';
+import HomeDiscover from '@/components/lists/homeDiscover';
+import { setCurrentUser } from '@/features/userSlice';
+import { useGetUserDetailsQuery } from '@/services/backendApi';
 
 export default function HomeScreen() {
   const id = useAppSelector(state => state.userIdSlice.id);
@@ -18,7 +18,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (isSuccess) dispatch(setCurrentUser(data));
-  }, [data]);
+  }, [data, isSuccess, dispatch]);
 
   return (
     <>
@@ -35,9 +35,9 @@ export default function HomeScreen() {
           <View style={styles.catagoriesContainer}>
             <HomeCatagories />
           </View>
-          <View style={styles.footerSpace}></View>
+          <View style={styles.footerSpace} />
         </View>
-        <StatusBar style="auto" />
+        <StatusBar style='auto' />
       </View>
     </>
   );

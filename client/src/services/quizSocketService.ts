@@ -1,5 +1,6 @@
-import { Socket, io } from 'socket.io-client';
-import {
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import type {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '@/types/QuizSocketTypes';
@@ -7,10 +8,10 @@ import {
 
 export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
-const BASE_URL =
+const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BACKEND_URL
-    : process.env.EXPO_PUBLIC_LOCAL_IP!;
+    ? process.env.BACKEND_URL || ''
+    : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(`${BASE_URL}quizspace`);
 

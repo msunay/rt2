@@ -6,21 +6,21 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import Checkbox from "expo-checkbox";
-import { boolean, date, number, object, string } from "yup";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Picker } from "@react-native-picker/picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { useAddDemoQuizMutation } from "@/services/backendApi";
-import { useAppDispatch, useAppSelector } from "@/utils/hooks";
-import { CATEGORY_IMAGES } from "@/utils/images";
-import { Image, ImageSource } from "expo-image";
-import { router } from "expo-router";
-import { addQuizData } from "@/features/quizCreationSlice";
-import { btnPressStyle } from "@/utils/helpers";
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import Checkbox from 'expo-checkbox';
+import { boolean, date, object, string } from 'yup';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useAddDemoQuizMutation } from '@/services/backendApi';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { CATEGORY_IMAGES } from '@/utils/images';
+import { Image } from 'expo-image';
+import type { ImageSource } from 'expo-image';
+import { router } from 'expo-router';
+import { addQuizData } from '@/features/quizCreationSlice';
 
 export default function CreateQuiz() {
   // Hook to initiate adding a new quiz, utilizing a mutation function from RTK Query.
@@ -30,27 +30,27 @@ export default function CreateQuiz() {
 
   // State for managing the selected category image with default set to 'general-knowledge'.
   const [catagoryImage, setCatagoryImage] = useState<ImageSource>(
-    CATEGORY_IMAGES["general-knowledge"]
+    CATEGORY_IMAGES['general-knowledge'],
   );
 
   // Retrieve the current user's ID from the Redux store using a selector.
-  const id = useAppSelector((state) => state.userIdSlice.id);
+  const id = useAppSelector(state => state.userIdSlice.id);
 
   // Define a schema for quiz creation form validation using Yup.
-  let quizSchema = object().shape({
-    quizName: string().required("Please fill in field"), // Quiz name is required.
-    category: string().required("Please fill in field"), // Category is required.
+  const quizSchema = object().shape({
+    quizName: string().required('Please fill in field'), // Quiz name is required.
+    category: string().required('Please fill in field'), // Category is required.
     dateTime: date()
       .required() // Date and time for the quiz must be set and be in the future.
       .default(() => new Date(Date.now() + 120000)) // Default to 2 minutes in the future.
-      .min(new Date(Date.now()), "please set a future time"),
+      .min(new Date(Date.now()), 'please set a future time'),
     isPrivate: boolean().required(),
-    pin: string().when("isPrivate", ([isPrivate], schema) => {
+    pin: string().when('isPrivate', ([isPrivate], schema) => {
       // If private validate pin else if public do not
       return isPrivate
         ? schema
-            .required("PIN is required")
-            .matches(/^\d{4}$/, "PIN must be exactly 4 digits")
+            .required('PIN is required')
+            .matches(/^\d{4}$/, 'PIN must be exactly 4 digits')
         : schema.notRequired();
     }),
   });
@@ -65,18 +65,18 @@ export default function CreateQuiz() {
   } = useForm({
     resolver: yupResolver(quizSchema),
     defaultValues: {
-      quizName: "",
-      category: "architecture",
+      quizName: '',
+      category: 'architecture',
       dateTime: new Date(Date.now() + 120000), // Default dateTime set to 2 minutes in the future.
       isPrivate: true,
-      pin: "",
+      pin: '',
     },
   });
 
   // Watch the category field in the form to update the category image when it changes.
-  const watchCatagory = watch("category");
+  const watchCatagory = watch('category');
   // Watch isPrivate field to render pin field
-  const isPrivate = watch("isPrivate");
+  const isPrivate = watch('isPrivate');
 
   // Update category image based on the selected category from the form.
   useEffect(() => {
@@ -123,42 +123,40 @@ export default function CreateQuiz() {
         quizOwner: id,
         isPrivate,
         pin,
-      })
+      }),
     );
     router.navigate({
-      pathname: "/createQuiz/[qno]",
+      pathname: '/createQuiz/[qno]',
       params: { qno: 1 }, // Navigate to the first question of the quiz creation process.
     });
   };
 
   const pressableStyle = ({ pressed }: { pressed: boolean }) => {
-    return pressed ? {
-      ...styles.loginBtn,
-      backgroundColor: '#ffb296'
-    } : {
-      ...styles.loginBtn,
-      backgroundColor: '#FF7F50'
-    }
-  }
+    return pressed
+      ? {
+          ...styles.loginBtn,
+          backgroundColor: '#ffb296',
+        }
+      : {
+          ...styles.loginBtn,
+          backgroundColor: '#FF7F50',
+        };
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
       <Pressable style={styles.background} onPress={Keyboard.dismiss}>
-        <Image
-          source={catagoryImage}
-          style={styles.categoryImage}
-          contentFit="contain"
-        />
+        <Image source={catagoryImage} style={styles.categoryImage} contentFit='contain' />
         <View style={styles.form}>
           <Text>Quiz Name</Text>
           <Controller
-            name="quizName"
+            name='quizName'
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <TextInput
                 style={styles.textInput}
-                placeholder="..."
-                autoCapitalize="none"
+                placeholder='...'
+                autoCapitalize='none'
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -166,67 +164,58 @@ export default function CreateQuiz() {
             )}
           />
           {errors.quizName && (
-            <Text style={styles.validationError}>
-              {errors.quizName.message}
-            </Text>
+            <Text style={styles.validationError}>{errors.quizName.message}</Text>
           )}
           <Text>Catagory</Text>
           <Controller
-            name="category"
+            name='category'
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <Picker
                 selectedValue={value}
                 onValueChange={onChange}
                 onBlur={onBlur}
-                placeholder="choose a category..."
+                placeholder='choose a category...'
                 style={styles.picker}
                 itemStyle={styles.pickerItem}
-                mode="dropdown"
+                mode='dropdown'
               >
-                <Picker.Item label="Architecture" value="architecture" />
-                <Picker.Item label="Environment" value="environment" />
-                <Picker.Item label="Food" value="food" />
-                <Picker.Item
-                  label="General Knowledge"
-                  value="general-knowledge"
-                />
-                <Picker.Item label="Geography" value="geography" />
-                <Picker.Item label="History" value="history" />
-                <Picker.Item label="Music" value="music" />
-                <Picker.Item label="Nature" value="nature" />
-                <Picker.Item label="Science" value="science" />
-                <Picker.Item label="Tech" value="tech" />
+                <Picker.Item label='Architecture' value='architecture' />
+                <Picker.Item label='Environment' value='environment' />
+                <Picker.Item label='Food' value='food' />
+                <Picker.Item label='General Knowledge' value='general-knowledge' />
+                <Picker.Item label='Geography' value='geography' />
+                <Picker.Item label='History' value='history' />
+                <Picker.Item label='Music' value='music' />
+                <Picker.Item label='Nature' value='nature' />
+                <Picker.Item label='Science' value='science' />
+                <Picker.Item label='Tech' value='tech' />
               </Picker>
             )}
           />
           {errors.category && (
-            <Text style={styles.validationError}>
-              {errors.category.message}
-            </Text>
+            <Text style={styles.validationError}>{errors.category.message}</Text>
           )}
           <Controller
-            name="dateTime"
+            name='dateTime'
             control={control}
             render={({ field: { value } }) => (
               <DateTimePicker
-                testID="dateTimePicker"
+                testID='dateTimePicker'
                 value={value}
-                mode="datetime"
+                mode='datetime'
                 onChange={(_, date) => {
-                  setValue("dateTime", date!, { shouldValidate: true });
+                  if (date) setValue('dateTime', date, { shouldValidate: true });
                 }}
               />
             )}
           />
           {errors.dateTime && (
-            <Text style={styles.validationError}>
-              {errors.dateTime.message}
-            </Text>
+            <Text style={styles.validationError}>{errors.dateTime.message}</Text>
           )}
           <Text>Private</Text>
           <Controller
-            name="isPrivate"
+            name='isPrivate'
             control={control}
             render={({ field: { value, onChange } }) => (
               <Checkbox value={value} onValueChange={onChange} />
@@ -234,33 +223,28 @@ export default function CreateQuiz() {
           />
           {isPrivate && (
             <Controller
-              name="pin"
+              name='pin'
               control={control}
               render={({ field: { value, onChange } }) => (
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Enter PIN"
+                  placeholder='Enter PIN'
                   maxLength={4}
                   value={`${value}`}
-                  onChangeText={(text) => {
-                    const filteredText = text.replace(/[^0-9]/g, ""); // Allow only numbers
+                  onChangeText={text => {
+                    const filteredText = text.replace(/[^0-9]/g, ''); // Allow only numbers
                     onChange(filteredText);
                   }}
-                  keyboardType="number-pad"
+                  keyboardType='number-pad'
                 />
               )}
             />
           )}
-          {errors.pin && (
-            <Text style={styles.validationError}>{errors.pin.message}</Text>
-          )}
+          {errors.pin && <Text style={styles.validationError}>{errors.pin.message}</Text>}
           <Pressable style={pressableStyle} onPress={handleSubmit(createQuiz)}>
             <Text style={styles.btnText}>Create Demo Quiz</Text>
           </Pressable>
-          <Pressable
-            style={pressableStyle}
-            onPress={handleSubmit(storeQuizDetails)}
-          >
+          <Pressable style={pressableStyle} onPress={handleSubmit(storeQuizDetails)}>
             <Text style={styles.btnText}>Create Full Quiz</Text>
           </Pressable>
         </View>
@@ -275,38 +259,38 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#f0f0f0",
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
   },
   form: {
     flex: 1.6,
-    width: "90%",
-    alignSelf: "center",
+    width: '90%',
+    alignSelf: 'center',
   },
   textInput: {
     height: 50,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     // marginBottom: 10,
     borderRadius: 10,
     paddingLeft: 15,
     fontSize: 16,
-    fontFamily: "Nunito-Regular",
+    fontFamily: 'Nunito-Regular',
   },
   validationError: {
-    fontFamily: "Nunito-Light",
-    color: "red",
+    fontFamily: 'Nunito-Light',
+    color: 'red',
   },
   loginBtn: {
-    justifyContent: "center",
-    alignContent: "center",
+    justifyContent: 'center',
+    alignContent: 'center',
     height: 50,
     borderRadius: 10,
     marginTop: 10,
   },
   btnText: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 16,
-    fontFamily: "Nunito-Bold",
+    fontFamily: 'Nunito-Bold',
   },
   picker: {
     // height: 40,

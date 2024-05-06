@@ -1,4 +1,3 @@
-/*
 import {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
@@ -328,4 +327,3 @@ const peersSocketInit = async (
 };
 
 export default peersSocketInit;
-*/

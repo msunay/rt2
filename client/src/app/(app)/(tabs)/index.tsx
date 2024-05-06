@@ -49,7 +49,7 @@ export default function TabScreen() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ size }: any) => (
+          tabBarIcon: ({ size }: { size: number }) => (
             <AntDesign name="home" size={size ? size : 24} color="black" />
           ),
           unmountOnBlur: true,
@@ -59,27 +59,27 @@ export default function TabScreen() {
         name="Discover"
         component={DiscoverScreen}
         options={{
-          tabBarIcon: ({ size }: any) => (
+          tabBarIcon: ({ size }: { size: number }) => (
             <Entypo name="compass" size={size ? size : 24} color="black" />
           ),
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
         name="Start Quiz"
         component={StartQuizScreen}
         options={{
-          tabBarIcon: ({ size }: any) => (
+          tabBarIcon: ({ size }: { size: number }) => (
             <MaterialIcons name="quiz" size={size ? size : 24} color="black" />
           ),
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
         name="Host Quiz"
         component={HostingScreen}
         options={{
-          tabBarIcon: ({ size }: any) => (
+          tabBarIcon: ({ size }: { size: number }) => (
             <Octicons name="gear" size={size ? size : 24} color="black" />
           ),
           unmountOnBlur: true,
@@ -89,7 +89,7 @@ export default function TabScreen() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ size }: any) => (
+          tabBarIcon: ({ size }: { size: number }) => (
             <FontAwesome5 name="user" size={size ? size : 24} color="black" />
           ),
           unmountOnBlur: true,

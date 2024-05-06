@@ -1,4 +1,4 @@
-import { Quiz } from '@/types/Types';
+import type { Quiz } from '@/types/Types';
 import { CATEGORIES } from '@/utils/consts';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import { Image } from 'expo-image';

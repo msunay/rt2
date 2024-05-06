@@ -10,8 +10,10 @@ export default function SignOut() {
     <View style={styles.container}>
       <Pressable
         onPress={() => {
-          signOut();
-          store.dispatch({ type: 'logout' });
+          if (signOut) {
+            signOut();
+            store.dispatch({ type: 'logout' });
+          }
         }}
       >
         <FontAwesome name="sign-out" size={24} color="black" />

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { QuestionAnswer, Answer } from "@/types/Types";
-import { useAppSelector } from "@/utils/hooks";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
-import { useGetOneQuizQuestionAnswerQuery } from "@/services/backendApi";
-import { btnPressStyle } from "@/utils/helpers";
-import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import { QUESTION_TIME } from "@/services/quizSocketService";
-import Animated from "react-native-reanimated";
+import { useState, useEffect } from 'react';
+import { QuestionAnswer, Answer } from '@/types/Types';
+import { useAppSelector } from '@/hooks/reduxHooks';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
+import { btnPressStyle } from '@/utils/helpers';
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+import { QUESTION_TIME } from '@/services/quizSocketService';
+import Animated from 'react-native-reanimated';
 
 interface Props {
   hidden: boolean;
@@ -19,13 +19,11 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
   const { data: quiz } = useGetOneQuizQuestionAnswerQuery(quizId);
 
   // Access the current question number from the Redux state.
-  const currentQuestionNumber = useAppSelector(
-    (state) => state.questionSlice.value
-  );
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value);
 
   // State to hold the current question object.
   const [currentQuestion, setCurrentQuestion] = useState<QuestionAnswer>(
-    {} as QuestionAnswer
+    {} as QuestionAnswer,
   );
   // State to hold the answers of the current question.
   const [currentAnswers, setCurrentAnswers] = useState<Answer[]>([]);
@@ -36,8 +34,8 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
       // Find the question in the quiz data that matches the current question number.
       setCurrentQuestion(
         quiz.Questions.find(
-          (question) => question.positionInQuiz === currentQuestionNumber
-        )!
+          question => question.positionInQuiz === currentQuestionNumber,
+        )!,
       );
     }
   }, [quiz, currentQuestionNumber]);
@@ -55,16 +53,11 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
       {currentQuestion && !hidden && (
         <View style={styles.host_question_container}>
           <View style={styles.questionTextContainer}>
-            <Text style={styles.question_text}>
-              {currentQuestion.questionText}
-            </Text>
+            <Text style={styles.question_text}>{currentQuestion.questionText}</Text>
           </View>
           <View style={styles.answer_container}>
             {currentAnswers?.map((answer, index) => (
-              <Pressable
-                key={index}
-                style={styles.answerBtn}
-              >
+              <Pressable key={index} style={styles.answerBtn}>
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
             ))}
@@ -81,34 +74,34 @@ const styles = StyleSheet.create({
   },
   host_question_container: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
   questionTextContainer: {
     flex: 1,
   },
   question_text: {
     flex: 1,
-    fontFamily: "Nunito-Black",
+    fontFamily: 'Nunito-Black',
     fontSize: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   answer_container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-evenly",
-    alignContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    alignContent: 'space-between',
   },
   answerText: {
-    fontFamily: "Nunito-Regular",
-    textAlign: "center",
+    fontFamily: 'Nunito-Regular',
+    textAlign: 'center',
     fontSize: 18,
-    fontWeight: "700",
-    color: "white",
+    fontWeight: '700',
+    color: 'white',
   },
   answerBtn: {
-    justifyContent: "center",
-    width: "50%",
-    height: "50%",
+    justifyContent: 'center',
+    width: '50%',
+    height: '50%',
     backgroundColor: 'grey',
   },
 });

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Quiz } from '@/types/Types';
+import type { Quiz } from '@/types/Types';
 import { Image } from 'expo-image';
 import { CATEGORY_IMAGES } from '@/utils/images';
 import {
@@ -7,7 +7,7 @@ import {
   useGetUserDetailsQuery,
 } from '@/services/backendApi';
 import { formatDistance } from 'date-fns';
-import { useAppSelector } from '@/utils/hooks';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import { Link } from 'expo-router';
 
 export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
@@ -20,7 +20,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
   // Fetches participation details for the current user and the specific quiz.
   const { data: participation } = useGetOneParticipationQuery({
     userId: id,
-    quizId: quiz.id!,
+    quizId: quiz.id || '',
   });
 
   return (
@@ -36,7 +36,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
           <Image
             source={CATEGORY_IMAGES[quiz.category]}
             style={styles.image}
-            contentFit="cover"
+            contentFit='cover'
           />
         </View>
         <View style={styles.detailsContainer}>

@@ -1,14 +1,15 @@
-import { Socket, io } from 'socket.io-client';
-import { types as mediasoupTypes } from 'mediasoup-client';
-import {
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import type { types as mediasoupTypes } from 'mediasoup-client';
+import type {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
 } from '@/types/PeerSocketTypes';
 
-const BASE_URL =
+const BASE_URL: string =
 process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BACKEND_URL
-  : process.env.EXPO_PUBLIC_LOCAL_IP!;
+  ? process.env.NEXT_PUBLIC_BACKEND_URL || ''
+  : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 
 const peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(`${BASE_URL}mediasoup`);
@@ -58,6 +59,7 @@ export const peersSocketService = {
         }
         console.log('transportParams: ', transportParams);
 
+        // biome-ignore lint: <explanation>
         producerTransport = device.createSendTransport(transportParams);
 
         console.log(
@@ -77,13 +79,13 @@ export const peersSocketService = {
             try {
               // Singnal local DTLS parameters to the server side transport
               peers.emit('transport_connect', {
-                dtlsParameters: dtlsParameters,
+                dtlsParameters,
               });
 
               // Tell the transport that parameters were transmitted.
               callback();
-            } catch (error: any) {
-              errback(error);
+            } catch (error) {
+              errback(error as Error);
             }
           },
         );
@@ -111,8 +113,8 @@ export const peersSocketService = {
                   callback({ id });
                 },
               );
-            } catch (err: any) {
-              errback(err);
+            } catch (err) {
+              errback(err as Error);
             }
           },
         );
@@ -139,6 +141,7 @@ export const peersSocketService = {
         }
         console.log('transportParams: ', transportParams);
         // Create recv transport
+        // biome-ignore lint: <explanation>
         consumerTransport = device.createRecvTransport(transportParams);
 
         console.log(
@@ -157,8 +160,8 @@ export const peersSocketService = {
               });
               // Tell the transport that parameters were transmitted
               callback();
-            } catch (err: any) {
-              errback(err);
+            } catch (err) {
+              errback(err as Error);
             }
           },
         );
@@ -186,6 +189,7 @@ export const peersSocketService = {
         }
 
         console.log(params);
+        // biome-ignore lint: <explanation>
         consumer = await consumerTransport.consume({
           id: params.id,
           producerId: params.producerId,
@@ -201,7 +205,8 @@ export const peersSocketService = {
         // producerTrack.getTracks()[0]
         console.log('remote vid ref: ', remoteVideo.current);
         console.log('producerTrack: ', producerTrack);
-        remoteVideo.current!.srcObject = producerTrack;
+        // biome-ignore lint: <explanation>
+        remoteVideo.current!.srcObject = producerTrack; // BUG
 
         peers.emit('consumer_resume');
       },

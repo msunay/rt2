@@ -1,4 +1,4 @@
-import { Quiz } from '@/types/Types';
+import type { Quiz } from '@/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface participatingState {

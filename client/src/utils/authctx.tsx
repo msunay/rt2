@@ -1,17 +1,17 @@
-/* eslint-disable @stylistic/indent */
-import { PropsWithChildren, createContext, useContext } from 'react';
-import { useStorageState } from '@/utils/useStorageState';
+import { createContext, useContext } from 'react';
+import type { PropsWithChildren } from 'react'
+import { useStorageState } from '@/hooks/useStorageState';
 import {
   useLoginUserMutation,
   usePostUserMutation,
 } from '@/services/backendApi';
-import { LoginCredentials, UserPost } from '@/types/Types';
+import type { LoginCredentials, ResponseLoginUser, ResponseRegisterUser, UserPost } from '@/types/Types';
 import { Alert } from 'react-native';
 
 // Create context to hold session data and functions
 const AuthContext = createContext<{
-  signIn?: ({ username, password }: LoginCredentials) => any;
-  register?: ({ email, username, password }: UserPost) => any;
+  signIn?: ({ username, password }: LoginCredentials) => Promise<ResponseLoginUser>;
+  register?: ({ email, username, password }: UserPost) => Promise<ResponseRegisterUser>;
   signOut?: () => void;
   session: string | null;
   isLoading: boolean;
@@ -34,32 +34,39 @@ export function SessionProvider(props: PropsWithChildren) {
   const [postCredentials] = usePostUserMutation();
 
   const signIn = async ({ username, password }: LoginCredentials) => {
-    return await sendCredentials({ username, password })
-      .unwrap() // Use result of sendCredentials mutation
-      .then(async (res) => {
-        setSession(res.token); // Set session state with token
-        return res;
-      })
-      .catch((error) => {
-        setSession(null); // Reset session state on failure
-        console.error('Login failed:', error);
-        Alert.alert(error.data);
-      });
+    try {
+      const responseUser: ResponseLoginUser = await sendCredentials({ username, password }).unwrap() // Use result of sendCredentials mutation
+
+      setSession(responseUser.token); // Set session state with token
+      return responseUser;
+
+    } catch (error) {
+
+      setSession(null); // Reset session state on failure
+      console.error('Login failed:', error);
+      Alert.alert('Login failed');
+
+      return Promise.reject(error);
+    }
   };
 
   const register = async ({ email, username, password }: UserPost) => {
-    return await postCredentials({ email, username, password })
-      .unwrap() // Use result of postCredentials mutation
-      .then(async (res) => {
-        setSession(res.token); // Set session state with token
-        return res;
-      })
-      .catch((error) => {
-        setSession(null); // Reset session state on failure
-        console.error('Sign-Up failed:', error);
-        Alert.alert(error.data);
-      });
+    try {
+      const responseUser: ResponseRegisterUser = await postCredentials({ email, username, password }).unwrap() // Use result of postCredentials mutation
+
+      setSession(responseUser.token)
+      return responseUser;
+
+    } catch (error) {
+
+      setSession(null); // Reset session state on failure
+      console.error('Sign-Up failed:', error);
+      Alert.alert('Sign-Up failed');
+
+      return Promise.reject(error);
+    }
   };
+
   return (
     <AuthContext.Provider
       value={{

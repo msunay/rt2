@@ -13,10 +13,9 @@ import { useSession } from '@/utils/authctx';
 import { object, ref, string } from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ResponseUser, UserPost } from '@/types/Types';
-import { useAppDispatch } from '@/utils/hooks';
+import type { ResponseLoginUser, UserPost } from '@/types/Types';
+import { useAppDispatch } from '@/hooks/reduxHooks';
 import { setUserId } from '@/features/userIdSlice';
-import { btnPressStyle } from '@/utils/helpers';
 
 export default function RegistrationScreen() {
   // Use Redux's useDispatch hook to dispatch actions, customized for the app's store.
@@ -59,13 +58,13 @@ export default function RegistrationScreen() {
 
   // Function to handle registration form submission.
   const onRegister = (formData: UserPost) => {
-    register!({
+    if (register) register({
       email: formData.email,
       username: formData.username,
       password: formData.password,
-    }).then((res) => {
+    }).then(res => {
       // Construct a user response object from the registration response.
-      const responseUser: ResponseUser = {
+      const responseUser: ResponseLoginUser = {
         token: res.token, // Authentication token received upon registration.
         id: res.dataValues.id, // User ID from the response.
         username: res.dataValues.username, // Username from the response.
@@ -77,34 +76,36 @@ export default function RegistrationScreen() {
 
   // Function to dynamically adjust Pressable component style based on press state.
   const pressableStyle = ({ pressed }: { pressed: boolean }) => {
-    return pressed ? {
-      ...styles.loginBtn,
-      backgroundColor: '#ffb296'
-    } : {
-      ...styles.loginBtn,
-      backgroundColor: '#FF7F50'
-    }
-  }
+    return pressed
+      ? {
+          ...styles.loginBtn,
+          backgroundColor: '#ffb296',
+        }
+      : {
+          ...styles.loginBtn,
+          backgroundColor: '#FF7F50',
+        };
+  };
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
       <View style={styles.imageContainer}>
         <Image
           source={require('../../assets/splash.png')}
-          contentFit="contain"
+          contentFit='contain'
           style={styles.image}
         />
       </View>
       <View style={styles.form}>
         <Controller
-          name="email"
+          name='email'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Email"
-              autoCapitalize="none"
-              keyboardType="email-address"
+              placeholder='Email'
+              autoCapitalize='none'
+              keyboardType='email-address'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -115,13 +116,13 @@ export default function RegistrationScreen() {
           <Text style={styles.validationError}>{errors.email.message}</Text>
         )}
         <Controller
-          name="username"
+          name='username'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Username"
-              autoCapitalize="none"
+              placeholder='Username'
+              autoCapitalize='none'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -132,14 +133,14 @@ export default function RegistrationScreen() {
           <Text style={styles.validationError}>{errors.username.message}</Text>
         )}
         <Controller
-          name="password"
+          name='password'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Password"
+              placeholder='Password'
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -150,14 +151,14 @@ export default function RegistrationScreen() {
           <Text style={styles.validationError}>{errors.password.message}</Text>
         )}
         <Controller
-          name="repeatPassword"
+          name='repeatPassword'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Repeat Password"
+              placeholder='Repeat Password'
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -165,15 +166,13 @@ export default function RegistrationScreen() {
           )}
         />
         {errors.repeatPassword && (
-          <Text style={styles.validationError}>
-            {errors.repeatPassword.message}
-          </Text>
+          <Text style={styles.validationError}>{errors.repeatPassword.message}</Text>
         )}
         <Pressable style={pressableStyle} onPress={handleSubmit(onRegister)}>
           <Text style={styles.btnText}>Register</Text>
         </Pressable>
         <Button
-          title="Already have an account?"
+          title='Already have an account?'
           onPress={() => {
             router.replace('/login');
           }}

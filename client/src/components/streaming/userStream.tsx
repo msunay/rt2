@@ -1,4 +1,4 @@
-import { useAppSelector } from '@/utils/hooks';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import { useEffect, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import { types as mediasoupTypes } from 'mediasoup-client';
@@ -6,13 +6,7 @@ import { Participation } from '@/types/Types';
 import { quizSocketService } from '@/services/quizSocketService';
 import { peersSocketService } from '@/services/peersSocketService';
 import { useGetOneParticipationByPartIdQuery } from '@/services/backendApi';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  ImageBackground,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { Link } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
@@ -32,7 +26,7 @@ export default function UserStream({ partId }: { partId: string }) {
   const [consumerTransportState, setConsumerTransportState] =
     useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
   const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
-    {} as mediasoupTypes.Consumer
+    {} as mediasoupTypes.Consumer,
   );
   // const [userParticipation, setUserParticipation] = useState<Participation>(
   //   {} as Participation
@@ -136,7 +130,7 @@ export default function UserStream({ partId }: { partId: string }) {
             ref={remoteVideo}
             style={styles.video}
             resizeMode={ResizeMode.CONTAIN}
-            onPlaybackStatusUpdate={(status) => setStatus(() => status)}
+            onPlaybackStatusUpdate={status => setStatus(() => status)}
           />
         </View>
         {trigger < 11 ? (

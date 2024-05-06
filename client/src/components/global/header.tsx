@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import SignOut from './signOut';
-import { useAppSelector } from '@/utils/hooks';
+import { useAppSelector } from '@/hooks/reduxHooks';
 import { Image } from 'expo-image';
 import { LOGO } from '@/utils/images';
 

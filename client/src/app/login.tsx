@@ -13,10 +13,9 @@ import { useSession } from '@/utils/authctx';
 import { object, string } from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { LoginCredentials, ResponseUser } from '@/types/Types';
-import { useAppDispatch } from '@/utils/hooks';
+import type { LoginCredentials } from '@/types/Types';
+import { useAppDispatch } from '@/hooks/reduxHooks';
 import { setUserId } from '@/features/userIdSlice';
-import { btnPressStyle } from '@/utils/helpers';
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch(); // Hook to dispatch actions to Redux store.
@@ -44,44 +43,49 @@ export default function LoginScreen() {
 
   // Function to handle login form submission.
   const onLogin = (formData: LoginCredentials) => {
-    signIn!({
-      username: formData.username,
-      password: formData.password,
-    }).then((res: ResponseUser) => {
-      dispatch(setUserId(res)); // Dispatch action to store user ID in Redux store.
-      router.replace('/'); // Navigate to home screen upon successful login.
-    });
+    if (signIn) {
+      signIn({
+        username: formData.username,
+        password: formData.password,
+      }).then((res) => {
+
+        dispatch(setUserId(res)); // Dispatch action to store user ID in Redux store.
+        router.replace('/'); // Navigate to home screen upon successful login.
+      });
+    }
   };
 
   // Function to dynamically adjust Pressable component style based on press state.
   const pressableStyle = ({ pressed }: { pressed: boolean }) => {
-    return pressed ? {
-      ...styles.loginBtn,
-      backgroundColor: '#ffb296'
-    } : {
-      ...styles.loginBtn,
-      backgroundColor: '#FF7F50'
-    }
-  }
+    return pressed
+      ? {
+          ...styles.loginBtn,
+          backgroundColor: '#ffb296',
+        }
+      : {
+          ...styles.loginBtn,
+          backgroundColor: '#FF7F50',
+        };
+  };
 
   return (
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
       <View style={styles.imageContainer}>
         <Image
           source={require('../../assets/splash.png')}
-          contentFit="contain"
+          contentFit='contain'
           style={styles.image}
         />
       </View>
       <View style={styles.form}>
         <Controller
-          name="username"
+          name='username'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Username"
-              autoCapitalize="none"
+              placeholder='Username'
+              autoCapitalize='none'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -92,14 +96,14 @@ export default function LoginScreen() {
           <Text style={styles.validationError}>{errors.username.message}</Text>
         )}
         <Controller
-          name="password"
+          name='password'
           control={control}
           render={({ field: { onChange, value, onBlur } }) => (
             <TextInput
               style={styles.textInput}
-              placeholder="Password"
+              placeholder='Password'
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}

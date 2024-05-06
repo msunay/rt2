@@ -1,15 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useAppSelector, useAppDispatch } from "@/utils/hooks";
-import { incrementQuestionNumber } from "@/features/questionSlice";
-import { quizSocketService } from "@/services/quizSocketService";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import HostQuestion from "../question/hostQuestion";
-import { QUESTION_TIME } from "@/services/quizSocketService";
+import React, { useEffect, useRef, useState } from 'react';
+import { useAppSelector, useAppDispatch } from '@/hooks/reduxHooks';
+import { incrementQuestionNumber } from '@/features/questionSlice';
+import { quizSocketService } from '@/services/quizSocketService';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import HostQuestion from '../question/hostQuestion';
+import { QUESTION_TIME } from '@/services/quizSocketService';
 
 export default function HostStream({ quizId }: { quizId: string }) {
-  const currentQuestionNumber = useAppSelector(
-    (state) => state.questionSlice.value
-  );
+  const currentQuestionNumber = useAppSelector(state => state.questionSlice.value);
   const dispatch = useAppDispatch();
 
   const [quizStarted, setQuizStarted] = useState(false);
@@ -41,11 +39,11 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
     dispatch(incrementQuestionNumber());
     quizSocketService.emitNextQ();
-    setTrigger((trigger) => trigger + 1);
+    setTrigger(trigger => trigger + 1);
   }
 
   function handleWinners() {
-    console.log("HANDLE WINNERS TRIGGER");
+    console.log('HANDLE WINNERS TRIGGER');
     quizSocketService.emitShowWinners();
   }
 
@@ -53,11 +51,11 @@ export default function HostStream({ quizId }: { quizId: string }) {
     return pressed
       ? {
           ...styles.next_q_btn,
-          backgroundColor: "#ffb296",
+          backgroundColor: '#ffb296',
         }
       : {
           ...styles.next_q_btn,
-          backgroundColor: "#FF7F50",
+          backgroundColor: '#FF7F50',
         };
   };
 
@@ -66,11 +64,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
       <View style={styles.video_container}>
         <View style={styles.question_component_container}>
           {quizStarted && (
-            <HostQuestion
-              quizId={quizId}
-              trigger={trigger}
-              hidden={questionHidden}
-            />
+            <HostQuestion quizId={quizId} trigger={trigger} hidden={questionHidden} />
           )}
         </View>
       </View>
@@ -89,20 +83,12 @@ export default function HostStream({ quizId }: { quizId: string }) {
                 <Text style={styles.next_q_btnText}>Reveal Winners</Text>
               </Pressable>
             ) : (
-              <Pressable
-                ref={nextQBtn}
-                onPress={nextQuestion}
-                style={pressableStyle}
-              >
+              <Pressable ref={nextQBtn} onPress={nextQuestion} style={pressableStyle}>
                 <Text style={styles.next_q_btnText}>Next Question</Text>
               </Pressable>
             )
           ) : (
-            <Pressable
-              ref={startBtn}
-              style={pressableStyle}
-              onPress={startQuiz}
-            >
+            <Pressable ref={startBtn} style={pressableStyle} onPress={startQuiz}>
               <Text style={styles.next_q_btnText}>Start Quiz</Text>
             </Pressable>
           )}
@@ -114,7 +100,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
 const styles = StyleSheet.create({
   unit: {
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
   },
   close_btn: {},
   count_down: {},
@@ -125,19 +111,18 @@ const styles = StyleSheet.create({
   },
   btn_join: {},
   btn_holder: {
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   quiz_controls: {},
   next_q_btn: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     height: 50,
     width: 200,
     borderRadius: 10,
     marginTop: 10,
   },
   next_q_btnText: {
-    fontFamily: "Nunito-Bold",
+    fontFamily: 'Nunito-Bold',
   },
-  stream_btns: {},
 });
