@@ -59,15 +59,17 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   }
 
   function nextQuestion() {
-    dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
     // setQuestionHidden(false);
 
-    if (currentQuestionNumber < 9) {
-      setTimeout(() => {}, QUESTION_TIME + 2000);
-    }
+    // if (currentQuestionNumber < 9) {
+      //   setTimeout(() => {
+
+        //   }, QUESTION_TIME + 2000);
+    // }
     dispatch(incrementQuestionNumber());
-    quizSocketService.emitNextQ();
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
+    quizSocketService.emitNextQ();
+    dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
     // setTrigger(trigger => trigger + 1);
   }
 
@@ -118,7 +120,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     const constraints: MediaStreamConstraints = {
       audio: true,
       video: {
-        facingMode: '',
+        facingMode: 'user',
         width: {
           min: 640,
           max: 1920,

@@ -1,4 +1,5 @@
 import type { HostVideoStreamStateAction } from '@/reducers/hostVideoStreamStateReducer';
+import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
 import type {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
@@ -25,24 +26,26 @@ export const quizSocketService = {
     }),
 
   startTimerListener: (
-    dispatchState: Dispatch<HostVideoStreamStateAction>,
+    dispatchState?: Dispatch<HostVideoStreamStateAction>,
+    dispatchUserState?: Dispatch<UserStreamStateAction>
   ) =>
     quiz.on('start_question_timer', () => {
-      dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: false})
+      if (dispatchState) dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: false})
+      if (dispatchUserState) dispatchUserState({type: 'SET_US_Q_HIDDEN', payload: false})
       // setQuestionHidden(false);
       // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
-  startQuizListener: (setQuizStarted: React.Dispatch<React.SetStateAction<boolean>>) =>
+  startQuizListener: (dispatchState: Dispatch<UserStreamStateAction>) =>
     quiz.on('start_quiz', () => {
-      setQuizStarted(true);
+      dispatchState({type: 'SET_US_QUIZ_STARTED', payload: true})
+      // setQuizStarted(true);
       // document.getElementById('countdown-canvas')!.hidden = false;
       startTimer();
     }),
 
   revealListener: (
-    setQuestionHidden: React.Dispatch<React.SetStateAction<boolean>>,
-    setTrigger: React.Dispatch<React.SetStateAction<number>>,
+    dispatchState: Dispatch<UserStreamStateAction>
   ) => {
     quiz.on('reveal_answers', () => {
       console.log('reveal');
@@ -52,8 +55,10 @@ export const quizSocketService = {
       //   .forEach((btn, i) => (btn.disabled = true));
 
       setTimeout(() => {
-        setTrigger(trigger => trigger + 1);
-        setQuestionHidden(true);
+        dispatchState({type: 'INCREMENT_US_TRIGGER'})
+        dispatchState({type: 'SET_US_Q_HIDDEN', payload: true})
+        // setTrigger(trigger => trigger + 1);
+        // setQuestionHidden(true);
         // document.getElementById('countdown-canvas')!.hidden = true;
       }, 2000);
     });
@@ -87,13 +92,14 @@ export const quizSocketService = {
     });
   },
 
-  playerWinnersListener: (setTrigger: React.Dispatch<React.SetStateAction<number>>) => {
+  playerWinnersListener: (dispatchState: Dispatch<UserStreamStateAction>) => {
     quiz.on('player_winners', () => {
       console.log('PLAYER WINNERS RECEIVED');
-      setTrigger(num => {
-        console.log('TRIGGER BEFORE +1::', num);
-        return num + 1;
-      });
+      dispatchState({ type: 'INCREMENT_US_TRIGGER' })
+      // setTrigger(num => {
+      //   console.log('TRIGGER BEFORE +1::', num);
+      //   return num + 1;
+      // });
     });
   },
 };

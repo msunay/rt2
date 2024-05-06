@@ -1,5 +1,5 @@
 import { useAppSelector } from '@/hooks/reduxHooks';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
 import { Participation } from '@/types/Types';
@@ -14,15 +14,18 @@ import PlayerQuestion from '../question/playerQuestion';
 import { QUIZ_BACKGROUND } from '@/utils/images';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
+import { defaultUserStreamState, userStreamStateReducer } from '@/reducers/userStreamStateReducer';
 
 export default function UserStream({ partId }: { partId: string }) {
   // const userId = useAppSelector((state) => state.userIdSlice.value);
   // const currentQuestionNumber = useAppSelector(
   //   (state) => state.questionSlice.value
   // );
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [questionHidden, setQuestionHidden] = useState(false);
-  const [trigger, setTrigger] = useState(0);
+
+  const [state, dispatchUserState] = useReducer(userStreamStateReducer, defaultUserStreamState)
+  // const [quizStarted, setQuizStarted] = useState(false);
+  // const [questionHidden, setQuestionHidden] = useState(false);
+  // const [trigger, setTrigger] = useState(0);
   const [consumerTransportState, setConsumerTransportState] =
     useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
   const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
@@ -32,7 +35,7 @@ export default function UserStream({ partId }: { partId: string }) {
   //   {} as Participation
   // );
 
-  const [status, setStatus] = useState({});
+  // const [status, setStatus] = useState({});
 
   const {
     data: participation,
@@ -41,22 +44,22 @@ export default function UserStream({ partId }: { partId: string }) {
   } = useGetOneParticipationByPartIdQuery(partId);
 
   const remoteVideo = useRef(null);
-  /*
+
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
-*/
+
   // useEffect(() => {
   //   if (!errParticipation) setUserParticipation(participation!)
   // }, [participation])
 
   useEffect(() => {
     quizSocketService.successListener();
-    quizSocketService.playerWinnersListener(setTrigger);
-    quizSocketService.startQuizListener(setQuizStarted);
-    quizSocketService.startTimerListener(setQuestionHidden);
-    quizSocketService.revealListener(setQuestionHidden, setTrigger);
+    quizSocketService.playerWinnersListener(dispatchUserState);
+    quizSocketService.startQuizListener(dispatchUserState);
+    quizSocketService.startTimerListener(() => {}, dispatchUserState);
+    quizSocketService.revealListener(dispatchUserState);
     // peersSocketService.successListener();
     // peersSocketService.producerClosedListener(
     //   consumerTransportState,
@@ -130,20 +133,20 @@ export default function UserStream({ partId }: { partId: string }) {
             ref={remoteVideo}
             style={styles.video}
             resizeMode={ResizeMode.CONTAIN}
-            onPlaybackStatusUpdate={status => setStatus(() => status)}
+            onPlaybackStatusUpdate={status => dispatchUserState({type: 'SET_US_AV_STATUS', payload: status})}
           />
         </View>
-        {trigger < 11 ? (
-          trigger === 10 ? (
+        {state.trigger < 11 ? (
+          state.trigger === 10 ? (
             //BUG last question not sent to backend before final score registered
             participation && <FinalScore userParticipation={participation} />
           ) : (
             <View style={styles.question_component_container}>
-              {quizStarted && (
+              {state.quizStarted && (
                 <PlayerQuestion
                   participation={participation}
-                  trigger={trigger}
-                  hidden={questionHidden}
+                  trigger={state.trigger}
+                  hidden={state.questionHidden}
                 />
               )}
             </View>

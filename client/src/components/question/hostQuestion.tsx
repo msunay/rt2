@@ -57,7 +57,7 @@ export default function HostQuestion({ hidden, trigger, quizId }: Props) {
           </View>
           <View style={styles.answer_container}>
             {currentAnswers?.map(answer => (
-              <Pressable key={answer.QuestionId} style={styles.answerBtn}>
+              <Pressable key={answer.id} style={styles.answerBtn}>
                 <Text style={styles.answerText}>{answer.answerText}</Text>
               </Pressable>
             ))}
