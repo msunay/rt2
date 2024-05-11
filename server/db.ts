@@ -21,7 +21,22 @@ const HOST = process.env.NODE_ENV === 'production' ? '/var/run/postgresql' : und
 export const sequelize = new Sequelize(...connection, {
   dialect: 'postgres',
   host: HOST,
-  logging: console.log,
+  benchmark: true,
+  logging: (msg: string, queryTime: string) => {
+
+    if (msg) {
+      const tableQueried = msg.match(/FROM\s(\"\w+\")/)?.[1] ?
+        `Query to table ${msg.match(/FROM\s(\"\w+\")/)?.[1]}`
+        : msg.match(/table_name\s=\s(\'\w+\')/)?.[1] ?
+          `...sequelize config - setup ${msg.match(/table_name\s=\s(\'\w+\')/)?.[1]}`
+          : null;
+
+          if (tableQueried) {
+            console.log(`\n${tableQueried}\n   QueryTime: ${queryTime}ms`)
+
+          }
+    }
+  },
 });
 
 export default sequelize;

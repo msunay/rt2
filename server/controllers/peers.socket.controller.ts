@@ -196,10 +196,11 @@ const createWebRtcTransport = async (callback: ({ transportParams }: { transport
   }
 };
 
+let i = 0, clients = 1;
 const peersSocketInit = async (
   peers: Socket<PeersServerToClientEvents, PeersClientToServerEvents>
 ) => {
-  console.log('peers ID: ', peers.id);
+  console.log(`\n\nclients: -- ${clients++} --\n\nconnection-${i++}:\n\tpeers ID: `, peers.id);
 
   peers.emit('connection_success', {
     socketId: peers.id,
@@ -207,6 +208,7 @@ const peersSocketInit = async (
   });
 
   peers.on('disconnect', () => {
+    clients--;
     console.log('peer disconnected');
     // consumer?.close();
     // producer?.close();

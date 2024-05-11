@@ -9,7 +9,7 @@ const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 const quizSocketInit = (
   quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
 ) => {
-  console.log('quiz ID: ', quiz.id);
+  setTimeout(() => console.log('\tquiz ID : ', quiz.id), 100);
 
   quiz.emit('connection_success', {
     socketId: quiz.id,
