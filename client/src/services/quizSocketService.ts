@@ -20,49 +20,55 @@ const quiz: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
 );
 
 export const quizSocketService = {
-  successListener: () =>
+  successListener: (quizId: string) =>
     quiz.on('connection_success', ({ socketId }) => {
       console.log('quiz socket connected: ', socketId);
+      // quiz.emit('join_room', { roomId: quizId });
+    }),
+
+  successListenerOff: () =>
+    quiz.off('connection_success', () => {
+      console.log('quiz socket connection_success listener off');
     }),
 
   startTimerListener: (
     dispatchState?: Dispatch<HostVideoStreamStateAction>,
-    dispatchUserState?: Dispatch<UserStreamStateAction>
+    dispatchUserState?: Dispatch<UserStreamStateAction>,
   ) =>
     quiz.on('start_question_timer', () => {
-      if (dispatchState) dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: false})
-      if (dispatchUserState) dispatchUserState({type: 'SET_US_Q_HIDDEN', payload: false})
-      // setQuestionHidden(false);
-      // document.getElementById('countdown-canvas')!.hidden = false;
-      startTimer();
+      if (dispatchState) dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
+      if (dispatchUserState) {
+        dispatchUserState({ type: 'SET_US_Q_HIDDEN', payload: false });
+      }
     }),
+
+  startTimerListenerOff: () => quiz.off('start_question_timer', () => {
+    console.log('quiz socket start_question_timer listener off');
+  }),
+
   startQuizListener: (dispatchState: Dispatch<UserStreamStateAction>) =>
     quiz.on('start_quiz', () => {
-      dispatchState({type: 'SET_US_QUIZ_STARTED', payload: true})
-      // setQuizStarted(true);
-      // document.getElementById('countdown-canvas')!.hidden = false;
-      startTimer();
+      dispatchState({ type: 'SET_US_QUIZ_STARTED', payload: true });
     }),
 
-  revealListener: (
-    dispatchState: Dispatch<UserStreamStateAction>
-  ) => {
-    quiz.on('reveal_answers', () => {
-      console.log('reveal');
-      // document
-      //   .querySelectorAll('button[name="a"]')
-      //   //@ts-ignore
-      //   .forEach((btn, i) => (btn.disabled = true));
+  startQuizListenerOff: () =>
+    quiz.off('start_quiz', () => {
+      console.log('quiz socket start_quiz listener off');
+    }),
 
+  revealListener: (dispatchState: Dispatch<UserStreamStateAction>) => {
+    quiz.on('reveal_answers', () => {
       setTimeout(() => {
-        dispatchState({type: 'INCREMENT_US_TRIGGER'})
-        dispatchState({type: 'SET_US_Q_HIDDEN', payload: true})
-        // setTrigger(trigger => trigger + 1);
-        // setQuestionHidden(true);
-        // document.getElementById('countdown-canvas')!.hidden = true;
+        dispatchState({ type: 'INCREMENT_US_CURRENT_Q_NUM' });
+        dispatchState({ type: 'SET_US_Q_HIDDEN', payload: true });
       }, 2000);
     });
   },
+
+  revealListenerOff: () =>
+    quiz.off('reveal_answers', () => {
+      console.log('quiz socket reveal_answers listener off');
+    }),
 
   emitNextQ: () => quiz.emit('next_question'),
 
@@ -70,16 +76,10 @@ export const quizSocketService = {
 
   emitShowWinners: () => quiz.emit('show_winners'),
 
-  revealAnswerHostListener: (
-    dispatchState: Dispatch<HostVideoStreamStateAction>,
-  ) => {
+  revealAnswerHostListener: (dispatchState: Dispatch<HostVideoStreamStateAction>) => {
     quiz.on('reveal_answers_host', () => {
-      console.log('reveal');
-
       setTimeout(() => {
-        dispatchState({type: 'SET_HVS_Q_HIDDEN', payload: true})
-        // setQuestionHidden(true);
-        // document.getElementById('countdown-canvas')!.hidden = true;
+        dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: true });
       }, 2000);
     });
   },
@@ -87,47 +87,20 @@ export const quizSocketService = {
   hostWinnersListener: (dispatchState: Dispatch<HostVideoStreamStateAction>) => {
     quiz.on('host_winners', () => {
       console.log('HOST WINNERS RECEIVED');
-      dispatchState({type: 'INCREMENT_HVS_TRIGGER', payload: undefined})
-      // setTrigger(num => num + 1);
+      dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
     });
   },
 
   playerWinnersListener: (dispatchState: Dispatch<UserStreamStateAction>) => {
     quiz.on('player_winners', () => {
       console.log('PLAYER WINNERS RECEIVED');
-      dispatchState({ type: 'INCREMENT_US_TRIGGER' })
-      // setTrigger(num => {
-      //   console.log('TRIGGER BEFORE +1::', num);
-      //   return num + 1;
-      // });
+      dispatchState({ type: 'INCREMENT_US_CURRENT_Q_NUM' });
     });
   },
-};
 
-export function startTimer() {
-  // const pickColorByPercentage = (percentage: any, time: any) => {
-  //   switch (true) {
-  //     case percentage >= 75:
-  //       return '#28a745'; // green
-  //     case percentage >= 50 && percentage < 75:
-  //       return '#17a2b8'; // blue
-  //     case percentage >= 25 && percentage < 50:
-  //       return '#ffc107'; // orange
-  //     default:
-  //       return '#dc3545'; // red
-  //   }
-  // };
-  // new CanvasCircularCountdown(document.getElementById('countdown-canvas'), {
-  //   duration: QUESTION_TIME,
-  //   radius: 40,
-  //   clockwise: true,
-  //   captionColor: pickColorByPercentage,
-  //   progressBarWidth: 15,
-  //   progressBarOffset: 0,
-  //   circleBackgroundColor: '#f5f5f5',
-  //   emptyProgressBarBackgroundColor: '#b9c1c7',
-  //   filledProgressBarBackgroundColor: '#17a2b8',
-  //   captionFont: '22px serif',
-  //   showCaption: true,
-  // }).start();
-}
+  playerWinnersListenerOff: () =>
+    quiz.off('player_winners', () => {
+      console.log('quiz socket player_winners listener off');
+    }),
+
+};

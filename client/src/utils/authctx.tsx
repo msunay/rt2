@@ -15,10 +15,10 @@ const AuthContext = createContext<{
   signIn?: ({ username, password }: LoginCredentials) => Promise<ResponseLoginUser>;
   register?: ({ email, username, password }: UserPost) => Promise<ResponseRegisterUser>;
   signOut?: () => void;
-  session: string | null;
+  session?: string | null;
   isLoading: boolean;
 }>({
-  session: null,
+  // session: null,
   isLoading: false,
 });
 

@@ -3,7 +3,7 @@ import {
   defaultUserStreamState,
   userStreamStateReducer,
 } from '@/reducers/userStreamStateReducer';
-import { useGetOneParticipationByPartIdQuery } from '@/services/backendApi';
+import { useGetOneParticipationByPartIdQuery, useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
 import { peersSocketService } from '@/services/peersSocketService';
 import { quizSocketService } from '@/services/quizSocketService';
 import { Participation } from '@/types/Types';
@@ -15,34 +15,18 @@ import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RTCView } from 'react-native-webrtc';
 import PlayerQuestion from '../question/playerQuestion';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function UserStream({ partId }: { partId: string }) {
-  // const userId = useAppSelector((state) => state.userIdSlice.value);
-  // const currentQuestionNumber = useAppSelector(
-  //   (state) => state.questionSlice.value
-  // );
 
   const [state, dispatchUserState] = useReducer(
     userStreamStateReducer,
     defaultUserStreamState,
   );
-  // const [quizStarted, setQuizStarted] = useState(false);
-  // const [questionHidden, setQuestionHidden] = useState(false);
-  // const [trigger, setTrigger] = useState(0);
-  // const [consumerTransportState, setConsumerTransportState] =
-  //   useState<mediasoupTypes.Transport>({} as mediasoupTypes.Transport);
-  // const [consumerState, setConsumerState] = useState<mediasoupTypes.Consumer>(
-  //   {} as mediasoupTypes.Consumer,
-  // );
-  // const [userParticipation, setUserParticipation] = useState<Participation>(
-  //   {} as Participation
-  // );
-
   // const [status, setStatus] = useState({});
 
   const {
@@ -51,30 +35,54 @@ export default function UserStream({ partId }: { partId: string }) {
     isLoading,
   } = useGetOneParticipationByPartIdQuery(partId);
 
+    // Fetch quiz details, including questions and answers, for a given participation's QuizId.
+    const {
+      data: quiz,
+      error: quizError,
+      isLoading: quizIsLoading,
+    } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
+
   // const remoteVideo = useRef(null);
 
   let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
-
-  // useEffect(() => {
-  //   if (!errParticipation) setUserParticipation(participation!)
-  // }, [participation])
-
   // biome-ignore lint: only want listerners to register once
+
   useEffect(() => {
-    quizSocketService.successListener();
+    if (quiz?.id) quizSocketService.successListener(quiz.id);
     quizSocketService.playerWinnersListener(dispatchUserState);
     quizSocketService.startQuizListener(dispatchUserState);
     quizSocketService.startTimerListener(() => {}, dispatchUserState);
     quizSocketService.revealListener(dispatchUserState);
+
+    return () => {
+      quizSocketService.successListenerOff();
+      quizSocketService.playerWinnersListenerOff();
+      quizSocketService.startQuizListenerOff();
+      quizSocketService.startTimerListenerOff();
+      quizSocketService.revealListenerOff();
+    }
+  }, [quiz]);
+
+  useEffect(() => {
     peersSocketService.successListener();
     peersSocketService.producerClosedListener(
       state.consumerTransportState,
       state.consumerState,
     );
-  }, []);
+
+    return () => {
+      peersSocketService.successListenerOff();
+      peersSocketService.producerClosedListenerOff();
+    }
+
+  }, [state.consumerTransportState, state.consumerState])
+
+  // useEffect(() => {
+  //   console.log('user trigger: ', state.currentQuestionNumber);
+  // }, [state.currentQuestionNumber]);
 
   // Consume Trigger
   const goConsume = () => {
@@ -152,14 +160,14 @@ export default function UserStream({ partId }: { partId: string }) {
       <RTCView
         streamURL={state.mediaStream?.toURL()}
         objectFit='cover'
-        style={{flex: 1}}
+        style={{ position: 'absolute', height: '100%', width: '100%' }}
       />
-        <View style={styles.unitContainer}>
-          <View style={styles.unit}>
-            {/* <Link href="/" style={styles.close_btn}>
+      <View style={styles.unitContainer}>
+        <View style={styles.unit}>
+          {/* <Link href="/" style={styles.close_btn}>
             <FontAwesome name="close" size={24} color="black" />
           </Link> */}
-            {/* <View style={styles.video_container}>
+          {/* <View style={styles.video_container}>
               <Video
                 ref={remoteVideo}
                 style={styles.video}
@@ -169,35 +177,41 @@ export default function UserStream({ partId }: { partId: string }) {
                 }
               />
             </View> */}
-            {state.trigger < 11 ? (
-              state.trigger === 10 ? (
-                //BUG last question not sent to backend before final score registered
-                participation && <FinalScore userParticipation={participation} />
-              ) : (
-                <View style={styles.question_component_container}>
-                  {state.quizStarted && (
-                    <PlayerQuestion
-                      participation={participation}
-                      trigger={state.trigger}
-                      hidden={state.questionHidden}
-                    />
-                  )}
-                </View>
-              )
+          {state.currentQuestionNumber < 12 ? (
+            state.currentQuestionNumber === 11 ? (
+              //BUG last question not sent to backend before final score registered
+              participation && <FinalScore userParticipation={participation} />
             ) : (
-              participation?.QuizId && <Winners quizId={participation.QuizId} />
-            )}
-            {/* <div className="current-question"></div> */}
-          </View>
-          <Pressable
-            style={pressableStyle}
-            id='join-stream-btn'
-            onPress={goConsume}
-            disabled={false}
-          >
-            <Text>Join Stream</Text>
-          </Pressable>
+              <View style={styles.question_component_container}>
+                {state.quizStarted && (
+                  <PlayerQuestion
+                    participation={participation}
+                    currentQuestionNumber={state.currentQuestionNumber}
+                    hidden={state.questionHidden}
+                    quiz={quiz}
+                    quizError={quizError}
+                    quizIsLoading={quizIsLoading}
+                  />
+                )}
+              </View>
+            )
+          ) : (
+            participation?.QuizId && <Winners quizId={participation.QuizId} />
+          )}
+          {/* <div className="current-question"></div> */}
         </View>
+        {/* <Text></Text> */}
+        <Pressable
+          style={pressableStyle}
+          id='join-stream-btn'
+          onPress={goConsume}
+          disabled={false}
+        >
+          <Text>
+            {state.currentQuestionNumber} {/* Join Stream */}
+          </Text>
+        </Pressable>
+      </View>
       {/* </RTCView> */}
     </SafeAreaView>
   );

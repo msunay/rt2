@@ -17,7 +17,10 @@
     "scheme": "rt2",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.msunay.rt2"
+      "bundleIdentifier": "com.msunay.rt2",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {

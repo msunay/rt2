@@ -38,8 +38,8 @@ export default function FinalScore({
   }, [data]);
 
   return (
-    <View>
-      <Text>You scored: {playerScore} / 10 </Text>
+    <View style={{backgroundColor: '#000'}}>
+      <Text style={{color: '#FFF'}}>You scored: {playerScore} / 10 </Text>
     </View>
   );
 }

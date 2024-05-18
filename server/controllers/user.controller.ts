@@ -11,7 +11,7 @@ async function addUser(req: Request, res: Response) {
     const hash = hashSync(password, saltRounds);
 
     const response = await models.User.create({ email, username, password: hash });
-    
+
     const token = tokenGenerator(response?.id, response?.username);
     res.status(201).send({ ...response, token });
   } catch (err) {

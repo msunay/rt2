@@ -11,12 +11,15 @@ const quizSocketInit = (
 ) => {
   setTimeout(() => console.log('\tquiz ID : ', quiz.id), 100);
 
+  // quiz.on('join_room', ({ roomId }) => {
+  //   quiz.join(roomId);
+  // })
+
   quiz.emit('connection_success', {
     socketId: quiz.id,
   });
 
   quiz.on('host_start_quiz', () => {
-    console.log('Emitted host_start_quiz event');
     quiz.broadcast.emit('start_quiz');
 
     setTimeout(() => {
@@ -27,7 +30,6 @@ const quizSocketInit = (
 
   quiz.on('next_question', () => {
     quiz.broadcast.emit('start_question_timer');
-
     setTimeout(() => {
       quiz.emit('reveal_answers_host');
       quiz.broadcast.emit('reveal_answers');

@@ -2,6 +2,7 @@ export interface QuizClientToServerEvents {
   next_question: () => void;
   host_start_quiz: () => void;
   show_winners: () => void;
+  join_room: ({ roomId }: {roomId: string}) => void;
 }
 
 export interface QuizServerToClientEvents {

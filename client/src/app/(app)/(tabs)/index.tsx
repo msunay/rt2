@@ -11,14 +11,19 @@ import {
   TabElementDisplayOptions,
 } from 'react-native-animated-nav-tab-bar';
 
+import { useAppSelector } from '@/hooks/reduxHooks';
 import DiscoverScreen from '@/screens/DiscoverScreen';
 import HomeScreen from '@/screens/HomeScreen';
 import HostingScreen from '@/screens/HostingScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import StartQuizScreen from '@/screens/StartQuizScreen';
+import { useEffect } from 'react';
 
 export default function TabScreen() {
   const Tabs = AnimatedTabBarNavigator(); // Use Tab component from react-native-animated-nav-tab-bar
+
+  // const id = useAppSelector(state => state.userIdSlice.id);
+
 
   const tabBarOptions = {
     activeBackgroundColor: '#25CED1',
@@ -52,7 +57,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: { size: number }) => (
             <AntDesign name='home' size={size ? size : 24} color='black' />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -62,7 +67,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: { size: number }) => (
             <Entypo name='compass' size={size ? size : 24} color='black' />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -72,7 +77,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: { size: number }) => (
             <MaterialIcons name='quiz' size={size ? size : 24} color='black' />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -82,7 +87,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: { size: number }) => (
             <Octicons name='gear' size={size ? size : 24} color='black' />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -92,7 +97,7 @@ export default function TabScreen() {
           tabBarIcon: ({ size }: { size: number }) => (
             <FontAwesome5 name='user' size={size ? size : 24} color='black' />
           ),
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
         }}
       />
     </Tabs.Navigator>

@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Header from '@/components/global/header';
 import PlayNextQuizBtn from '@/components/homeScreen/playNextQuizBtn';
@@ -12,12 +12,13 @@ import { useGetUserDetailsQuery } from '@/services/backendApi';
 
 export default function HomeScreen() {
   const id = useAppSelector(state => state.userIdSlice.id);
+
   const { data, isSuccess } = useGetUserDetailsQuery(id);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (isSuccess) dispatch(setCurrentUser(data));
+    if (isSuccess && data) dispatch(setCurrentUser(data));
   }, [data, isSuccess, dispatch]);
 
   return (

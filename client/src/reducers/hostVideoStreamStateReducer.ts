@@ -1,10 +1,12 @@
 import type { MediaStream } from 'react-native-webrtc';
 
-interface HostVideoStreamState {
+export interface HostVideoStreamState {
   quizStarted: boolean;
   questionHidden: boolean;
   trigger: number;
   mediaStream: MediaStream | undefined;
+  actionBtnOpen: boolean;
+  frontFacing: boolean;
 }
 
 export const defaultHostVideoStreamState: HostVideoStreamState = {
@@ -12,6 +14,8 @@ export const defaultHostVideoStreamState: HostVideoStreamState = {
   questionHidden: false,
   trigger: 0,
   mediaStream: undefined,
+  actionBtnOpen: false,
+  frontFacing: true,
 };
 
 const hostVideoStreamStateActions = {
@@ -19,6 +23,8 @@ const hostVideoStreamStateActions = {
   SET_HVS_Q_HIDDEN: 'SET_HVS_Q_HIDDEN',
   INCREMENT_HVS_TRIGGER: 'INCREMENT_HVS_TRIGGER',
   SET_HVS_MEDIA_STREAM: 'SET_HVS_MEDIA_STREAM',
+  TOGGLE_HVS_ACTION_BTN_OPEN: 'TOGGLE_HVS_ACTION_BTN_OPEN',
+  TOGGLE_HVS_FRONT_FACING: 'TOGGLE_HVS_FRONT_FACING',
 };
 
 type HostVideoStreamStateActionKey = keyof typeof hostVideoStreamStateActions;
@@ -40,10 +46,16 @@ export const hostVideoStreamStateReducer = (
       return { ...state, questionHidden: action.payload as boolean };
 
     case 'INCREMENT_HVS_TRIGGER':
-      return { ...state, trigger: state.trigger++ };
+      return { ...state, trigger: state.trigger + 1};
 
     case 'SET_HVS_MEDIA_STREAM':
       return { ...state, mediaStream: action.payload as MediaStream | undefined };
+
+    case 'TOGGLE_HVS_ACTION_BTN_OPEN':
+      return { ...state, actionBtnOpen: !state.actionBtnOpen };
+
+    case 'TOGGLE_HVS_FRONT_FACING':
+      return { ...state, frontFacing: !state.frontFacing };
 
     default:
       return state;

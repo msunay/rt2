@@ -31,6 +31,11 @@ export const peersSocketService = {
       console.log('peers socket connected:', socketId, producerAlreadyExists);
     }),
 
+  successListenerOff: () =>
+    peers.off('connection_success', () => {
+      console.log('peers socket connection_success listener off');
+    }),
+
   emitCreateRoom: (
     createDevice: (rtpCapabilities: mediasoupTypes.RtpCapabilities) => Promise<void>,
   ) => {
@@ -207,4 +212,9 @@ export const peersSocketService = {
       consumerTransport.close();
       consumer.close();
     }),
+
+    producerClosedListenerOff: () =>
+      peers.off('producer_closed', () => {
+        console.log('peers socket producer_closed listener off');
+      }),
 };

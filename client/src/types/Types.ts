@@ -211,8 +211,13 @@ export interface ParticipationAndAnswers {
 // Authentication types
 
 export interface ResponseLoginUser {
-  token: string;
   id: string;
+  token: {
+    exp: number;
+    iat: number;
+    id: string;
+    username: string;
+  };
   username: string;
 }
 

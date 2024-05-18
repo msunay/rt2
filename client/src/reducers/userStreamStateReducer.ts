@@ -5,7 +5,7 @@ import type { MediaStream } from 'react-native-webrtc';
 interface UserStreamState {
   quizStarted: boolean;
   questionHidden: boolean;
-  trigger: number;
+  currentQuestionNumber: number;
   consumerTransportState: mediasoupTypes.Transport;
   consumerState: mediasoupTypes.Consumer;
   avStatus: AVPlaybackStatus;
@@ -15,7 +15,7 @@ interface UserStreamState {
 export const defaultUserStreamState: UserStreamState = {
   quizStarted: false,
   questionHidden: false,
-  trigger: 0,
+  currentQuestionNumber: 1,
   consumerTransportState: {} as mediasoupTypes.Transport,
   consumerState: {} as mediasoupTypes.Consumer,
   avStatus: {} as AVPlaybackStatus,
@@ -25,7 +25,7 @@ export const defaultUserStreamState: UserStreamState = {
 const userStreamStateActions = {
   SET_US_QUIZ_STARTED: 'SET_US_QUIZ_STARTED',
   SET_US_Q_HIDDEN: 'SET_US_Q_HIDDED',
-  INCREMENT_US_TRIGGER: 'INCREMENT_US_TRIGGER',
+  INCREMENT_US_CURRENT_Q_NUM: 'INCREMENT_US_CURRENT_Q_NUM',
   SET_US_CONSUMER_TS: 'SET_US_CONSUMER_TS',
   SET_US_CONSUMER_STATE: 'SET_US_CONSUMER_STATE',
   SET_US_AV_STATUS: 'SET_US_AV_STATUS',
@@ -56,8 +56,8 @@ export const userStreamStateReducer = (
     case 'SET_US_Q_HIDDEN':
       return { ...state, questionHidden: action.payload as boolean };
 
-    case 'INCREMENT_US_TRIGGER':
-      return { ...state, trigger: state.trigger++ };
+    case 'INCREMENT_US_CURRENT_Q_NUM':
+      return { ...state, currentQuestionNumber: state.currentQuestionNumber + 1};
 
     case 'SET_US_CONSUMER_TS':
       return {

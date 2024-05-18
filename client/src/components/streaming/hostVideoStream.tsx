@@ -5,8 +5,7 @@ import {
   hostVideoStreamStateReducer,
 } from '@/reducers/hostVideoStreamStateReducer';
 import { peersSocketService } from '@/services/peersSocketService';
-import { quizSocketService, startTimer } from '@/services/quizSocketService';
-import { QUESTION_TIME } from '@/services/quizSocketService';
+import { quizSocketService } from '@/services/quizSocketService';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
@@ -15,6 +14,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
 import type { MediaStream } from 'react-native-webrtc';
 import HostQuestion from '../question/hostQuestion';
+import SpeedDialComponent from './speedDial';
 
 export default function HostVideoStream({ quizId }: { quizId: string }) {
   // Register Globals for Mediasoup
@@ -28,12 +28,6 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     hostVideoStreamStateReducer,
     defaultHostVideoStreamState,
   );
-  // const [quizStarted, setQuizStarted] = useState(false);
-  // const [questionHidden, setQuestionHidden] = useState(false);
-  // const [trigger, setTrigger] = useState(0);
-  // const [nextDisabled, setNextDisabled] = useState(false);
-  // const [startDisabled, setStartDisabled] = useState(false);
-  // const [mediaStream, setMediaStream] = useState<MediaStream>();
 
   const nextQBtn = useRef(null);
   const startBtn = useRef(null);
@@ -53,24 +47,15 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
   function startQuiz() {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
-    // setQuizStarted(true);
     quizSocketService.emitHostStartQuiz();
     dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
-    // setQuestionHidden(false);
-
-    // if (currentQuestionNumber < 9) {
-    //   setTimeout(() => {
-
-    //   }, QUESTION_TIME + 2000);
-    // }
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
     quizSocketService.emitNextQ();
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
-    // setTrigger(trigger => trigger + 1);
   }
 
   function handleWinners() {
@@ -120,17 +105,19 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     const constraints: MediaStreamConstraints = {
       audio: true,
       video: {
-        facingMode: 'user',
+        facingMode: state.frontFacing ? 'user' : 'environment',
         width: {
-          min: 640,
+          min: 1280,
           max: 1920,
         },
         height: {
-          min: 400,
+          min: 720,
           max: 1080,
         },
+        frameRate: 30,
       },
     };
+
     if (!state.mediaStream) {
       mediaDevices
         .getUserMedia(constraints)
@@ -218,12 +205,13 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   };
 
   return (
-    <RTCView
-      streamURL={state.mediaStream?.toURL()}
-      mirror={true}
-      objectFit='cover'
-      style={{ flex: 1 }}
-    >
+    <View style={{ flex: 1 }}>
+      <RTCView
+        streamURL={state.mediaStream?.toURL()}
+        mirror={state.frontFacing}
+        objectFit='cover'
+        style={{ position: 'absolute', height: '100%', width: '100%' }}
+      />
       <View style={styles.unit}>
         <View style={styles.video_container}>
           <View style={styles.question_component_container}>
@@ -240,7 +228,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
         <View style={styles.btn_holder}>
           <View style={styles.quiz_controls}>
             {state.quizStarted ? (
-              currentQuestionNumber === 10 ? (
+              currentQuestionNumber > 10 ? null : currentQuestionNumber === 10 ? (
                 <Pressable
                   style={pressableStyle}
                   onPress={() => {
@@ -261,23 +249,23 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
               </Pressable>
             )}
           </View>
-          <Pressable style={pressableStyle} onPress={getLocalStream}>
-            <Text>Start Video</Text>
-          </Pressable>
-          <Pressable style={pressableStyle} onPress={stream}>
-            <Text>Stream</Text>
-          </Pressable>
-          <Pressable style={pressableStyle} onPress={endStream}>
-            <Text>End Stream</Text>
-          </Pressable>
         </View>
+        <SpeedDialComponent
+          state={state}
+          dispatchState={dispatchState}
+          getLocalStream={getLocalStream}
+          stream={stream}
+          endStream={endStream}
+        />
       </View>
-    </RTCView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   unit: {
+    flex: 1,
+    // borderWidth: 1,
     justifyContent: 'flex-end',
   },
   close_btn: {},

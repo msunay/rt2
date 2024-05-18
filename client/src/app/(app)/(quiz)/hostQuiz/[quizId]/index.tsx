@@ -26,7 +26,8 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
-    paddingBottom: 50,
+    // paddingBottom: 50,
+    // borderWidth: 1,
   },
   camera: {
     flex: 1,
