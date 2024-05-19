@@ -23,7 +23,8 @@ export const quizSocketService = {
   successListener: (quizId: string) =>
     quiz.on('connection_success', ({ socketId }) => {
       console.log('quiz socket connected: ', socketId);
-      // quiz.emit('join_room', { roomId: quizId });
+      quiz.emit('join_room', { roomId: quizId });
+      console.log('client roomId:', quizId);
     }),
 
   successListenerOff: () =>
@@ -48,6 +49,7 @@ export const quizSocketService = {
 
   startQuizListener: (dispatchState: Dispatch<UserStreamStateAction>) =>
     quiz.on('start_quiz', () => {
+      console.log('start_quiz listener!!!!!!!!!!');
       dispatchState({ type: 'SET_US_QUIZ_STARTED', payload: true });
     }),
 
@@ -70,11 +72,11 @@ export const quizSocketService = {
       console.log('quiz socket reveal_answers listener off');
     }),
 
-  emitNextQ: () => quiz.emit('next_question'),
+  emitNextQ: (roomId: string) => quiz.emit('next_question', { roomId }),
 
-  emitHostStartQuiz: () => quiz.emit('host_start_quiz'),
+  emitHostStartQuiz: (roomId: string) => {console.log('roomId client::', roomId); quiz.emit('host_start_quiz', { roomId })},
 
-  emitShowWinners: () => quiz.emit('show_winners'),
+  emitShowWinners: (roomId: string) => quiz.emit('show_winners', { roomId }),
 
   revealAnswerHostListener: (dispatchState: Dispatch<HostVideoStreamStateAction>) => {
     quiz.on('reveal_answers_host', () => {
@@ -84,12 +86,22 @@ export const quizSocketService = {
     });
   },
 
+  revealAnswerHostListenerOff: () =>
+    quiz.off('reveal_answers_host', () => {
+      console.log('quiz socket reveal_answers_host listener off');
+    }),
+
   hostWinnersListener: (dispatchState: Dispatch<HostVideoStreamStateAction>) => {
     quiz.on('host_winners', () => {
       console.log('HOST WINNERS RECEIVED');
       dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
     });
   },
+
+  hostWinnersListenerOff: () =>
+    quiz.off('host_winners', () => {
+      console.log('quiz socket host_winners listener off');
+    }),
 
   playerWinnersListener: (dispatchState: Dispatch<UserStreamStateAction>) => {
     quiz.on('player_winners', () => {

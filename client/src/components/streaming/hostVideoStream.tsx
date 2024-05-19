@@ -38,29 +38,43 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   let producer: mediasoupTypes.Producer;
 
   useEffect(() => {
-    quizSocketService.successListener();
+    quizSocketService.successListener(quizId);
     quizSocketService.startTimerListener(dispatchState);
     quizSocketService.revealAnswerHostListener(dispatchState);
     quizSocketService.hostWinnersListener(dispatchState);
+
+    return () => {
+      quizSocketService.successListenerOff();
+      quizSocketService.startTimerListenerOff();
+      quizSocketService.revealAnswerHostListenerOff();
+      quizSocketService.hostWinnersListenerOff();
+    };
+  }, [quizId]);
+
+  useEffect(() => {
     peersSocketService.successListener();
-  }, []);
+
+    return () => {
+      peersSocketService.successListenerOff();
+    };
+  }, [])
 
   function startQuiz() {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
-    quizSocketService.emitHostStartQuiz();
+    quizSocketService.emitHostStartQuiz(quizId);
     dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-    quizSocketService.emitNextQ();
+    quizSocketService.emitNextQ(quizId);
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
   }
 
   function handleWinners() {
     console.log('HANDLE WINNERS TRIGGER');
-    quizSocketService.emitShowWinners();
+    quizSocketService.emitShowWinners(quizId);
   }
 
   const stream = () => {

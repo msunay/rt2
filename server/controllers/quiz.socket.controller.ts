@@ -2,44 +2,58 @@ import {
   QuizClientToServerEvents,
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
-import { Socket } from 'socket.io';
+import type { Socket } from 'socket.io';
+// import { io } from '../index';
+import { quizNamespace } from '../index';
 
 const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
 const quizSocketInit = (
-  quiz: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
+  quizSocket: Socket<QuizClientToServerEvents, QuizServerToClientEvents>
 ) => {
-  setTimeout(() => console.log('\tquiz ID : ', quiz.id), 100);
+  setTimeout(() => console.log('\tquiz ID : ', quizSocket.id), 100);
 
-  // quiz.on('join_room', ({ roomId }) => {
-  //   quiz.join(roomId);
-  // })
-
-  quiz.emit('connection_success', {
-    socketId: quiz.id,
+  quizSocket.emit('connection_success', {
+    socketId: quizSocket.id,
   });
 
-  quiz.on('host_start_quiz', () => {
-    quiz.broadcast.emit('start_quiz');
+  quizSocket.on('join_room', ({ roomId }) => {
+    console.log(`\nClient ${quizSocket.id} joining room ${roomId}`);
+    quizSocket.join(roomId);
+
+    // Verify room membership
+    const room = quizNamespace.adapter.rooms.get(roomId);
+    // const room = io.sockets.adapter.rooms.get(roomId);
+    if (room) {
+      console.log(`\nRoom ${roomId} now has ${room.size} client(s).`);
+    } else {
+      console.log(`\nRoom ${roomId} does not exist.`);
+    }
+  });
+
+
+  quizSocket.on('host_start_quiz', ({ roomId }) => {
+    console.log('\nroom id: ', roomId);
+    quizSocket.to(roomId).emit('start_quiz');
 
     setTimeout(() => {
-      quiz.emit('reveal_answers_host');
-      quiz.broadcast.emit('reveal_answers');
+      quizSocket.to(roomId).emit('reveal_answers_host');
+      quizSocket.to(roomId).emit('reveal_answers');
     }, QUESTION_TIME);
   });
 
-  quiz.on('next_question', () => {
-    quiz.broadcast.emit('start_question_timer');
+  quizSocket.on('next_question', ({ roomId }) => {
+    quizSocket.to(roomId).emit('start_question_timer');
     setTimeout(() => {
-      quiz.emit('reveal_answers_host');
-      quiz.broadcast.emit('reveal_answers');
+      quizSocket.emit('reveal_answers_host');
+      quizSocket.broadcast.emit('reveal_answers');
     }, QUESTION_TIME);
   });
 
-  quiz.on('show_winners', () => {
+  quizSocket.on('show_winners', ({ roomId }) => {
     console.log('I MADE IT TO THE BACK!');
-    quiz.emit('host_winners');
-    quiz.broadcast.emit('player_winners');
+    quizSocket.to(roomId).emit('host_winners');
+    quizSocket.to(roomId).emit('player_winners');
   });
 };
 

@@ -48,7 +48,6 @@ export default function UserStream({ partId }: { partId: string }) {
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
-  // biome-ignore lint: only want listerners to register once
 
   useEffect(() => {
     if (quiz?.id) quizSocketService.successListener(quiz.id);

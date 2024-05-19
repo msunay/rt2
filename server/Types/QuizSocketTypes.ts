@@ -1,8 +1,8 @@
 export interface QuizClientToServerEvents {
-  next_question: () => void;
-  host_start_quiz: () => void;
-  show_winners: () => void;
-  join_room: ({ roomId }: {roomId: string}) => void;
+  next_question: ({ roomId }: { roomId: string }) => void;
+  host_start_quiz: ({ roomId }: { roomId: string }) => void;
+  show_winners: ({ roomId }: { roomId: string }) => void;
+  join_room: ({ roomId }: { roomId: string }) => void;
 }
 
 export interface QuizServerToClientEvents {
