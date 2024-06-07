@@ -22,19 +22,18 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
-      throw new Error();
+      throw new Error('No token');
     }
 
-    const tokenObject = jwt.decode(token) as Token;
     const decoded = jwt.verify(token, SECRET_KEY);
-    //NOTE what is quiz id doing here
-    (req as CustomRequest).userId = tokenObject.id;
-    (req as CustomRequest).username = tokenObject.username;
-    (req as CustomRequest).token = decoded;
-    (req as CustomRequest).quizId = req.body.quizId;
+
+    (req as CustomRequest).userId = (decoded as Token).id;
+    (req as CustomRequest).username = (decoded as Token).username;
+    (req as CustomRequest).token = (decoded as Token);
 
     next();
   } catch (err) {
-    res.status(401).send('Please authenticate');
+    // @ts-ignore
+    res.status(401).send({authError: {type: `${err?.name}`, message: `${err?.message}`}});
   }
 };

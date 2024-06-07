@@ -31,10 +31,10 @@ export const sequelize = new Sequelize(...connection, {
           `...sequelize config - setup ${msg.match(/table_name\s=\s(\'\w+\')/)?.[1]}`
           : null;
 
-          if (tableQueried) {
-            console.log(`\n${tableQueried}\n   QueryTime: ${queryTime}ms`)
+      if (tableQueried) {
+        console.log(`\n${tableQueried}\n   QueryTime: ${queryTime}ms`)
 
-          }
+      }
     }
   },
 });
