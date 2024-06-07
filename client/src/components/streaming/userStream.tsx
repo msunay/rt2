@@ -20,8 +20,26 @@ import { RTCView } from 'react-native-webrtc';
 import PlayerQuestion from '../question/playerQuestion';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
+import { type Socket, io } from 'socket.io-client';
+import type { QuizClientToServerEvents, QuizServerToClientEvents } from '@/types/QuizSocketTypes';
+import { QuizPlayerSocketManager } from '@/services/quizPlayerSocketManager';
+
+const BASE_URL: string =
+process.env.NODE_ENV === 'production'
+  ? process.env.BACKEND_URL || ''
+  : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 export default function UserStream({ partId }: { partId: string }) {
+
+
+
+const quizNSP: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
+  `${BASE_URL}quizspace`,
+);
+
+// export const mediasoupNSP: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
+//   `${BASE_URL}mediasoup`,
+// );
 
   const [state, dispatchUserState] = useReducer(
     userStreamStateReducer,
@@ -49,35 +67,83 @@ export default function UserStream({ partId }: { partId: string }) {
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
 
-  useEffect(() => {
-    if (quiz?.id) quizSocketService.successListener(quiz.id);
-    quizSocketService.playerWinnersListener(dispatchUserState);
-    quizSocketService.startQuizListener(dispatchUserState);
-    quizSocketService.startTimerListener(() => {}, dispatchUserState);
-    quizSocketService.revealListener(dispatchUserState);
+  const socketManager = new QuizPlayerSocketManager(dispatchUserState);
 
-    return () => {
-      quizSocketService.successListenerOff();
-      quizSocketService.playerWinnersListenerOff();
-      quizSocketService.startQuizListenerOff();
-      quizSocketService.startTimerListenerOff();
-      quizSocketService.revealListenerOff();
-    }
-  }, [quiz]);
+  const isListenerSet = useRef(false);
 
   useEffect(() => {
-    peersSocketService.successListener();
-    peersSocketService.producerClosedListener(
-      state.consumerTransportState,
-      state.consumerState,
-    );
-
-    return () => {
-      peersSocketService.successListenerOff();
-      peersSocketService.producerClosedListenerOff();
+    if (!isListenerSet.current && quiz?.id) {
+      socketManager.successListener(quiz.id);
+      isListenerSet.current = true;
     }
 
-  }, [state.consumerTransportState, state.consumerState])
+    return () => {
+      if (isListenerSet.current) {
+        socketManager.successListenerOff();
+        isListenerSet.current = false;
+      }
+      socketManager.disconnect();
+    }
+  }, [quiz, socketManager])
+
+  // biome-ignore lint: only register listeners once
+  useEffect(() => {
+    socketManager.playerWinnersListener();
+    socketManager.startQuizListener();
+    socketManager.startTimerListener();
+    socketManager.revealListener();
+
+    return () => {
+      socketManager.playerWinnersListenerOff();
+      socketManager.startQuizListenerOff();
+      socketManager.startTimerListenerOff();
+      socketManager.revealListenerOff();
+      socketManager.disconnect();
+    }
+  }, []);
+
+  // useEffect(() => {
+  //   peersSocketService.successListener();
+  //   peersSocketService.producerClosedListener(
+  //     state.consumerTransportState,
+  //     state.consumerState,
+  //   );
+
+  //   return () => {
+  //     peersSocketService.successListenerOff();
+  //     peersSocketService.producerClosedListenerOff();
+  //   }
+
+  // }, [state.consumerTransportState, state.consumerState])
+  // useEffect(() => {
+  //   if (quiz?.id) quizSocketService.successListener(quiz.id);
+  //   quizSocketService.playerWinnersListener(dispatchUserState);
+  //   quizSocketService.startQuizListener(dispatchUserState);
+  //   quizSocketService.startTimerListener(() => {}, dispatchUserState);
+  //   quizSocketService.revealListener(dispatchUserState);
+
+  //   return () => {
+  //     quizSocketService.successListenerOff();
+  //     quizSocketService.playerWinnersListenerOff();
+  //     quizSocketService.startQuizListenerOff();
+  //     quizSocketService.startTimerListenerOff();
+  //     quizSocketService.revealListenerOff();
+  //   }
+  // }, [quiz]);
+
+  // useEffect(() => {
+  //   peersSocketService.successListener();
+  //   peersSocketService.producerClosedListener(
+  //     state.consumerTransportState,
+  //     state.consumerState,
+  //   );
+
+  //   return () => {
+  //     peersSocketService.successListenerOff();
+  //     peersSocketService.producerClosedListenerOff();
+  //   }
+
+  // }, [state.consumerTransportState, state.consumerState])
 
   // useEffect(() => {
   //   console.log('user trigger: ', state.currentQuestionNumber);

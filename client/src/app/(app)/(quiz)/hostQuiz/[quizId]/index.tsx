@@ -16,7 +16,7 @@ export default function HostStreamPage() {
     <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
       {quiz?.hasVideo
         ? quizId && <HostVideoStream quizId={quizId} />
-        : quizId && <HostStream quizId={quizId} />}
+        : null/* quizId && <HostStream quizId={quizId} />*/}
     </ImageBackground>
   );
 }

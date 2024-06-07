@@ -4,7 +4,8 @@ import {
   defaultHostVideoStreamState,
   hostVideoStreamStateReducer,
 } from '@/reducers/hostVideoStreamStateReducer';
-import { peersSocketService } from '@/services/peersSocketService';
+// import { peersSocketService } from '@/services/peersSocketService';
+import { QuizHostSocketManager } from '@/services/quizHostSocketManager';
 import { quizSocketService } from '@/services/quizSocketService';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
@@ -37,44 +38,63 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   let producerTransport: mediasoupClient.types.Transport;
   let producer: mediasoupTypes.Producer;
 
-  useEffect(() => {
-    quizSocketService.successListener(quizId);
-    quizSocketService.startTimerListener(dispatchState);
-    quizSocketService.revealAnswerHostListener(dispatchState);
-    quizSocketService.hostWinnersListener(dispatchState);
-
-    return () => {
-      quizSocketService.successListenerOff();
-      quizSocketService.startTimerListenerOff();
-      quizSocketService.revealAnswerHostListenerOff();
-      quizSocketService.hostWinnersListenerOff();
-    };
-  }, [quizId]);
+  const socketManager = new QuizHostSocketManager(dispatchState);
 
   useEffect(() => {
-    peersSocketService.successListener();
+    socketManager.successListener(quizId);
+    socketManager.startTimerListener();
+    socketManager.revealAnswerHostListener();
+    socketManager.hostWinnersListener();
 
     return () => {
-      peersSocketService.successListenerOff();
+      socketManager.successListenerOff();
+      socketManager.startTimerListenerOff();
+      socketManager.revealAnswerHostListenerOff();
+      socketManager.hostWinnersListenerOff();
+      socketManager.disconnect();
     };
-  }, [])
+  }, []);
+  // useEffect(() => {
+  //   quizSocketService.successListener(quizId);
+  //   quizSocketService.startTimerListener(dispatchState);
+  //   quizSocketService.revealAnswerHostListener(dispatchState);
+  //   quizSocketService.hostWinnersListener(dispatchState);
+
+  //   return () => {
+  //     quizSocketService.successListenerOff();
+  //     quizSocketService.startTimerListenerOff();
+  //     quizSocketService.revealAnswerHostListenerOff();
+  //     quizSocketService.hostWinnersListenerOff();
+  //   };
+  // }, [quizId]);
+
+  // useEffect(() => {
+  //   peersSocketService.successListener();
+
+  //   return () => {
+  //     peersSocketService.successListenerOff();
+  //   };
+  // }, [])
 
   function startQuiz() {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
-    quizSocketService.emitHostStartQuiz(quizId);
+    // quizSocketService.emitHostStartQuiz(quizId);
+    socketManager.emitHostStartQuiz(quizId);
     dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-    quizSocketService.emitNextQ(quizId);
+    // quizSocketService.emitNextQ(quizId);
+    socketManager.emitNextQ(quizId);
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
   }
 
   function handleWinners() {
     console.log('HANDLE WINNERS TRIGGER');
-    quizSocketService.emitShowWinners(quizId);
+    // quizSocketService.emitShowWinners(quizId);
+    socketManager.emitShowWinners(quizId);
   }
 
   const stream = () => {
@@ -148,7 +168,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
   const getRtpCapabilities = () => {
     // get router rtp capabilities from server
-    peersSocketService.emitCreateRoom(createDevice);
+    // peersSocketService.emitCreateRoom(createDevice);
   };
 
   const createDevice = async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
@@ -172,11 +192,11 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   };
 
   const createSendTransport = () => {
-    peersSocketService.emitcreateProducerWebRtcTransport(
-      producerTransport,
-      device,
-      connectSendTransport,
-    );
+    // peersSocketService.emitcreateProducerWebRtcTransport(
+    //   producerTransport,
+    //   device,
+    //   connectSendTransport,
+    // );
   };
 
   const connectSendTransport = async (producerTransport: mediasoupTypes.Transport) => {

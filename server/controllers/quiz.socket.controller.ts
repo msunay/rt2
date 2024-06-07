@@ -3,7 +3,7 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import type { Socket } from 'socket.io';
-// import { io } from '../index';
+import { io } from '../index';
 import { quizNamespace } from '../index';
 
 const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
@@ -33,8 +33,9 @@ const quizSocketInit = (
 
 
   quizSocket.on('host_start_quiz', ({ roomId }) => {
-    console.log('\nroom id: ', roomId);
-    quizSocket.to(roomId).emit('start_quiz');
+    // console.log('\nroom id: ', roomId);
+
+    quizNamespace.to(roomId).emit('start_quiz');
 
     setTimeout(() => {
       quizSocket.to(roomId).emit('reveal_answers_host');
@@ -55,6 +56,8 @@ const quizSocketInit = (
     quizSocket.to(roomId).emit('host_winners');
     quizSocket.to(roomId).emit('player_winners');
   });
+
+  quizSocket.on('disconnect', () => console.log('quiz socket disconnected'))
 };
 
 export default quizSocketInit;
