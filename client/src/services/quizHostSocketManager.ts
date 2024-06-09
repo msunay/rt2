@@ -2,7 +2,7 @@ import type { HostVideoStreamStateAction } from '@/reducers/hostVideoStreamState
 import type { Dispatch } from 'react';
 import { SocketManager } from './socketManager';
 
-export class QuizHostSocketManager extends SocketManager {
+export class QuizHostSocketManager extends SocketManager<'quizspace'> {
   private dispatchState: Dispatch<HostVideoStreamStateAction>;
 
   constructor(dispatchState: Dispatch<HostVideoStreamStateAction>) {

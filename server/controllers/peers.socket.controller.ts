@@ -298,7 +298,7 @@ const peersSocketInit = async (
           console.log('Transport closed from consumer');
         });
 
-        consumer.on('producerclose', () => {
+        cons  umer.on('producerclose', () => {
           console.log('Producer of consumer closed');
           peers.emit('producer_closed');
 

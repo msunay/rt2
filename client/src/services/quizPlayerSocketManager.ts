@@ -2,7 +2,7 @@ import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
 import type { Dispatch } from 'react';
 import { SocketManager } from './socketManager';
 
-export class QuizPlayerSocketManager extends SocketManager {
+export class QuizPlayerSocketManager extends SocketManager<'quizspace'> {
   private dispatchState: Dispatch<UserStreamStateAction>;
 
   constructor(dispatchState: Dispatch<UserStreamStateAction>) {

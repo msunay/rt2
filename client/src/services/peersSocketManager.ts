@@ -1,14 +1,10 @@
 import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
-import type {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/types/PeerSocketTypes';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import type { Dispatch } from 'react';
-// import { MediaStream } from 'react-native-webrtc';
-import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
-// import { mediasoupNSP } from '@/app/(app)/(quiz)/_layout';
+import type { Dispatch, SetStateAction } from 'react';
+import { SocketManager } from './socketManager';
+import type * as mediasoupClient from 'mediasoup-client';
+import { MediaStream, type MediaStreamTrack } from 'react-native-webrtc';
+import util from 'util';
 
 interface parameters {
   kind: mediasoupTypes.MediaKind;
@@ -17,21 +13,27 @@ interface parameters {
 }
 type callback = ({ id }: { id: string }) => void;
 
-export const peersSocketService = {
-  successListener: () =>
-    mediasoupNSP.on('connection_success', ({ socketId, producerAlreadyExists }) => {
-      console.log('peers socket connected:', socketId, producerAlreadyExists);
-    }),
+export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
+  constructor() {
+    super('mediasoup');
+  }
 
-  successListenerOff: () =>
-    mediasoupNSP.off('connection_success', () => {
-      console.log('peers socket connection_success listener off');
-    }),
+  successListener = () => {
+    this.getSocket().on('connection_success', ({ socketId, producerAlreadyExists }) => {
+      console.log('peers host socket connected:', socketId, producerAlreadyExists);
+    });
+  };
 
-  emitCreateRoom: (
+  successListenerOff = () => {
+    this.getSocket().off('connection_success', () => {
+      console.log('peers host socket connection_success listener off');
+    });
+  };
+
+  emitCreateRoom = (
     createDevice: (rtpCapabilities: mediasoupTypes.RtpCapabilities) => Promise<void>,
   ) => {
-    mediasoupNSP.emit(
+    this.getSocket().emit(
       'create_room',
       ({ rtpCapabilities }: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
         console.log('Router RTP Capabilities: ', rtpCapabilities);
@@ -39,14 +41,14 @@ export const peersSocketService = {
         createDevice(rtpCapabilities);
       },
     );
-  },
+  };
 
-  emitcreateProducerWebRtcTransport: (
-    producerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+  emitcreateProducerWebRtcTransport = (
+    setProducerTransport: Dispatch<SetStateAction<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>>,
     device: mediasoupTypes.Device,
     connectSendTransport: (producerTransport: mediasoupTypes.Transport) => Promise<void>,
   ) => {
-    mediasoupNSP.emit(
+    this.getSocket().emit(
       'createWebRtcTransport',
       { sender: true },
       ({ transportParams }) => {
@@ -56,12 +58,13 @@ export const peersSocketService = {
         }
         console.log('transportParams: ', transportParams);
 
-        // biome-ignore lint: <explanation>
-        producerTransport = device.createSendTransport(transportParams);
+        const newProducerTransport = device.createSendTransport(transportParams);
 
-        console.log('CreateSendTransport producerTransport: ', producerTransport);
+        setProducerTransport(newProducerTransport);
 
-        producerTransport.on(
+        console.log('CreateSendTransport producerTransport: ', newProducerTransport);
+
+        newProducerTransport.on(
           'connect',
           async (
             { dtlsParameters }: { dtlsParameters: mediasoupTypes.DtlsParameters },
@@ -70,7 +73,7 @@ export const peersSocketService = {
           ) => {
             try {
               // Singnal local DTLS parameters to the server side transport
-              mediasoupNSP.emit('transport_connect', {
+              this.getSocket().emit('transport_connect', {
                 dtlsParameters,
               });
 
@@ -82,7 +85,7 @@ export const peersSocketService = {
           },
         );
 
-        producerTransport.on(
+        newProducerTransport.on(
           'produce',
           async (
             parameters: parameters,
@@ -92,7 +95,7 @@ export const peersSocketService = {
             console.log('producer.on produce params: ', parameters);
 
             try {
-              mediasoupNSP.emit(
+              this.getSocket().emit(
                 'transport_produce',
                 {
                   kind: parameters.kind,
@@ -110,111 +113,115 @@ export const peersSocketService = {
             }
           },
         );
-        connectSendTransport(producerTransport);
+        connectSendTransport(newProducerTransport);
       },
     );
-  },
+  };
 
-  emitcreateConsumerWebRtcTransport: (
-    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+  emitCreateConsumerWebRtcTransport = (
+    setConsumerTransport: Dispatch<SetStateAction<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>>,
     device: mediasoupTypes.Device,
     connectRecvTransport: (
-      consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
+      consumerTransport: mediasoupTypes.Transport,
       device: mediasoupTypes.Device,
     ) => Promise<void>,
   ) => {
-    mediasoupNSP.emit(
+    this.getSocket().emit(
       'createWebRtcTransport',
       { sender: false },
       ({ transportParams }) => {
         if (transportParams.error) {
-          console.log(transportParams.error);
+          console.log('transportParams.error: ', transportParams.error);
           return;
         }
         console.log('transportParams: ', transportParams);
-        // Create recv transport
-        // biome-ignore lint: <explanation>
-        consumerTransport = device.createRecvTransport(transportParams);
 
-        console.log('CreateRecvTransport consumerTransport: ', consumerTransport);
+        const newConsumerTransport = device.createRecvTransport(transportParams);
 
-        consumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+        setConsumerTransport(newConsumerTransport);
+
+        console.log('CreateRecvTransport consumerTransport: ', newConsumerTransport);
+
+        newConsumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
           try {
-            // Signal local DTLS parameters to the server side transport
-            mediasoupNSP.emit('transport_recv_connect', {
-              // transportId: consumerTransport.id,
+            // Singnal local DTLS parameters to the server side transport
+            this.getSocket().emit('transport_recv_connect', {
               dtlsParameters,
             });
-            // Tell the transport that parameters were transmitted
+
+            // Tell the transport that parameters were transmitted.
             callback();
-          } catch (err) {
-            errback(err as Error);
+          } catch (error) {
+            errback(error as Error);
           }
         });
 
-        connectRecvTransport(consumerTransport, device);
+        connectRecvTransport(newConsumerTransport, device);
       },
     );
-  },
+  };
 
-  emitConsume: (
+  emitConsume = (
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     device: mediasoupTypes.Device,
-    consumer: mediasoupTypes.Consumer,
-    dispatchUserState: Dispatch<UserStreamStateAction>,
+    setConsumer: Dispatch<SetStateAction<mediasoupClient.types.Consumer<mediasoupClient.types.AppData> | null>>,
+    setMediaStream: Dispatch<SetStateAction<MediaStream | null>>,
   ) => {
-    mediasoupNSP.emit(
+    this.getSocket().emit(
       'consume',
-      {
-        rtpCapabilities: device.rtpCapabilities,
-      },
+      { rtpCapabilities: device.rtpCapabilities },
       async ({ params }) => {
         if (params.error) {
-          console.log('Cannnot consume');
+          console.error(params.error);
+          console.log('Cannot consume');
           return;
         }
 
-        console.log(params);
-        // biome-ignore lint: <explanation>
-        consumer = await consumerTransport.consume({
+        console.log('params: ', params);
+
+        const newConsumer = await consumerTransport.consume({
           id: params.id,
           producerId: params.producerId,
           kind: params.kind,
           rtpParameters: params.rtpParameters,
         });
 
-        console.log('consumer: ', consumer);
+        setConsumer(newConsumer);
 
-        const { track } = consumer;
+        console.log('consumer: ', newConsumer);
 
-        const producerTrack = new MediaStream([track]);
+        const { track } = newConsumer;
+
+        const producerTrack = new MediaStream([track as unknown as MediaStreamTrack]);
         producerTrack.getTracks()[0];
         console.log('producerTrack: ', producerTrack);
-        // biome-ignore lint: <explanation>
-        // remoteVideo.current!.srcObject = producerTrack; // BUG
-        dispatchUserState({ type: 'SET_US_MEDIA_STREAM', payload: producerTrack });
 
-        mediasoupNSP.emit('consumer_resume');
+        // dispatchUserState({ type: 'SET_US_MEDIA_STREAM', payload: producerTrack });
+        setMediaStream(producerTrack)
+        this.getSocket().emit('consumer_resume');
       },
     );
-    return {
-      consumerTransport,
-      consumer,
-    };
-  },
 
-  producerClosedListener: (
+    return {
+      // newConsumer,
+      consumerTransport,
+    };
+  };
+
+  producerClosedListener = (
     consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
     consumer: mediasoupTypes.Consumer,
-  ) =>
-    mediasoupNSP.on('producer_closed', () => {
+  ) => {
+    this.getSocket().on('producer_closed', () => {
       // Server notified when producer is closed
-      consumerTransport.close();
       consumer.close();
-    }),
+      consumerTransport.close();
+    });
+  };
 
-  producerClosedListenerOff: () =>
-    mediasoupNSP.off('producer_closed', () => {
-      console.log('peers socket producer_closed listener off');
-    }),
-};
+  producerClosedListenerOff = () => {
+    this.getSocket().off('producer_closed', () => {
+      console.log('peers host socket producer_closed listener off');
+    });
+  };
+}
