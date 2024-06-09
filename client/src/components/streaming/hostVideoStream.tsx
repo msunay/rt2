@@ -1,16 +1,16 @@
 import { incrementQuestionNumber } from '@/features/questionSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import {
+  type HostVideoStreamStateAction,
   defaultHostVideoStreamState,
   hostVideoStreamStateReducer,
 } from '@/reducers/hostVideoStreamStateReducer';
 // import { peersSocketService } from '@/services/peersSocketService';
 import { QuizHostSocketManager } from '@/services/quizHostSocketManager';
-import { quizSocketService } from '@/services/quizSocketService';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useReducer, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
 import type { MediaStream } from 'react-native-webrtc';
@@ -39,40 +39,10 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupClient.types.Transport;
   let producer: mediasoupTypes.Producer;
-  // biome-ignore lint: only register listeners once
 
-  useEffect(() => {
-    if (!socketManager) {
-      setSocketManager(new QuizHostSocketManager(dispatchState));
-    }
-    if (socketManager) {
-      socketManager.successListener(quizId);
-      socketManager.startTimerListener();
-      socketManager.revealAnswerHostListener();
-      socketManager.hostWinnersListener();
 
-      return () => {
-        socketManager.successListenerOff();
-        socketManager.startTimerListenerOff();
-        socketManager.revealAnswerHostListenerOff();
-        socketManager.hostWinnersListenerOff();
-        socketManager.disconnect();
-      };
-    }
-  }, [socketManager, quizId]);
-  // useEffect(() => {
-  //   quizSocketService.successListener(quizId);
-  //   quizSocketService.startTimerListener(dispatchState);
-  //   quizSocketService.revealAnswerHostListener(dispatchState);
-  //   quizSocketService.hostWinnersListener(dispatchState);
+  useQuizSocketManager(socketManager, dispatchState, setSocketManager, quizId);
 
-  //   return () => {
-  //     quizSocketService.successListenerOff();
-  //     quizSocketService.startTimerListenerOff();
-  //     quizSocketService.revealAnswerHostListenerOff();
-  //     quizSocketService.hostWinnersListenerOff();
-  //   };
-  // }, [quizId]);
 
   // useEffect(() => {
   //   peersSocketService.successListener();
@@ -84,24 +54,25 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
 
   function startQuiz() {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
-    // quizSocketService.emitHostStartQuiz(quizId);
+
     if (socketManager) socketManager.emitHostStartQuiz(quizId);
     else console.error('Socket Manager not initialized');
+
     dispatch(incrementQuestionNumber());
   }
 
   function nextQuestion() {
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-    // quizSocketService.emitNextQ(quizId);
+
     if (socketManager) socketManager.emitNextQ(quizId);
     else console.error('Socket Manager not initialized');
+
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
   }
 
   function handleWinners() {
     console.log('HANDLE WINNERS TRIGGER');
-    // quizSocketService.emitShowWinners(quizId);
     if (socketManager) socketManager.emitShowWinners(quizId);
     else console.error('Socket Manager not initialized');
   }
@@ -345,3 +316,34 @@ const styles = StyleSheet.create({
   },
   stream_btns: {},
 });
+
+const useQuizSocketManager = (
+  socketManager: QuizHostSocketManager | null,
+  dispatch: Dispatch<HostVideoStreamStateAction>,
+  setSocketManager: Dispatch<SetStateAction<QuizHostSocketManager | null>>,
+  quizId: string,
+) => {
+
+  useEffect(() => {
+
+    if (!socketManager) {
+      setSocketManager(new QuizHostSocketManager(dispatch));
+    }
+
+    if (socketManager) {
+      socketManager.successListener(quizId);
+      socketManager.startTimerListener();
+      socketManager.revealAnswerHostListener();
+      socketManager.hostWinnersListener();
+
+      return () => {
+        socketManager.successListenerOff();
+        socketManager.startTimerListenerOff();
+        socketManager.revealAnswerHostListenerOff();
+        socketManager.hostWinnersListenerOff();
+        socketManager.disconnect();
+
+      };
+    }
+  }, [socketManager, quizId, dispatch, setSocketManager]);
+};
