@@ -224,6 +224,6 @@ describe('Quiz endpoint tests', () => {
 
   it('should fetch all quiz details', async () => {
     const response = await request.get('/quizzes');
-    expect(JSON.parse(response.text)).toHaveLength(5);
+    expect(JSON.parse(response.text)).toHaveLength(25);
   });
 });

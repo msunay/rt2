@@ -30,6 +30,8 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     defaultHostVideoStreamState,
   );
 
+  const [socketManager, setSocketManager] = useState<QuizHostSocketManager | null>(null);
+
   const nextQBtn = useRef(null);
   const startBtn = useRef(null);
   // const { push } = useRouter();
@@ -37,23 +39,27 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   let device: mediasoupTypes.Device;
   let producerTransport: mediasoupClient.types.Transport;
   let producer: mediasoupTypes.Producer;
-
-  const socketManager = new QuizHostSocketManager(dispatchState);
+  // biome-ignore lint: only register listeners once
 
   useEffect(() => {
-    socketManager.successListener(quizId);
-    socketManager.startTimerListener();
-    socketManager.revealAnswerHostListener();
-    socketManager.hostWinnersListener();
+    if (!socketManager) {
+      setSocketManager(new QuizHostSocketManager(dispatchState));
+    }
+    if (socketManager) {
+      socketManager.successListener(quizId);
+      socketManager.startTimerListener();
+      socketManager.revealAnswerHostListener();
+      socketManager.hostWinnersListener();
 
-    return () => {
-      socketManager.successListenerOff();
-      socketManager.startTimerListenerOff();
-      socketManager.revealAnswerHostListenerOff();
-      socketManager.hostWinnersListenerOff();
-      socketManager.disconnect();
-    };
-  }, []);
+      return () => {
+        socketManager.successListenerOff();
+        socketManager.startTimerListenerOff();
+        socketManager.revealAnswerHostListenerOff();
+        socketManager.hostWinnersListenerOff();
+        socketManager.disconnect();
+      };
+    }
+  }, [socketManager, quizId]);
   // useEffect(() => {
   //   quizSocketService.successListener(quizId);
   //   quizSocketService.startTimerListener(dispatchState);
@@ -79,7 +85,8 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   function startQuiz() {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
     // quizSocketService.emitHostStartQuiz(quizId);
-    socketManager.emitHostStartQuiz(quizId);
+    if (socketManager) socketManager.emitHostStartQuiz(quizId);
+    else console.error('Socket Manager not initialized');
     dispatch(incrementQuestionNumber());
   }
 
@@ -87,14 +94,16 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
     // quizSocketService.emitNextQ(quizId);
-    socketManager.emitNextQ(quizId);
+    if (socketManager) socketManager.emitNextQ(quizId);
+    else console.error('Socket Manager not initialized');
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
   }
 
   function handleWinners() {
     console.log('HANDLE WINNERS TRIGGER');
     // quizSocketService.emitShowWinners(quizId);
-    socketManager.emitShowWinners(quizId);
+    if (socketManager) socketManager.emitShowWinners(quizId);
+    else console.error('Socket Manager not initialized');
   }
 
   const stream = () => {

@@ -3,7 +3,6 @@ import {
   QuizServerToClientEvents,
 } from '../Types/QuizSocketTypes';
 import type { Socket } from 'socket.io';
-import { io } from '../index';
 import { quizNamespace } from '../index';
 
 const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
@@ -13,9 +12,11 @@ const quizSocketInit = (
 ) => {
   setTimeout(() => console.log('\tquiz ID : ', quizSocket.id), 100);
 
-  quizSocket.emit('connection_success', {
-    socketId: quizSocket.id,
-  });
+  setTimeout(() => {
+    quizSocket.emit('connection_success', {
+      socketId: quizSocket.id,
+    });
+  }, 200)
 
   quizSocket.on('join_room', ({ roomId }) => {
     console.log(`\nClient ${quizSocket.id} joining room ${roomId}`);

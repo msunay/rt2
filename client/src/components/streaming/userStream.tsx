@@ -1,11 +1,21 @@
 import { useAppSelector } from '@/hooks/reduxHooks';
 import {
+  type UserStreamStateAction,
   defaultUserStreamState,
   userStreamStateReducer,
 } from '@/reducers/userStreamStateReducer';
-import { useGetOneParticipationByPartIdQuery, useGetOneQuizQuestionAnswerQuery } from '@/services/backendApi';
+import {
+  useGetOneParticipationByPartIdQuery,
+  useGetOneQuizQuestionAnswerQuery,
+} from '@/services/backendApi';
 import { peersSocketService } from '@/services/peersSocketService';
+import { QuizHostSocketManager } from '@/services/quizHostSocketManager';
+import { QuizPlayerSocketManager } from '@/services/quizPlayerSocketManager';
 import { quizSocketService } from '@/services/quizSocketService';
+import type {
+  QuizClientToServerEvents,
+  QuizServerToClientEvents,
+} from '@/types/QuizSocketTypes';
 import { Participation } from '@/types/Types';
 import { QUIZ_BACKGROUND } from '@/utils/images';
 import { FontAwesome } from '@expo/vector-icons';
@@ -13,39 +23,37 @@ import { ResizeMode, Video } from 'expo-av';
 import { Link } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { type Dispatch, useEffect, useReducer, useRef, useState, type SetStateAction } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RTCView } from 'react-native-webrtc';
+import { type Socket, io } from 'socket.io-client';
 import PlayerQuestion from '../question/playerQuestion';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
-import { type Socket, io } from 'socket.io-client';
-import type { QuizClientToServerEvents, QuizServerToClientEvents } from '@/types/QuizSocketTypes';
-import { QuizPlayerSocketManager } from '@/services/quizPlayerSocketManager';
 
 const BASE_URL: string =
-process.env.NODE_ENV === 'production'
-  ? process.env.BACKEND_URL || ''
-  : process.env.EXPO_PUBLIC_LOCAL_IP || '';
+  process.env.NODE_ENV === 'production'
+    ? process.env.BACKEND_URL || ''
+    : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 export default function UserStream({ partId }: { partId: string }) {
+  // const quizNSP: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
+  //   `${BASE_URL}quizspace`,
+  // );
 
-
-
-const quizNSP: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
-  `${BASE_URL}quizspace`,
-);
-
-// export const mediasoupNSP: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
-//   `${BASE_URL}mediasoup`,
-// );
+  // export const mediasoupNSP: Socket<PeersServerToClientEvents, PeersClientToServerEvents> = io(
+  //   `${BASE_URL}mediasoup`,
+  // );
 
   const [state, dispatchUserState] = useReducer(
     userStreamStateReducer,
     defaultUserStreamState,
   );
   // const [status, setStatus] = useState({});
+  const [socketManager, setSocketManager] = useState<QuizPlayerSocketManager | null>(
+    null,
+  );
 
   const {
     data: participation,
@@ -53,12 +61,12 @@ const quizNSP: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
     isLoading,
   } = useGetOneParticipationByPartIdQuery(partId);
 
-    // Fetch quiz details, including questions and answers, for a given participation's QuizId.
-    const {
-      data: quiz,
-      error: quizError,
-      isLoading: quizIsLoading,
-    } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
+  // Fetch quiz details, including questions and answers, for a given participation's QuizId.
+  const {
+    data: quiz,
+    error: quizError,
+    isLoading: quizIsLoading,
+  } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
 
   // const remoteVideo = useRef(null);
 
@@ -67,40 +75,8 @@ const quizNSP: Socket<QuizServerToClientEvents, QuizClientToServerEvents> = io(
   let consumerTransport: mediasoupTypes.Transport;
   let consumer: mediasoupTypes.Consumer;
 
-  const socketManager = new QuizPlayerSocketManager(dispatchUserState);
+  useQuizSocketManager(socketManager, dispatchUserState, setSocketManager, quiz?.id);
 
-  const isListenerSet = useRef(false);
-
-  useEffect(() => {
-    if (!isListenerSet.current && quiz?.id) {
-      socketManager.successListener(quiz.id);
-      isListenerSet.current = true;
-    }
-
-    return () => {
-      if (isListenerSet.current) {
-        socketManager.successListenerOff();
-        isListenerSet.current = false;
-      }
-      socketManager.disconnect();
-    }
-  }, [quiz, socketManager])
-
-  // biome-ignore lint: only register listeners once
-  useEffect(() => {
-    socketManager.playerWinnersListener();
-    socketManager.startQuizListener();
-    socketManager.startTimerListener();
-    socketManager.revealListener();
-
-    return () => {
-      socketManager.playerWinnersListenerOff();
-      socketManager.startQuizListenerOff();
-      socketManager.startTimerListenerOff();
-      socketManager.revealListenerOff();
-      socketManager.disconnect();
-    }
-  }, []);
 
   // useEffect(() => {
   //   peersSocketService.successListener();
@@ -317,3 +293,35 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+
+const useQuizSocketManager = (
+  socketManager: QuizPlayerSocketManager | null,
+  dispatch: Dispatch<UserStreamStateAction>,
+  setSocketManager: Dispatch<SetStateAction<QuizPlayerSocketManager | null>>,
+  quizId: string | undefined,
+) => {
+
+  useEffect(() => {
+
+    if (!socketManager) {
+      setSocketManager(new QuizPlayerSocketManager(dispatch));
+    }
+
+    if (socketManager && quizId) {
+      socketManager.successListener(quizId);
+      socketManager.playerWinnersListener();
+      socketManager.startQuizListener();
+      socketManager.startTimerListener();
+      socketManager.revealListener();
+
+      return () => {
+        socketManager.successListenerOff();
+        socketManager.playerWinnersListenerOff();
+        socketManager.startQuizListenerOff();
+        socketManager.startTimerListenerOff();
+        socketManager.revealListenerOff();
+        socketManager.disconnect();
+      };
+    }
+  }, [socketManager, quizId, dispatch, setSocketManager]);
+};
