@@ -22,8 +22,14 @@ import { QUIZ_BACKGROUND } from '@/utils/images';
 import { FontAwesome } from '@expo/vector-icons';
 import { ResizeMode, Video } from 'expo-av';
 import { Link } from 'expo-router';
-import * as mediasoupClient from 'mediasoup-client';
-import type { types as mediasoupTypes } from 'mediasoup-client';
+// import * as mediasoupClient from 'mediasoup-client';
+import { Device /* type types as mediasoupTypes */ } from 'mediasoup-client';
+import type {
+  AppData,
+  Consumer,
+  RtpCapabilities,
+  Transport,
+} from 'mediasoup-client/lib/types';
 import {
   type Dispatch,
   type SetStateAction,
@@ -34,25 +40,22 @@ import {
 } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RTCView, registerGlobals, type MediaStream } from 'react-native-webrtc';
+import { type MediaStream, RTCView, registerGlobals } from 'react-native-webrtc';
 import PlayerQuestion from '../question/playerQuestion';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
 
-
 export default function UserStream({ partId }: { partId: string }) {
   // Register Globals for Mediasoup
   registerGlobals();
-
 
   const [state, dispatchUserState] = useReducer(
     userStreamStateReducer,
     defaultUserStreamState,
   );
   // const [status, setStatus] = useState({});
-  const [quizSocketManager, setQuizSocketManager] = useState<QuizPlayerSocketManager | null>(
-    null,
-  );
+  const [quizSocketManager, setQuizSocketManager] =
+    useState<QuizPlayerSocketManager | null>(null);
 
   const {
     data: participation,
@@ -74,9 +77,19 @@ export default function UserStream({ partId }: { partId: string }) {
   // let consumerTransport: mediasoupTypes.Transport;
   // let consumer: mediasoupTypes.Consumer;
 
-  useQuizSocketManager(quizSocketManager, dispatchUserState, setQuizSocketManager, quiz?.id);
+  useQuizSocketManager(
+    quizSocketManager,
+    dispatchUserState,
+    setQuizSocketManager,
+    quiz?.id,
+  );
 
   const { goConsume, mediaStream } = useUserPeersSocketManager();
+
+  useEffect(() => {
+    console.log('mediaStream: ', mediaStream);
+  }, [mediaStream]);
+
 
   // useEffect(() => {
   //   peersSocketService.successListener();
@@ -109,7 +122,7 @@ export default function UserStream({ partId }: { partId: string }) {
   // useEffect(() => {
   //   console.log('user trigger: ', state.currentQuestionNumber);
   // }, [state.currentQuestionNumber]);
-/*
+  /*
   // Consume Trigger
   const goConsume = () => {
     device === undefined ? getRtpCapabilities() : createRecvTransport();
@@ -183,7 +196,7 @@ export default function UserStream({ partId }: { partId: string }) {
   };
 
   return (
-    <SafeAreaView>
+    <View style={{ flex:0.7 }}>
       <RTCView
         streamURL={mediaStream?.toURL()}
         objectFit='cover'
@@ -240,7 +253,7 @@ export default function UserStream({ partId }: { partId: string }) {
         </Pressable>
       </View>
       {/* </RTCView> */}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -271,6 +284,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   btn_join: {
+    zIndex: 100000,
     justifyContent: 'center',
     alignItems: 'center',
     height: 50,
@@ -311,47 +325,52 @@ const useQuizSocketManager = (
 };
 
 const useUserPeersSocketManager = () => {
-  const [device, setDevice] = useState<mediasoupTypes.Device | null>(null);
+  const [device, setDevice] = useState<Device | null>(null);
   // const [rtpCapabilities, setRtpCapabilities] =
   //   useState<mediasoupTypes.RtpCapabilities | null>(null);
-  const [consumerTransport, setConsumerTransport] =
-    useState<mediasoupTypes.Transport | null>(null);
-  const [consumer, setConsumer] = useState<mediasoupTypes.Consumer | null>(null);
+  const [consumerTransport, setConsumerTransport] = useState<Transport | null>(null);
+  const [consumer, setConsumer] = useState<Consumer | null>(null);
   const [mediasoupSocketManager, setMediasoupSocketManager] =
     useState<PeersHostSocketManager | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
     if (!mediasoupSocketManager) {
-      setMediasoupSocketManager(new PeersHostSocketManager());
-    }
-    if (mediasoupSocketManager) {
-      mediasoupSocketManager.successListener();
-      if (consumerTransport && consumer)
-        mediasoupSocketManager.producerClosedListener(consumerTransport, consumer);
+      const manager = new PeersHostSocketManager();
+      setMediasoupSocketManager(manager);
+      manager.successListener();
 
       return () => {
-        mediasoupSocketManager.successListenerOff();
+        manager.successListenerOff();
+        // mediasoupSocketManager.producerClosedListenerOff();
+      };
+    }
+  }, [mediasoupSocketManager]);
+
+  useEffect(() => {
+    if (consumerTransport && consumer && mediasoupSocketManager) {
+      mediasoupSocketManager.producerClosedListener(consumerTransport, consumer);
+      return () => {
         mediasoupSocketManager.producerClosedListenerOff();
       };
     }
   }, [consumerTransport, consumer, mediasoupSocketManager]);
-
-   // Consume Trigger
-   const goConsume = () => {
+  // Consume Trigger
+  const goConsume = () => {
     !device ? getRtpCapabilities() : createRecvTransport();
     console.log('goConsume');
   };
 
   const getRtpCapabilities = () => {
     // get router rtp capabilities from server
-    if (!mediasoupSocketManager) throw new Error('No socket manager when getting rtp capabilities');
+    if (!mediasoupSocketManager)
+      throw new Error('No socket manager when getting rtp capabilities');
     mediasoupSocketManager.emitCreateRoom(createDevice);
   };
 
-  const createDevice = async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
+  const createDevice = async (rtpCapabilities: RtpCapabilities) => {
     try {
-      const newDevice = new mediasoupClient.Device();
+      const newDevice = new Device();
       console.log('Is this working???');
 
       await newDevice.load({ routerRtpCapabilities: rtpCapabilities });
@@ -379,29 +398,32 @@ const useUserPeersSocketManager = () => {
     }
   };
 
-  const createRecvTransport = async (newDevice?: mediasoupClient.types.Device) => {
-    if (!mediasoupSocketManager) throw new Error('No socket manager when creating transport');
+  const createRecvTransport = async (newDevice?: Device) => {
+    if (!mediasoupSocketManager)
+      throw new Error('No socket manager when creating transport');
     const d = newDevice ? newDevice : device;
     if (!d) throw new Error('No device');
-    console.log('Is this working???');
     mediasoupSocketManager.emitCreateConsumerWebRtcTransport(
       setConsumerTransport,
       d,
       connectRecvTransport,
     );
+    console.log('Is this working???');
   };
 
   const connectRecvTransport = async (
-    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-    device: mediasoupTypes.Device,
+    consumerTransport: Transport<AppData>,
+    device: Device,
   ) => {
-    if (!mediasoupSocketManager) throw new Error('No socket manager when connecting transport');
+    if (!mediasoupSocketManager)
+      throw new Error('No socket manager when connecting transport');
 
+    console.log('connectRecvTransport!:!:"!:":!::!"');
     const response = mediasoupSocketManager.emitConsume(
       consumerTransport,
       device,
       setConsumer,
-      setMediaStream
+      setMediaStream,
     );
     // dispatchUserState({
     //   type: 'SET_US_CONSUMER_TS',
@@ -415,5 +437,5 @@ const useUserPeersSocketManager = () => {
   return {
     goConsume,
     mediaStream,
-  }
+  };
 };

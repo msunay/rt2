@@ -1,20 +1,21 @@
 import {
   PeersClientToServerEvents,
   PeersServerToClientEvents,
+  TransportOptions,
 } from '../Types/PeerSocketTypes';
 import { Socket } from 'socket.io';
-import { types as mediasoupTypes } from 'mediasoup';
+// import { types as mediasoupTypes } from 'mediasoup';
 import * as mediasoup from 'mediasoup';
 import { RtpCodecCapability } from 'mediasoup/node/lib/RtpParameters';
 import util from 'util'
-import { AppData, WebRtcServer, WebRtcServerOptions } from 'mediasoup/node/lib/types';
+import { AppData, Consumer, Producer, ProducerOptions, Router, Transport, WebRtcServer, WebRtcServerOptions, WebRtcTransportOptions, Worker } from 'mediasoup/node/lib/types';
 
-let msWorker: mediasoupTypes.Worker<mediasoupTypes.AppData>;
-let msRouter: mediasoupTypes.Router;
-let producerTransport: mediasoupTypes.Transport | undefined;
-let consumerTransport: mediasoupTypes.Transport | undefined;
-let producer: mediasoupTypes.Producer;
-let consumer: mediasoupTypes.Consumer;
+let msWorker: Worker;
+let msRouter: Router;
+let producerTransport: Transport | undefined;
+let consumerTransport: Transport | undefined;
+let producer: Producer;
+let consumer: Consumer;
 
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
@@ -41,21 +42,21 @@ const createWorker = async () => {
   const ip = process.env.NODE_ENV === 'production' ? process.env.PRIVATE_IP! : '0.0.0.0'
 
   const webRtcServerOptions = {
-    listenInfos :
-    [
-      {
-        protocol: 'udp',
-        ip,
-        announcedIp,
-        port: 40000
-      },
-      {
-        protocol: 'tcp',
-        ip,
-        announcedIp,
-        port: 40000
-      }
-    ]
+    listenInfos:
+      [
+        {
+          protocol: 'udp',
+          ip,
+          announcedIp,
+          port: 40000
+        },
+        {
+          protocol: 'tcp',
+          ip,
+          announcedIp,
+          port: 40000
+        }
+      ]
   } as WebRtcServerOptions
 
   const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions);
@@ -67,84 +68,84 @@ const createWorker = async () => {
 
 createWorker().then((w) => (msWorker = w));
 
-const iceServers = [
+const iceServers: RTCIceServer[] = [
   {
-      "urls": "turn:a.relay.metered.ca:80",
-      "username": process.env.ICE_USERNAME,
-      "credential": process.env.ICE_CREDENTIAL
+    "urls": "turn:a.relay.metered.ca:80",
+    "username": process.env.ICE_USERNAME,
+    "credential": process.env.ICE_CREDENTIAL
   },
   {
-      "urls": "turn:a.relay.metered.ca:80?transport=tcp",
-      "username": process.env.ICE_USERNAME,
-      "credential": process.env.ICE_CREDENTIAL
+    "urls": "turn:a.relay.metered.ca:80?transport=tcp",
+    "username": process.env.ICE_USERNAME,
+    "credential": process.env.ICE_CREDENTIAL
   },
   {
-      "urls": "turn:a.relay.metered.ca:443",
-      "username": process.env.ICE_USERNAME,
-      "credential": process.env.ICE_CREDENTIAL
+    "urls": "turn:a.relay.metered.ca:443",
+    "username": process.env.ICE_USERNAME,
+    "credential": process.env.ICE_CREDENTIAL
   },
   {
-      "urls": "turn:a.relay.metered.ca:443?transport=tcp",
-      "username": process.env.ICE_USERNAME,
-      "credential": process.env.ICE_CREDENTIAL
+    "urls": "turn:a.relay.metered.ca:443?transport=tcp",
+    "username": process.env.ICE_USERNAME,
+    "credential": process.env.ICE_CREDENTIAL
   }
 ];
 
 const mediaCodecs: RtpCodecCapability[] = [
   {
-    kind      : 'audio',
-    mimeType  : 'audio/opus',
-    clockRate : 48000,
-    channels  : 2
+    kind: 'audio',
+    mimeType: 'audio/opus',
+    clockRate: 48000,
+    channels: 2
   },
   {
-    kind       : 'video',
-    mimeType   : 'video/VP8',
-    clockRate  : 90000,
-    parameters :
+    kind: 'video',
+    mimeType: 'video/VP8',
+    clockRate: 90000,
+    parameters:
     {
-      'x-google-start-bitrate' : 1000
+      'x-google-start-bitrate': 1000
     }
   },
   {
-    kind       : 'video',
-    mimeType   : 'video/VP9',
-    clockRate  : 90000,
-    parameters :
+    kind: 'video',
+    mimeType: 'video/VP9',
+    clockRate: 90000,
+    parameters:
     {
-      'profile-id'             : 2,
-      'x-google-start-bitrate' : 1000
+      'profile-id': 2,
+      'x-google-start-bitrate': 1000
     }
   },
   {
-    kind       : 'video',
-    mimeType   : 'video/h264',
-    clockRate  : 90000,
-    parameters :
+    kind: 'video',
+    mimeType: 'video/h264',
+    clockRate: 90000,
+    parameters:
     {
-      'packetization-mode'      : 1,
-      'profile-level-id'        : '4d0032',
-      'level-asymmetry-allowed' : 1,
-      'x-google-start-bitrate'  : 1000
+      'packetization-mode': 1,
+      'profile-level-id': '4d0032',
+      'level-asymmetry-allowed': 1,
+      'x-google-start-bitrate': 1000
     }
   },
   {
-    kind       : 'video',
-    mimeType   : 'video/h264',
-    clockRate  : 90000,
-    parameters :
+    kind: 'video',
+    mimeType: 'video/h264',
+    clockRate: 90000,
+    parameters:
     {
-      'packetization-mode'      : 1,
-      'profile-level-id'        : '42e01f',
-      'level-asymmetry-allowed' : 1,
-      'x-google-start-bitrate'  : 1000
+      'packetization-mode': 1,
+      'profile-level-id': '42e01f',
+      'level-asymmetry-allowed': 1,
+      'x-google-start-bitrate': 1000
     }
   },
 ];
 
-const createWebRtcTransport = async (callback: ({ transportParams }: { transportParams: any }) => void) => {
+const createWebRtcTransport = async (callback: ({ transportOptions }: { transportOptions: TransportOptions }) => void) => {
   try {
-    const webRtcTransportOptions: mediasoupTypes.WebRtcTransportOptions = {
+    const webRtcTransportOptions: WebRtcTransportOptions = {
       webRtcServer: msWorker.appData.webRtcServer as WebRtcServer<AppData>,
       enableUdp: true,
       enableTcp: true,
@@ -173,11 +174,11 @@ const createWebRtcTransport = async (callback: ({ transportParams }: { transport
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
-        iceServers
+        // iceServers
       },
-    }, {showHidden: false, depth: null, colors: true}))
+    }, { showHidden: false, depth: null, colors: true }))
     callback({
-      transportParams: {
+      transportOptions: {
         id: transport.id,
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
@@ -188,11 +189,12 @@ const createWebRtcTransport = async (callback: ({ transportParams }: { transport
     return transport;
   } catch (error) {
     console.error(error);
-    callback({
-      transportParams: {
-        error,
-      },
-    });
+
+    // callback({
+    //   transportParams: {
+    //     error,
+    //   },
+    // });
   }
 };
 
@@ -240,7 +242,7 @@ const peersSocketInit = async (
 
   peers.on('createWebRtcTransport', async ({ sender }, callback) => {
     try {
-      console.log(`Is this a sender request? ${sender ? 'Yes': 'No'}`);
+      console.log(`Is this a sender request? ${sender ? 'Yes' : 'No'}`);
       if (sender) producerTransport = await createWebRtcTransport(callback);
       else consumerTransport = await createWebRtcTransport(callback);
     } catch (error) {
@@ -261,7 +263,7 @@ const peersSocketInit = async (
         kind,
         rtpParameters,
         appData
-      });
+      } as ProducerOptions);
 
       console.log('Producer iD: ', producer.id, producer.kind);
 
@@ -282,6 +284,7 @@ const peersSocketInit = async (
   });
 
   peers.on('consume', async ({ rtpCapabilities }, initConsumer) => {
+    console.log('!!!!!!!!!!!!hey biatch::::!!!!!!!!!!!!!!!!!!');
     try {
       if (
         msRouter.canConsume({
@@ -298,28 +301,30 @@ const peersSocketInit = async (
           console.log('Transport closed from consumer');
         });
 
-        cons  umer.on('producerclose', () => {
+        consumer.on('producerclose', () => {
           console.log('Producer of consumer closed');
           peers.emit('producer_closed');
 
           // consumerTransport?.close();
         });
 
-        const params = {
+        const consumerOptions = {
           id: consumer.id,
           producerId: producer.id,
           kind: consumer.kind,
           rtpParameters: consumer.rtpParameters,
         };
-        initConsumer({ params });
+        console.log('consumerOptions:', consumerOptions)
+
+        initConsumer({ consumerOptions });
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      initConsumer({
-        params: {
-          error: err,
-        },
-      });
+      // initConsumer({
+      //   params: {
+      //     error: err,
+      //   },
+      // });
     }
   });
   peers.on('consumer_resume', async () => {

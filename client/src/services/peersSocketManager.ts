@@ -1,15 +1,24 @@
 import type { UserStreamStateAction } from '@/reducers/userStreamStateReducer';
-import type { types as mediasoupTypes } from 'mediasoup-client';
-import type { Dispatch, SetStateAction } from 'react';
-import { SocketManager } from './socketManager';
 import type * as mediasoupClient from 'mediasoup-client';
+import type {
+  AppData,
+  Consumer,
+  DtlsParameters,
+  MediaKind,
+  RtpCapabilities,
+  RtpParameters,
+  Transport,
+  TransportOptions,
+} from 'mediasoup-client/lib/types';
+// import type { types as mediasoupTypes} from 'mediasoup-client';
+import type { Dispatch, SetStateAction } from 'react';
 import { MediaStream, type MediaStreamTrack } from 'react-native-webrtc';
-import util from 'util';
+import { SocketManager } from './socketManager';
 
 interface parameters {
-  kind: mediasoupTypes.MediaKind;
-  rtpParameters: mediasoupTypes.RtpParameters;
-  appData: mediasoupTypes.AppData;
+  kind: MediaKind;
+  rtpParameters: RtpParameters;
+  appData: AppData;
 }
 type callback = ({ id }: { id: string }) => void;
 
@@ -31,11 +40,11 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
   };
 
   emitCreateRoom = (
-    createDevice: (rtpCapabilities: mediasoupTypes.RtpCapabilities) => Promise<void>,
+    createDevice: (rtpCapabilities: RtpCapabilities) => Promise<void>,
   ) => {
     this.getSocket().emit(
       'create_room',
-      ({ rtpCapabilities }: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
+      ({ rtpCapabilities }: { rtpCapabilities: RtpCapabilities }) => {
         console.log('Router RTP Capabilities: ', rtpCapabilities);
         // assign to local variable
         createDevice(rtpCapabilities);
@@ -44,21 +53,25 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
   };
 
   emitcreateProducerWebRtcTransport = (
-    setProducerTransport: Dispatch<SetStateAction<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>>,
-    device: mediasoupTypes.Device,
-    connectSendTransport: (producerTransport: mediasoupTypes.Transport) => Promise<void>,
+    setProducerTransport: Dispatch<
+      SetStateAction<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>
+    >,
+    device: mediasoupClient.Device,
+    connectSendTransport: (producerTransport: Transport) => Promise<void>,
   ) => {
     this.getSocket().emit(
       'createWebRtcTransport',
       { sender: true },
-      ({ transportParams }) => {
-        if (transportParams.error) {
-          console.log('transportParams.error: ', transportParams.error);
-          return;
+      ({ transportOptions }) => {
+        // @ts-ignore
+        if (!transportOptions /*  || transportOptions.error */) {
+          // @ts-ignore
+          // console.error('transportOptions: ', transportOptions.error);
+          throw new Error('transportOptions is null');
         }
-        console.log('transportParams: ', transportParams);
+        console.log('transportOptions: ', transportOptions);
 
-        const newProducerTransport = device.createSendTransport(transportParams);
+        const newProducerTransport = device.createSendTransport(transportOptions);
 
         setProducerTransport(newProducerTransport);
 
@@ -67,7 +80,7 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
         newProducerTransport.on(
           'connect',
           async (
-            { dtlsParameters }: { dtlsParameters: mediasoupTypes.DtlsParameters },
+            { dtlsParameters }: { dtlsParameters: DtlsParameters },
             callback: () => void,
             errback: (error: Error) => void,
           ) => {
@@ -119,86 +132,102 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
   };
 
   emitCreateConsumerWebRtcTransport = (
-    setConsumerTransport: Dispatch<SetStateAction<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>>,
-    device: mediasoupTypes.Device,
+    setConsumerTransport: Dispatch<SetStateAction<Transport<AppData> | null>>,
+    device: mediasoupClient.Device,
     connectRecvTransport: (
-      consumerTransport: mediasoupTypes.Transport,
-      device: mediasoupTypes.Device,
+      consumerTransport: Transport,
+      device: mediasoupClient.Device,
     ) => Promise<void>,
   ) => {
     this.getSocket().emit(
       'createWebRtcTransport',
       { sender: false },
-      ({ transportParams }) => {
-        if (transportParams.error) {
-          console.log('transportParams.error: ', transportParams.error);
-          return;
+      ({ transportOptions }) => {
+        // @ts-ignore
+        if (/* transportOptions.error ||  */ !transportOptions) {
+          // @ts-ignore
+          // console.error('transportOptions.error: ', transportOptions.error);
+          throw new Error('transportOptions is null or .error above');
         }
-        console.log('transportParams: ', transportParams);
+        console.log('transportOptions: ', transportOptions);
 
-        const newConsumerTransport = device.createRecvTransport(transportParams);
+        const newConsumerTransport = device.createRecvTransport(transportOptions);
 
         setConsumerTransport(newConsumerTransport);
 
         console.log('CreateRecvTransport consumerTransport: ', newConsumerTransport);
 
-        newConsumerTransport.on('connect', async ({ dtlsParameters }, callback, errback) => {
-          try {
-            // Singnal local DTLS parameters to the server side transport
-            this.getSocket().emit('transport_recv_connect', {
-              dtlsParameters,
-            });
+        newConsumerTransport.on(
+          'connect',
+          async ({ dtlsParameters }, callback, errback) => {
+            try {
+              // Singnal local DTLS parameters to the server side transport
+              this.getSocket().emit('transport_recv_connect', {
+                dtlsParameters,
+              });
 
-            // Tell the transport that parameters were transmitted.
-            callback();
-          } catch (error) {
-            errback(error as Error);
-          }
-        });
+              // Tell the transport that parameters were transmitted.
+              callback();
+            } catch (error) {
+              errback(error as Error);
+            }
+          },
+        );
 
         connectRecvTransport(newConsumerTransport, device);
       },
     );
+    console.log('dddddddddd!!!!!!!!');
   };
 
   emitConsume = (
-    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-    device: mediasoupTypes.Device,
-    setConsumer: Dispatch<SetStateAction<mediasoupClient.types.Consumer<mediasoupClient.types.AppData> | null>>,
+    consumerTransport: Transport<AppData>,
+    device: mediasoupClient.Device,
+    setConsumer: Dispatch<SetStateAction<Consumer<AppData> | null>>,
     setMediaStream: Dispatch<SetStateAction<MediaStream | null>>,
   ) => {
     this.getSocket().emit(
       'consume',
       { rtpCapabilities: device.rtpCapabilities },
-      async ({ params }) => {
-        if (params.error) {
-          console.error(params.error);
-          console.log('Cannot consume');
-          return;
+      async ({ consumerOptions }) => {
+        console.log('consumerOptions: ', consumerOptions);
+        try {
+          // @ts-ignore
+          if (/* consumerOptions.error ||  */ !consumerOptions) {
+            // @ts-ignore
+            // console.error('consumerOptions.error', consumerOptions.error);
+            throw new Error('consumerOptions is null or .error above');
+          }
+
+          console.log('consumerOptions: ', consumerOptions);
+
+          const newConsumer = await consumerTransport.consume(consumerOptions);
+          // const newConsumer = await consumerTransport.consume({
+          //   id: params.id,
+          //   producerId: params.producerId,
+          //   kind: params.kind,
+          //   rtpParameters: params.rtpParameters,
+          // });
+
+          setConsumer(newConsumer);
+
+          console.log('consumer: ', newConsumer);
+
+          const { track } = newConsumer;
+
+          const producerTrack = new MediaStream([
+            track /*  as unknown as MediaStreamTrack */,
+          ]);
+          producerTrack.getTracks()[0];
+          console.log('producerTrack: ', producerTrack);
+          console.log('producerTrack.getTracks()[0]: ', producerTrack.getTracks()[0]);
+
+          // dispatchUserState({ type: 'SET_US_MEDIA_STREAM', payload: producerTrack });
+          setMediaStream(producerTrack);
+          this.getSocket().emit('consumer_resume');
+        } catch (error) {
+          console.error('consume error: ', error);
         }
-
-        console.log('params: ', params);
-
-        const newConsumer = await consumerTransport.consume({
-          id: params.id,
-          producerId: params.producerId,
-          kind: params.kind,
-          rtpParameters: params.rtpParameters,
-        });
-
-        setConsumer(newConsumer);
-
-        console.log('consumer: ', newConsumer);
-
-        const { track } = newConsumer;
-
-        const producerTrack = new MediaStream([track as unknown as MediaStreamTrack]);
-        producerTrack.getTracks()[0];
-        console.log('producerTrack: ', producerTrack);
-
-        // dispatchUserState({ type: 'SET_US_MEDIA_STREAM', payload: producerTrack });
-        setMediaStream(producerTrack)
-        this.getSocket().emit('consumer_resume');
       },
     );
 
@@ -209,8 +238,8 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
   };
 
   producerClosedListener = (
-    consumerTransport: mediasoupTypes.Transport<mediasoupTypes.AppData>,
-    consumer: mediasoupTypes.Consumer,
+    consumerTransport: Transport<AppData>,
+    consumer: Consumer,
   ) => {
     this.getSocket().on('producer_closed', () => {
       // Server notified when producer is closed

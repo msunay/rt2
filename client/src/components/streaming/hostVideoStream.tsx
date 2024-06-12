@@ -267,7 +267,7 @@ const useMediasoupSocketManager = () => {
     if (!mediaStream) throw new Error('No media stream');
     setMediaStream(mediaStream);
     const track = mediaStream.getVideoTracks()[0];
-
+console.log('track: ', track)
     setParams(prevParams => {
       return {
         ...prevParams,

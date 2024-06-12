@@ -7,9 +7,11 @@ export default function UserStreamPage() {
   // Get participation id from route slug.
   const { partId } = useLocalSearchParams<{ partId: string }>();
   return (
-    <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
-      {partId && <UserStream partId={partId} />}
-    </ImageBackground>
+    <>
+      {/* <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}> */}
+        {partId && <UserStream partId={partId} />}
+      {/* </ImageBackground> */}
+    </>
   );
 }
 
