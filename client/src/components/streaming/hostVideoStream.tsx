@@ -6,7 +6,6 @@ import {
   hostVideoStreamStateReducer,
 } from '@/reducers/hostVideoStreamStateReducer';
 import { PeersHostSocketManager } from '@/services/peersSocketManager';
-// import { peersSocketService } from '@/services/peersSocketService';
 import { QuizHostSocketManager } from '@/services/quizHostSocketManager';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
@@ -20,8 +19,12 @@ import {
   useState,
 } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
-import type { MediaStream } from 'react-native-webrtc';
+import {
+  type MediaStream,
+  RTCView,
+  mediaDevices,
+  registerGlobals,
+} from 'react-native-webrtc';
 import HostQuestion from '../question/hostQuestion';
 import SpeedDialComponent from './speedDial';
 
@@ -267,7 +270,7 @@ const useMediasoupSocketManager = () => {
     if (!mediaStream) throw new Error('No media stream');
     setMediaStream(mediaStream);
     const track = mediaStream.getVideoTracks()[0];
-console.log('track: ', track)
+    console.log('track: ', track);
     setParams(prevParams => {
       return {
         ...prevParams,

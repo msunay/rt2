@@ -295,33 +295,33 @@ const styles = StyleSheet.create({
 });
 
 const useQuizSocketManager = (
-  socketManager: QuizPlayerSocketManager | null,
+  quizSocketManager: QuizPlayerSocketManager | null,
   dispatch: Dispatch<UserStreamStateAction>,
-  setSocketManager: Dispatch<SetStateAction<QuizPlayerSocketManager | null>>,
+  setQuizSocketManager: Dispatch<SetStateAction<QuizPlayerSocketManager | null>>,
   quizId: string | undefined,
 ) => {
   useEffect(() => {
-    if (!socketManager) {
-      setSocketManager(new QuizPlayerSocketManager(dispatch));
+    if (!quizSocketManager) {
+      setQuizSocketManager(new QuizPlayerSocketManager(dispatch));
     }
 
-    if (socketManager && quizId) {
-      socketManager.successListener(quizId);
-      socketManager.playerWinnersListener();
-      socketManager.startQuizListener();
-      socketManager.startTimerListener();
-      socketManager.revealListener();
+    if (quizSocketManager && quizId) {
+      quizSocketManager.successListener(quizId);
+      quizSocketManager.playerWinnersListener();
+      quizSocketManager.startQuizListener();
+      quizSocketManager.startTimerListener();
+      quizSocketManager.revealListener();
 
       return () => {
-        socketManager.successListenerOff();
-        socketManager.playerWinnersListenerOff();
-        socketManager.startQuizListenerOff();
-        socketManager.startTimerListenerOff();
-        socketManager.revealListenerOff();
-        socketManager.disconnect();
+        quizSocketManager.successListenerOff();
+        quizSocketManager.playerWinnersListenerOff();
+        quizSocketManager.startQuizListenerOff();
+        quizSocketManager.startTimerListenerOff();
+        quizSocketManager.revealListenerOff();
+        quizSocketManager.disconnect();
       };
     }
-  }, [socketManager, quizId, dispatch, setSocketManager]);
+  }, [quizSocketManager, quizId, dispatch, setQuizSocketManager]);
 };
 
 const useUserPeersSocketManager = () => {
@@ -355,6 +355,7 @@ const useUserPeersSocketManager = () => {
       };
     }
   }, [consumerTransport, consumer, mediasoupSocketManager]);
+  
   // Consume Trigger
   const goConsume = () => {
     !device ? getRtpCapabilities() : createRecvTransport();

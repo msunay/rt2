@@ -7,7 +7,12 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.214:8080/"
+        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.214:8080/",
+        "APP_VARIANT": "development"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "scheme": 
       }
     },
     "preview": {

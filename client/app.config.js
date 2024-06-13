@@ -1,43 +1,45 @@
-{
-  "expo": {
-    "name": "rt2-client",
-    "slug": "rt2",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#07102c"
+const IS_DEV = process.env.APP_VARIANT === 'development';
+
+export default {
+  expo: {
+    name: IS_DEV ? "RT2 (dev)" : "RT2",
+    slug: "rt2",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "light",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#07102c"
     },
-    "assetBundlePatterns": [
+    assetBundlePatterns: [
       "**/*"
     ],
-    "scheme": "rt2",
-    "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.msunay.rt2",
-      "config": {
-        "usesNonExemptEncryption": false
+    scheme: "rt2",
+    ios: {
+      supportsTablet: false,
+      bundleIdentifier: IS_DEV ? "com.msunay.rt2.dev" : "com.msunay.rt2",
+      config: {
+        usesNonExemptEncryption: false
       }
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#ffffff"
       },
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+      permissions: [
+        android.permission.CAMERA,
+        android.permission.RECORD_AUDIO,
+        android.permission.MODIFY_AUDIO_SETTINGS
       ],
-      "package": "com.msunay.rt2"
+      package: IS_DEV ? "com.msunay.rt2.dev" : "com.msunay.rt2"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    web: {
+      favicon: "./assets/favicon.png"
     },
-    "plugins": [
+    plugins: [
       [
         "@config-plugins/react-native-webrtc",
         {
@@ -46,9 +48,9 @@
         }
       ],
       [
-        "expo-font",
+        expo-font,
         {
-          "fonts": [
+          fonts: [
             "./assets/fonts/Nunito-Black.ttf",
             "./assets/fonts/Nunito-Regular.ttf",
             "./assets/fonts/Nunito-Light.ttf",
@@ -80,14 +82,14 @@
         }
       ]
     ],
-    "extra": {
-      "router": {
+    extra: {
+      router: {
         "origin": false
       },
-      "eas": {
-        "projectId": "c1ac51d9-87e4-427e-a2ab-01244251a217"
+      eas: {
+        projectId: "c1ac51d9-87e4-427e-a2ab-01244251a217"
       }
     },
-    "owner": "msunay"
+    owner: "msunay"
   }
 }
