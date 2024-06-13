@@ -12,11 +12,19 @@
       },
       "ios": {
         "buildConfiguration": "Debug",
-        "scheme": 
+        "scheme": "rt2-client-dev"
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.214:8080/",
+        "APP_VARIANT": "development"
+      },
+      "ios": {
+        "buildConfiguration": "Release",
+        "scheme": "rt2-client"
+      }
     },
     "production": {}
   },
