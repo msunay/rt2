@@ -202,12 +202,6 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
           console.log('consumerOptions: ', consumerOptions);
 
           const newConsumer = await consumerTransport.consume(consumerOptions);
-          // const newConsumer = await consumerTransport.consume({
-          //   id: params.id,
-          //   producerId: params.producerId,
-          //   kind: params.kind,
-          //   rtpParameters: params.rtpParameters,
-          // });
 
           setConsumer(newConsumer);
 
