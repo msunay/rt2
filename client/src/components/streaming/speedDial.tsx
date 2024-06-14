@@ -19,10 +19,6 @@ export default function SpeedDialComponent({
   state: HostVideoStreamState;
   dispatchState: Dispatch<HostVideoStreamStateAction>;
 }) {
-  // const [state, dispatchState] = useReducer(
-  //   hostVideoStreamStateReducer,
-  //   defaultHostVideoStreamState,
-  // );
 
   return (
     <SpeedDial
