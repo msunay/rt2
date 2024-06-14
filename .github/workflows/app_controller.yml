@@ -11,16 +11,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check for changes
-        uses: silverlyra/monorepo-changes@v0.1
-        id: changes
+      - id: updated-packages
+        uses: vgpastor/monorepo-updated-packages@v1.3
+        with:
+          folder: ./
 
       - name: Build backend
-        if: fromJSON(steps.changes.outputs.changes)['server']
+        if: contains(steps.updated-packages.outputs.packages, 'server')
         run: echo "backend"
 
       - name: Build frontend
-        if: fromJSON(steps.changes.outputs.changes)['client']
+        if: contains(steps.updated-packages.outputs.packages, 'client')
         run: echo "frontend"
 
 

@@ -209,6 +209,8 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
 
           const { track } = newConsumer;
 
+          console.log('track: ', track);
+
           const producerTrack = new MediaStream([
             track /*  as unknown as MediaStreamTrack */,
           ]);
