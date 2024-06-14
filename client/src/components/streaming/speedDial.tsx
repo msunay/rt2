@@ -19,7 +19,6 @@ export default function SpeedDialComponent({
   state: HostVideoStreamState;
   dispatchState: Dispatch<HostVideoStreamStateAction>;
 }) {
-
   return (
     <SpeedDial
       style={{ position: 'absolute' }}
