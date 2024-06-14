@@ -14,7 +14,10 @@ jobs:
       - id: updated-packages
         uses: vgpastor/monorepo-updated-packages@v1.3
         with:
-          folder: ./
+          folder: ../../
+
+      - name: Print outputs
+        run: echo "${{ steps.updated-packages.projects }}"
 
       - name: Print outputs
         run: echo "${{ steps.updated-packages.outputs.packages }}"
