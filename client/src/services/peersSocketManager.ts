@@ -216,7 +216,6 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
           console.log('producerTrack: ', producerTrack);
           console.log('producerTrack.getTracks()[0]: ', producerTrack.getTracks()[0]);
 
-          // dispatchUserState({ type: 'SET_US_MEDIA_STREAM', payload: producerTrack });
           setMediaStream(producerTrack);
           this.getSocket().emit('consumer_resume');
         } catch (error) {

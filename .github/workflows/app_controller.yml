@@ -16,11 +16,11 @@ jobs:
         id: changes
 
       - name: Build backend
-        if: fromJSON(steps.changes.outputs.changes)['packages/backend']
+        if: fromJSON(steps.changes.outputs.changes)['server']
         run: echo "backend"
 
       - name: Build frontend
-        if: fromJSON(steps.changes.outputs.changes)['packages/frontend']
+        if: fromJSON(steps.changes.outputs.changes)['client']
         run: echo "frontend"
 
 
