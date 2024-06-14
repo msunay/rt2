@@ -1,0 +1,26 @@
+name: App Controller
+
+on:
+  push:
+    branches: ['main', 'develop']
+
+jobs:
+  whats-changed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: silverlyra/monorepo-changes@v0.1
+        id: changes
+
+      - name: Build backend
+        if: fromJSON(steps.changes.outputs.changes)['packages/backend']
+        run: echo "backend"
+
+      - name: Build frontend
+        if: fromJSON(steps.changes.outputs.changes)['packages/frontend']
+        run: echo "frontend"
+
+

@@ -27,6 +27,7 @@ const appReducer = combineReducers({
 const rootReducer = (state: ReturnType<typeof store.getState>, action: Action) => {
   if (action.type === RESET_ACTION_TYPE) {
     // If the reset action is dispatched, return the initial state
+
     return appReducer(undefined, action);
   }
   return appReducer(state, action);
