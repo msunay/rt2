@@ -1,0 +1,21 @@
+name: Check which services have changes
+
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  check_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Sensitive Codepaths Checker
+        uses: wickett/sensitive-codepaths@v0.0.1
+        with:
+          token: ${{ secrets.MY_GITHUB_PAT }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+
+
