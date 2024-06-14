@@ -35,6 +35,14 @@ jobs:
       - name: Print application name
         run: echo "Application ${{ matrix.application }}"
 
+      - name: Print
+        run: echo "find changes application= ${{ needs.find-changes.outputs.applications }}"
+
+      - name: Print
+        run: echo "find changes result= ${{ needs.find-changes.result }}"
+
+
+
       # - name: Build
       #   id: build
       #   uses: cloudposse/github-action-docker-build-push@1.9.0
