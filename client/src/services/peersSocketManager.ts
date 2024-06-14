@@ -193,9 +193,8 @@ export class PeersHostSocketManager extends SocketManager<'mediasoup'> {
         console.log('consumerOptions: ', consumerOptions);
         try {
           // @ts-ignore
-          if (/* consumerOptions.error ||  */ !consumerOptions) {
+          if (!consumerOptions) {
             // @ts-ignore
-            // console.error('consumerOptions.error', consumerOptions.error);
             throw new Error('consumerOptions is null or .error above');
           }
 
