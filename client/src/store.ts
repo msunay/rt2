@@ -23,7 +23,6 @@ const appReducer = combineReducers({
   quizzesSlice,
 });
 
-// export type RootState;
 // This is the wrapper reducer that checks for the reset action
 const rootReducer = (state: ReturnType<typeof store.getState>, action: Action) => {
   if (action.type === RESET_ACTION_TYPE) {
