@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "rt2-client",
+    "name": "rt2-client-dev",
     "slug": "rt2",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,7 +17,7 @@
     "scheme": "rt2",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.msunay.rt2",
+      "bundleIdentifier": "com.msunay.rt2.dev",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -32,7 +32,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "package": "com.msunay.rt2"
+      "package": "com.msunay.rt2.dev"
     },
     "web": {
       "favicon": "./assets/favicon.png"

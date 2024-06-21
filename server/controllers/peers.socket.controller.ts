@@ -20,7 +20,7 @@ let consumer: Consumer;
 const createWorker = async () => {
   const worker = await mediasoup.createWorker({
     rtcMinPort: 40000,
-    rtcMaxPort: 49000,
+    rtcMaxPort: 40000,
     logLevel: 'debug',
     logTags: [
       'info',
@@ -28,7 +28,8 @@ const createWorker = async () => {
       'dtls',
       'rtp',
       'srtp',
-      'rtcp'
+      'rtcp',
+      'message'
     ]
   });
   console.log(`worker pid: ${worker.pid}`);
@@ -38,28 +39,32 @@ const createWorker = async () => {
     setTimeout(() => process.exit(1), 2000);
   });
 
-  const announcedIp = process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP! : '127.0.0.1'
-  const ip = process.env.NODE_ENV === 'production' ? process.env.PRIVATE_IP! : '0.0.0.0'
+  const udpAnnouncedAddress = process.env.NODE_ENV === 'production' ? process.env.UDP_ANNOUNCED_ADDRESS! : '127.0.0.1'
+  const udpBindIp = process.env.NODE_ENV === 'production' ? process.env.UDP_BIND_IP! : '0.0.0.0'
+  const tcpAnnouncedAddress = process.env.NODE_ENV === 'production' ? process.env.TCP_ANNOUNCED_ADDRESS! : '127.0.0.1'
+  const tcpBindIp = process.env.NODE_ENV === 'production' ? process.env.TCP_BIND_IP! : '0.0.0.0'
 
   const webRtcServerOptions = {
     listenInfos:
       [
         {
           protocol: 'udp',
-          ip,
-          announcedIp,
-          port: 40000
+          ip: udpBindIp,
+          announcedAddress: udpAnnouncedAddress,
         },
         {
           protocol: 'tcp',
-          ip,
-          announcedIp,
-          port: 40000
+          ip: tcpBindIp,
+          announcedAddress: tcpAnnouncedAddress,
+
         }
       ]
   } as WebRtcServerOptions
 
-  const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions);
+  const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions).catch(err => {
+    console.error('Error:', err)
+    process.exit(1);
+  });
 
   worker.appData.webRtcServer = webRtcServer;
 
@@ -212,10 +217,10 @@ const peersSocketInit = async (
   peers.on('disconnect', () => {
     clients--;
     console.log('peer disconnected');
-    // consumer?.close();
-    // producer?.close();
-    // consumerTransport?.close();
-    // producerTransport?.close();
+    consumer?.close();
+    producer?.close();
+    consumerTransport?.close();
+    producerTransport?.close();
   });
 
   const getRtpCapabilities = (callback: any) => {

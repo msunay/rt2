@@ -18,7 +18,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const BASE_URL: string =
   process.env.NODE_ENV === 'production'
-    ? process.env.BACKEND_URL || ''
+    ? process.env.EXPO_PUBLIC_BACKEND_URL || ''
     : process.env.EXPO_PUBLIC_LOCAL_IP || '';
 
 export const backendApi = createApi({
