@@ -1,70 +1,48 @@
-import type { Dispatch } from 'react';
-import { WebSocketManager } from '@/src/services/webSocketManager';
 import { AppDispatch } from '@/src/store';
-import {
+import { 
   setQuizStarted,
   setQuestionHidden,
   incrementQuestionNumber,
   incrementTrigger
 } from '@/src/features/quizSlice';
-
-/**
- * Type for legacy action dispatch function
- * Used for backward compatibility with existing code
- */
-type LegacyDispatch = Dispatch<{
-  type: string;
-  payload?: any;
-}>;
+import { QuizSocketBase, LegacyDispatch } from '@/src/services/quizSocketBase';
 
 /**
  * Socket manager for quiz hosts/broadcasters
  */
-export class QuizBroadcasterManager extends WebSocketManager<'quizspace'> {
-  private dispatchAction: LegacyDispatch;
+export class QuizBroadcasterManager extends QuizSocketBase {
+  private static readonly ROLE = 'Broadcaster';
   
-  /**
-   * Creates a new quiz broadcaster socket manager
-   * @param dispatchAction Dispatch function for actions
-   */
-  constructor(dispatchAction: LegacyDispatch) {
-    super('quizspace');
-    this.dispatchAction = dispatchAction;
-  }
-
   /**
    * Sets up connection success listener and automatically joins the specified room
    * @param quizId Quiz ID to join
    */
   public setupConnectionListeners(quizId: string): void {
-    this.addListener('connection_success', ({ socketId }) => {
-      console.log('Quiz broadcaster socket connected:', socketId);
-      this.getSocket().emit('join_room', { roomId: quizId });
-      console.log('Broadcaster socket ID:', this.getSocket().id);
-    }, 'Broadcaster connection');
+    super.setupConnectionListeners(quizId, QuizBroadcasterManager.ROLE);
   }
 
   /**
    * Removes connection success listener
    */
   public removeConnectionListeners(): void {
-    this.removeListener('connection_success', null, 'Broadcaster connection');
+    super.removeConnectionListeners(QuizBroadcasterManager.ROLE);
   }
 
   /**
    * Sets up question timer listener
    */
   public setupQuestionTimerListener(): void {
-    this.addListener('start_question_timer', () => {
-      this.dispatchAction({ type: 'SET_HVS_Q_HIDDEN', payload: false });
-    }, 'Broadcaster question timer');
+    super.setupQuestionTimerListener(
+      () => this.dispatchAction({ type: 'SET_HVS_Q_HIDDEN', payload: false }),
+      QuizBroadcasterManager.ROLE
+    );
   }
 
   /**
    * Removes question timer listener
    */
   public removeQuestionTimerListener(): void {
-    this.removeListener('start_question_timer', null, 'Broadcaster question timer');
+    super.removeQuestionTimerListener(QuizBroadcasterManager.ROLE);
   }
 
   /**
@@ -75,14 +53,14 @@ export class QuizBroadcasterManager extends WebSocketManager<'quizspace'> {
       setTimeout(() => {
         this.dispatchAction({ type: 'SET_HVS_Q_HIDDEN', payload: true });
       }, 2000);
-    }, 'Broadcaster answer reveal');
+    }, `${QuizBroadcasterManager.ROLE} answer reveal`);
   }
 
   /**
    * Removes answer reveal listener
    */
   public removeAnswerRevealListener(): void {
-    this.removeListener('reveal_answers_host', null, 'Broadcaster answer reveal');
+    this.removeListener('reveal_answers_host', null, `${QuizBroadcasterManager.ROLE} answer reveal`);
   }
 
   /**
@@ -90,16 +68,16 @@ export class QuizBroadcasterManager extends WebSocketManager<'quizspace'> {
    */
   public setupWinnersListener(): void {
     this.addListener('host_winners', () => {
-      console.log('Broadcaster winners received');
+      console.log(`${QuizBroadcasterManager.ROLE} winners received`);
       this.dispatchAction({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-    }, 'Broadcaster winners');
+    }, `${QuizBroadcasterManager.ROLE} winners`);
   }
 
   /**
    * Removes winners display listener
    */
   public removeWinnersListener(): void {
-    this.removeListener('host_winners', null, 'Broadcaster winners');
+    this.removeListener('host_winners', null, `${QuizBroadcasterManager.ROLE} winners`);
   }
 
   /**
@@ -154,24 +132,10 @@ export class QuizBroadcasterManager extends WebSocketManager<'quizspace'> {
    */
   public static withReduxDispatch(dispatch: AppDispatch): QuizBroadcasterManager {
     // Create an adapter that translates legacy actions to Redux actions
-    const dispatchAdapter: LegacyDispatch = (action) => {
-      switch (action.type) {
-        case 'SET_HVS_QUIZ_STARTED':
-          dispatch(setQuizStarted(action.payload));
-          break;
-        case 'SET_HVS_Q_HIDDEN':
-          dispatch(setQuestionHidden(action.payload));
-          break;
-        case 'INCREMENT_HVS_CURRENT_Q_NUM':
-          dispatch(incrementQuestionNumber());
-          break;
-        case 'INCREMENT_HVS_TRIGGER':
-          dispatch(incrementTrigger());
-          break;
-        default:
-          console.warn('Unknown action type in QuizBroadcasterManager:', action.type);
-      }
-    };
+    const dispatchAdapter: LegacyDispatch = QuizSocketBase.createReduxAdapter(
+      dispatch,
+      QuizSocketBase.standardReduxActionMap
+    );
 
     return new QuizBroadcasterManager(dispatchAdapter);
   }
