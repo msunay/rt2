@@ -10,9 +10,9 @@ import type {
 } from 'mediasoup-client/lib/types';
 import { MediaStream, MediaStreamTrack } from 'react-native-webrtc';
 import { WebSocketManager } from '@/src/services/webSocketManager';
-import { 
-  setConsumerTransport, 
-  setConsumer, 
+import {
+  setConsumerTransport,
+  setConsumer,
   setMediaStream,
 } from '@/src/features/mediaStreamSlice';
 import { AppDispatch } from '@/src/store';
@@ -27,9 +27,9 @@ interface ProducerParameters {
 }
 
 /**
- * Callback type for producer
+ * Callback type for producer creation success
  */
-type ProducerCallback = ({ id }: { id: string }) => void;
+type ProducerSuccessCallback = ({ id }: { id: string }) => void;
 
 /**
  * Socket manager for streaming host
@@ -92,15 +92,18 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
   public createRoom(
     createDevice: (rtpCapabilities: RtpCapabilities) => Promise<void>
   ): void {
+    // Handler for RTP capabilities response
+    const handleRtpCapabilities = ({ rtpCapabilities }: { rtpCapabilities: RtpCapabilities }) => {
+      this.log('Router RTP Capabilities received');
+      createDevice(rtpCapabilities).catch(err => {
+        this.log(`Error creating device: ${err.message}`, 'error');
+      });
+    };
+
     this.emitWithErrorHandling(
       'create_room',
       {},
-      ({ rtpCapabilities }: { rtpCapabilities: RtpCapabilities }) => {
-        this.log('Router RTP Capabilities received');
-        createDevice(rtpCapabilities).catch(err => {
-          this.log(`Error creating device: ${err.message}`, 'error');
-        });
-      }
+      handleRtpCapabilities
     );
   }
 
@@ -115,55 +118,53 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
     device: mediasoupClient.Device,
     connectSendTransport: (producerTransport: Transport<AppData>) => Promise<void>
   ): void {
-    this.emitWithErrorHandling(
-      'createWebRtcTransport',
-      { sender: true },
-      ({ transportOptions }) => {
+    // Define a named handler for the transport options callback
+    const handleProducerTransportOptions = ({ transportOptions }: { transportOptions: any }) => {
         if (!transportOptions) {
           const error = new Error('Transport options are null');
           this.log(error.message, 'error');
           throw error;
         }
-        
+
         this.log('Producer transport options received');
-        
+
         try {
           const newProducerTransport = device.createSendTransport(transportOptions);
           setProducerTransport(newProducerTransport);
-          
+
           this.log(`Created send transport: ${newProducerTransport.id}`);
-          
+
           // Handle transport connect event
           newProducerTransport.on(
             'connect',
             async (
               { dtlsParameters }: { dtlsParameters: DtlsParameters },
-              callback: () => void,
-              errback: (error: Error) => void
+              onTransportConnectSuccess: () => void,
+              onTransportConnectError: (error: Error) => void
             ) => {
               try {
                 // Signal local DTLS parameters to the server side transport
                 this.emitWithErrorHandling('transport_connect', {
                   dtlsParameters,
                 });
-                callback();
+                onTransportConnectSuccess();
               } catch (error) {
                 this.log(`Error in transport connect event: ${(error as Error).message}`, 'error');
-                errback(error as Error);
+                onTransportConnectError(error as Error);
               }
             }
           );
-          
+
           // Handle transport produce event
           newProducerTransport.on(
             'produce',
             async (
               parameters: ProducerParameters,
-              callback: ProducerCallback,
-              errback: (error: Error) => void
+              onProducerSuccess: ProducerSuccessCallback,
+              onProducerError: (error: Error) => void
             ) => {
               this.log(`Producer parameters received: ${parameters.kind}`);
-              
+
               try {
                 this.emitWithErrorHandling(
                   'transport_produce',
@@ -173,16 +174,16 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
                     appData: parameters.appData,
                   },
                   ({ id }) => {
-                    callback({ id });
+                    onProducerSuccess({ id });
                   }
                 );
               } catch (err) {
                 this.log(`Error in transport produce event: ${(err as Error).message}`, 'error');
-                errback(err as Error);
+                onProducerError(err as Error);
               }
             }
           );
-          
+
           // Connect the transport
           connectSendTransport(newProducerTransport).catch(err => {
             this.log(`Error connecting send transport: ${err.message}`, 'error');
@@ -191,7 +192,14 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
           this.log(`Error creating send transport: ${(err as Error).message}`, 'error');
           throw err;
         }
-      }
+      };
+
+      // Use the named handler
+      this.emitWithErrorHandling(
+        'createWebRtcTransport',
+        { sender: true },
+        handleProducerTransportOptions
+      )
     );
   }
 
@@ -209,41 +217,43 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
       device: mediasoupClient.Device
     ) => Promise<void>
   ): void {
-    this.emitWithErrorHandling(
-      'createWebRtcTransport',
-      { sender: false },
-      ({ transportOptions }) => {
+    // Define a named handler for the consumer transport options
+    const handleConsumerTransportOptions = ({ transportOptions }: { transportOptions: any }) => {
         if (!transportOptions) {
           const error = new Error('Transport options are null');
           this.log(error.message, 'error');
           throw error;
         }
-        
+
         this.log('Consumer transport options received');
-        
+
         try {
           const newConsumerTransport = device.createRecvTransport(transportOptions);
           setConsumerTransportCb(newConsumerTransport);
-          
+
           this.log(`Created receive transport: ${newConsumerTransport.id}`);
-          
+
           // Handle transport connect event
           newConsumerTransport.on(
             'connect',
-            async ({ dtlsParameters }, callback, errback) => {
+            async (
+              { dtlsParameters },
+              onConsumerConnectSuccess,
+              onConsumerConnectError
+            ) => {
               try {
                 // Signal local DTLS parameters to the server side transport
                 this.emitWithErrorHandling('transport_recv_connect', {
                   dtlsParameters,
                 });
-                callback();
+                onConsumerConnectSuccess();
               } catch (error) {
                 this.log(`Error in transport connect event: ${(error as Error).message}`, 'error');
-                errback(error as Error);
+                onConsumerConnectError(error as Error);
               }
             }
           );
-          
+
           // Connect the transport
           connectRecvTransport(newConsumerTransport, device).catch(err => {
             this.log(`Error connecting receive transport: ${err.message}`, 'error');
@@ -252,7 +262,14 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
           this.log(`Error creating receive transport: ${(err as Error).message}`, 'error');
           throw err;
         }
-      }
+      };
+
+      // Use the named handler
+      this.emitWithErrorHandling(
+        'createWebRtcTransport',
+        { sender: false },
+        handleConsumerTransportOptions
+      )
     );
   }
 
@@ -270,42 +287,47 @@ export class MediaStreamBroadcaster extends WebSocketManager<'mediasoup'> {
     setConsumerCb: (consumer: Consumer<AppData>) => void,
     setMediaStreamCb: (mediaStream: MediaStream) => void
   ): { consumerTransport: Transport<AppData> } {
-    this.emitWithErrorHandling(
-      'consume',
-      { rtpCapabilities: device.rtpCapabilities },
-      async ({ consumerOptions }) => {
+    // Define handler for consumer options
+    const handleConsumerOptions = async ({ consumerOptions }: { consumerOptions: any }) => {
         if (!consumerOptions) {
           const error = new Error('Consumer options are null');
           this.log(error.message, 'error');
           throw error;
         }
-        
+
         this.log('Consumer options received');
-        
+
         try {
           const newConsumer = await consumerTransport.consume(consumerOptions);
           setConsumerCb(newConsumer);
-          
+
           this.log(`Created consumer: ${newConsumer.id}`);
-          
+
           const { track } = newConsumer;
           this.log(`Consumer track received: ${track.kind}`);
-          
+
           // Create a MediaStream with the track from the consumer
           // Use proper type casting instead of @ts-expect-error
           const mediaTrack = track as unknown as MediaStreamTrack;
           const producerTrack = new MediaStream([mediaTrack]);
-          
+
           this.log(`Media stream created with ${producerTrack.getTracks().length} tracks`);
-          
+
           setMediaStreamCb(producerTrack);
           this.emitWithErrorHandling('consumer_resume', {});
         } catch (error) {
           this.log(`Error consuming: ${(error as Error).message}`, 'error');
         }
-      }
+      };
+
+      // Use the named handler
+      this.emitWithErrorHandling(
+        'consume',
+        { rtpCapabilities: device.rtpCapabilities },
+        handleConsumerOptions
+      )
     );
-    
+
     return { consumerTransport };
   }
 
