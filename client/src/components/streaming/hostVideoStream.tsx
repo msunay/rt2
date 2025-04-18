@@ -1,108 +1,337 @@
 import { incrementQuestionNumber } from '@/features/questionSlice';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import {
-  type HostVideoStreamStateAction,
+  HostVideoStreamState,
+  HostVideoStreamStateAction,
   defaultHostVideoStreamState,
   hostVideoStreamStateReducer,
 } from '@/reducers/hostVideoStreamStateReducer';
-import { PeersHostSocketManager } from '@/services/peersSocketManager';
-import { QuizHostSocketManager } from '@/services/quizHostSocketManager';
+import { QuizBroadcasterManager } from '@/services/quizBroadcasterManager';
+import { MediaStreamBroadcaster } from '@/services/mediaStreamBroadcaster';
 import { router } from 'expo-router';
 import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
-import {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  type MediaStream,
-  RTCView,
-  mediaDevices,
-  registerGlobals,
-} from 'react-native-webrtc';
+import { useEffect, useReducer, useRef, useCallback, useMemo } from 'react';
+import { Pressable, StyleSheet, Text, View, Alert } from 'react-native';
+import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
+import type { MediaStream } from 'react-native-webrtc';
 import HostQuestion from '../question/hostQuestion';
-import SpeedDialComponent from './speedDial';
 
+// Media stream configuration
+const MEDIA_CONSTRAINTS: MediaStreamConstraints = {
+  audio: true,
+  video: {
+    facingMode: 'user',
+    width: {
+      min: 640,
+      max: 1920,
+    },
+    height: {
+      min: 400,
+      max: 1080,
+    },
+  },
+};
+
+// Question timer duration
+export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
+
+// Default encoding parameters for video streaming
+const DEFAULT_ENCODING_PARAMS: mediasoupClient.types.AppData = {
+  encodings: [
+    {
+      rid: 'r0',
+      maxBitrate: 100000,
+      scalabilityMode: 'S1T3',
+    },
+    {
+      rid: 'r1',
+      maxBitrate: 300000,
+      scalabilityMode: 'S1T3',
+    },
+    {
+      rid: 'r2',
+      maxBitrate: 900000,
+      scalabilityMode: 'S1T3',
+    },
+  ],
+  codecOptions: {
+    videoGoogleStartBitrate: 1000,
+  },
+};
+
+/**
+ * Custom hook for mediasoup WebRTC functionality
+ */
+function useMediasoup(
+  state: HostVideoStreamState,
+  dispatchState: React.Dispatch<HostVideoStreamStateAction>,
+  streamSocketManager: MediaStreamBroadcaster
+) {
+  // Device and transport refs to persist across renders
+  const deviceRef = useRef<mediasoupTypes.Device>();
+  const producerTransportRef = useRef<mediasoupTypes.Transport>();
+  const producerRef = useRef<mediasoupTypes.Producer>();
+  const paramsRef = useRef<mediasoupClient.types.AppData>(DEFAULT_ENCODING_PARAMS);
+  
+  /**
+   * Gets local user media stream
+   */
+  const getLocalStream = useCallback(async () => {
+    try {
+      if (!state.mediaStream) {
+        const stream = await mediaDevices.getUserMedia(MEDIA_CONSTRAINTS);
+        streamSuccess(stream);
+      }
+    } catch (err) {
+      console.error('Failed to get media stream:', err);
+      Alert.alert('Camera Error', 'Unable to access camera and microphone.');
+    }
+  }, [state.mediaStream]);
+
+  /**
+   * Handles successful stream acquisition
+   */
+  const streamSuccess = useCallback((mediaStream: MediaStream) => {
+    dispatchState({ type: 'SET_HVS_MEDIA_STREAM', payload: mediaStream });
+    
+    const track = mediaStream.getVideoTracks()[0];
+    paramsRef.current = {
+      track,
+      ...paramsRef.current,
+    };
+  }, [dispatchState]);
+
+  /**
+   * Start connection process
+   */
+  const connect = useCallback(() => {
+    if (!deviceRef.current) {
+      getRtpCapabilities();
+    } else {
+      createSendTransport();
+    }
+  }, []);
+
+  /**
+   * Get RTP capabilities from server
+   */
+  const getRtpCapabilities = useCallback(() => {
+    streamSocketManager.createRoom(createDevice);
+  }, [streamSocketManager]);
+
+  /**
+   * Create mediasoup device with router capabilities
+   */
+  const createDevice = useCallback(async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
+    try {
+      const device = new mediasoupClient.Device();
+      await device.load({
+        routerRtpCapabilities: rtpCapabilities,
+      });
+      
+      console.log('Device RTP Capabilities', device.rtpCapabilities);
+      deviceRef.current = device;
+      createSendTransport();
+    } catch (err) {
+      console.error('Failed to create device:', err);
+      const error = err as Error;
+      if (error.name === 'UnsupportedError') {
+        Alert.alert('Error', 'Browser not supported for WebRTC.');
+      }
+    }
+  }, []);
+
+  /**
+   * Create transport for sending media
+   */
+  const createSendTransport = useCallback(() => {
+    if (!deviceRef.current) {
+      console.error('Device not initialized');
+      return;
+    }
+    
+    streamSocketManager.createProducerTransport(
+      (transport) => {
+        producerTransportRef.current = transport as mediasoupTypes.Transport;
+        return connectSendTransport(transport as mediasoupTypes.Transport);
+      },
+      deviceRef.current,
+      connectSendTransport
+    );
+  }, [streamSocketManager]);
+
+  /**
+   * Connect the send transport
+   */
+  const connectSendTransport = useCallback(async (producerTransport: mediasoupTypes.Transport) => {
+    try {
+      if (!paramsRef.current.track) {
+        console.error('No track available to produce');
+        return;
+      }
+      
+      const producer = await producerTransport.produce(paramsRef.current);
+      producerRef.current = producer;
+
+      producer.on('trackended', () => {
+        console.log('Track ended');
+        if (state.mediaStream) {
+          state.mediaStream.getTracks().forEach(track => track.stop());
+        }
+      });
+
+      producer.on('transportclose', () => {
+        console.log('Transport ended');
+        if (state.mediaStream) {
+          state.mediaStream.getTracks().forEach(track => track.stop());
+        }
+      });
+    } catch (err) {
+      console.error('Failed to connect send transport:', err);
+      Alert.alert('Connection Error', 'Failed to establish streaming connection.');
+    }
+  }, [state.mediaStream]);
+
+  /**
+   * End streaming and clean up resources
+   */
+  const endStream = useCallback(() => {
+    if (producerRef.current) {
+      producerRef.current.close();
+    }
+    
+    if (producerTransportRef.current) {
+      producerTransportRef.current.close();
+    }
+    
+    if (state.mediaStream) {
+      state.mediaStream.getTracks().forEach(track => track.stop());
+      dispatchState({ type: 'SET_HVS_MEDIA_STREAM', payload: undefined });
+    }
+    
+    router.navigate('/');
+  }, [state.mediaStream, dispatchState]);
+
+  return {
+    getLocalStream,
+    connect,
+    endStream
+  };
+}
+
+/**
+ * Host video streaming component
+ */
 export default function HostVideoStream({ quizId }: { quizId: string }) {
-  // Register Globals for Mediasoup
+  // Register WebRTC globals for Mediasoup
   registerGlobals();
 
+  // Redux state and dispatch
   const dispatch = useAppDispatch();
-
   const currentQuestionNumber = useAppSelector(state => state.questionSlice.value);
 
+  // Local component state
   const [state, dispatchState] = useReducer(
     hostVideoStreamStateReducer,
     defaultHostVideoStreamState,
   );
 
-  const [quizSocketManager, setQuizSocketManager] =
-    useState<QuizHostSocketManager | null>(null);
+  // Socket managers
+  const quizSocketManager = useMemo(() => new QuizBroadcasterManager(dispatchState), []);
+  const streamSocketManager = useMemo(() => new MediaStreamBroadcaster(), []);
 
-  const [mediasoupSocketManager, setMediasoupSocketManager] =
-    useState<PeersHostSocketManager | null>(null);
+  // Initialize mediasoup functionality
+  const { getLocalStream, connect, endStream } = useMediasoup(state, dispatchState, streamSocketManager);
 
-  const nextQBtn = useRef(null);
-  const startBtn = useRef(null);
-  // const { push } = useRouter();
+  // Set up socket listeners
+  useEffect(() => {
+    // Set up all quiz host listeners
+    quizSocketManager.setupAllListeners(quizId);
+    
+    // Set up streaming socket listeners
+    streamSocketManager.setupConnectionListener();
+    
+    // Get media permissions as soon as component mounts
+    getLocalStream().catch(err => {
+      console.error('Error getting local stream on mount:', err);
+    });
+    
+    // Cleanup function
+    return () => {
+      // Clean up socket listeners
+      quizSocketManager.removeAllListeners();
+      quizSocketManager.disconnect();
+      
+      streamSocketManager.removeConnectionListener();
+      streamSocketManager.disconnect();
+      
+      // Ensure media streams are stopped
+      if (state.mediaStream) {
+        state.mediaStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [quizId, quizSocketManager, streamSocketManager, getLocalStream, state.mediaStream]);
 
-  useQuizSocketManager(quizSocketManager, dispatchState, setQuizSocketManager, quizId);
-
-  const { endStream, getLocalStream, stream, mediaStream } = useMediasoupSocketManager();
-
-  function startQuiz() {
+  /**
+   * Start the quiz
+   */
+  const startQuiz = useCallback(() => {
     dispatchState({ type: 'SET_HVS_QUIZ_STARTED', payload: true });
-
-    if (quizSocketManager) quizSocketManager.emitHostStartQuiz(quizId);
-    else console.error('Socket Manager not initialized');
-
+    quizSocketManager.startQuiz(quizId);
     dispatch(incrementQuestionNumber());
-  }
+  }, [dispatch, quizId, quizSocketManager]);
 
-  function nextQuestion() {
+  /**
+   * Proceed to next question
+   */
+  const nextQuestion = useCallback(() => {
     dispatch(incrementQuestionNumber());
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-
-    if (quizSocketManager) quizSocketManager.emitNextQ(quizId);
-    else console.error('Socket Manager not initialized');
-
+    quizSocketManager.nextQuestion(quizId);
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
-  }
+    
+    // Optional: Add timer for auto-progression if needed
+    // if (currentQuestionNumber < 9) {
+    //   setTimeout(() => {
+    //     // Auto-progress logic
+    //   }, QUESTION_TIME + 2000);
+    // }
+  }, [dispatch, currentQuestionNumber, quizId, quizSocketManager]);
 
-  function handleWinners() {
-    console.log('HANDLE WINNERS TRIGGER');
-    if (quizSocketManager) quizSocketManager.emitShowWinners(quizId);
-    else console.error('Socket Manager not initialized');
-  }
+  /**
+   * Show winners screen
+   */
+  const handleWinners = useCallback(() => {
+    console.log('Showing winners');
+    quizSocketManager.showWinners(quizId);
+  }, [quizId, quizSocketManager]);
 
-  const pressableStyle = ({ pressed }: { pressed: boolean }) => {
+  /**
+   * Button style with pressed state
+   */
+  const pressableStyle = useCallback(({ pressed }: { pressed: boolean }) => {
     return pressed
       ? {
-          ...styles.next_q_btn,
+          ...styles.actionButton,
           backgroundColor: '#ffb296',
         }
       : {
-          ...styles.next_q_btn,
+          ...styles.actionButton,
           backgroundColor: '#FF7F50',
         };
-  };
+  }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <RTCView
-        streamURL={mediaStream?.toURL()}
-        mirror={state.frontFacing}
-        objectFit='cover'
-        style={{ position: 'absolute', height: '100%', width: '100%' }}
-      />
-      <View style={styles.unit}>
-        <View style={styles.video_container}>
-          <View style={styles.question_component_container}>
+    <RTCView
+      streamURL={state.mediaStream?.toURL()}
+      mirror={true}
+      objectFit='cover'
+      style={styles.rtcView}
+    >
+      <View style={styles.container}>
+        <View style={styles.videoContainer}>
+          <View style={styles.questionComponentContainer}>
             {state.quizStarted && (
               <HostQuestion
                 quizId={quizId}
@@ -113,10 +342,10 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
           </View>
         </View>
 
-        <View style={styles.btn_holder}>
-          <View style={styles.quiz_controls}>
+        <View style={styles.buttonContainer}>
+          <View style={styles.quizControls}>
             {state.quizStarted ? (
-              currentQuestionNumber > 10 ? null : currentQuestionNumber === 10 ? (
+              currentQuestionNumber === 10 ? (
                 <Pressable
                   style={pressableStyle}
                   onPress={() => {
@@ -124,60 +353,63 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
                     dispatch(incrementQuestionNumber());
                   }}
                 >
-                  <Text style={styles.next_q_btnText}>Reveal Winners</Text>
+                  <Text style={styles.buttonText}>Reveal Winners</Text>
                 </Pressable>
               ) : (
-                <Pressable ref={nextQBtn} onPress={nextQuestion} style={pressableStyle}>
-                  <Text style={styles.next_q_btnText}>Next Question</Text>
+                <Pressable onPress={nextQuestion} style={pressableStyle}>
+                  <Text style={styles.buttonText}>Next Question</Text>
                 </Pressable>
               )
             ) : (
-              <Pressable ref={startBtn} style={pressableStyle} onPress={startQuiz}>
-                <Text style={styles.next_q_btnText}>Start Quiz</Text>
+              <Pressable style={pressableStyle} onPress={startQuiz}>
+                <Text style={styles.buttonText}>Start Quiz</Text>
               </Pressable>
             )}
           </View>
+          
+          <View style={styles.streamControls}>
+            <Pressable style={pressableStyle} onPress={getLocalStream}>
+              <Text style={styles.buttonText}>Start Video</Text>
+            </Pressable>
+            <Pressable style={pressableStyle} onPress={connect}>
+              <Text style={styles.buttonText}>Stream</Text>
+            </Pressable>
+            <Pressable style={pressableStyle} onPress={endStream}>
+              <Text style={styles.buttonText}>End Stream</Text>
+            </Pressable>
+          </View>
         </View>
-        <SpeedDialComponent
-          state={state}
-          dispatchState={dispatchState}
-          getLocalStream={getLocalStream}
-          stream={stream}
-          endStream={endStream}
-        />
       </View>
-    </View>
+    </RTCView>
   );
 }
 
 const styles = StyleSheet.create({
-  unit: {
+  rtcView: {
     flex: 1,
-    // borderWidth: 1,
+  },
+  container: {
+    flex: 1,
     justifyContent: 'flex-end',
   },
-  close_btn: {},
-  count_down: {},
-  video_container: {},
-  video: {},
-  question_component_container: {
+  videoContainer: {
+    flex: 1,
+  },
+  questionComponentContainer: {
     height: 170,
   },
-  btn_join: {},
-  btn_holder: {
+  buttonContainer: {
     alignSelf: 'center',
+    marginBottom: 20,
   },
-  quiz_controls: {
-    // flex: 1,
-    // height: 85,
-    // width: '100%',
-    // justifyContent: 'space-around',
-    // alignItems: 'center',
-    // alignContent: 'flex-end',
-    // box-sizing: border-box,
-    // padding: 15px 20px,
+  quizControls: {
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  next_q_btn: {
+  streamControls: {
+    alignItems: 'center',
+  },
+  actionButton: {
     justifyContent: 'center',
     alignItems: 'center',
     height: 50,
@@ -185,220 +417,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
-  next_q_btnText: {
+  buttonText: {
     fontFamily: 'Nunito-Bold',
+    fontSize: 16,
   },
-  stream_btns: {},
 });
-
-const useQuizSocketManager = (
-  socketManager: QuizHostSocketManager | null,
-  dispatch: Dispatch<HostVideoStreamStateAction>,
-  setSocketManager: Dispatch<SetStateAction<QuizHostSocketManager | null>>,
-  quizId: string,
-) => {
-  useEffect(() => {
-    if (!socketManager) {
-      setSocketManager(new QuizHostSocketManager(dispatch));
-    }
-
-    if (socketManager) {
-      socketManager.successListener(quizId);
-      socketManager.startTimerListener();
-      socketManager.revealAnswerHostListener();
-      socketManager.hostWinnersListener();
-
-      return () => {
-        socketManager.successListenerOff();
-        socketManager.startTimerListenerOff();
-        socketManager.revealAnswerHostListenerOff();
-        socketManager.hostWinnersListenerOff();
-        socketManager.disconnect();
-      };
-    }
-  }, [socketManager, quizId, dispatch, setSocketManager]);
-};
-
-const useMediasoupSocketManager = () => {
-  const [device, setDevice] = useState<mediasoupTypes.Device | null>(null);
-  const [producerTransport, setProducerTransport] =
-    useState<mediasoupClient.types.Transport | null>(null);
-  const [producer, setProducer] = useState<mediasoupTypes.Producer | null>(null);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
-  const [frontFacing, setFrontFacing] = useState<boolean>(true);
-  const [socketManager, setSocketManager] = useState<PeersHostSocketManager | null>(null);
-  const [params, setParams] = useState<mediasoupClient.types.AppData>({
-    encodings: [
-      {
-        rid: 'r0',
-        maxBitrate: 100000,
-        scalabilityMode: 'S1T3',
-      },
-      {
-        rid: 'r1',
-        maxBitrate: 300000,
-        scalabilityMode: 'S1T3',
-      },
-      {
-        rid: 'r2',
-        maxBitrate: 900000,
-        scalabilityMode: 'S1T3',
-      },
-    ],
-    codecOptions: {
-      videoGoogleStartBitrate: 1000,
-    },
-  });
-
-  useEffect(() => {
-    if (!socketManager) {
-      const manager = new PeersHostSocketManager();
-      setSocketManager(manager);
-      manager.successListener();
-
-      return () => {
-        manager.successListenerOff();
-      };
-    }
-  }, [socketManager]);
-
-  const stream = () => {
-    goConnect();
-  };
-
-  const streamSuccess = (mediaStream: MediaStream) => {
-    if (!mediaStream) throw new Error('No media stream');
-    setMediaStream(mediaStream);
-    const track = mediaStream.getVideoTracks()[0];
-    console.log('track: ', track);
-    setParams(prevParams => {
-      return {
-        ...prevParams,
-        track,
-      };
-    });
-  };
-
-  const getLocalStream = async () => {
-    const constraints: MediaStreamConstraints = {
-      audio: true,
-      video: {
-        facingMode: frontFacing ? 'user' : 'environment',
-        width: {
-          min: 1280,
-          max: 1920,
-        },
-        height: {
-          min: 720,
-          max: 1080,
-        },
-        frameRate: 30,
-      },
-    };
-
-    if (!mediaStream) {
-      try {
-        const stream = await mediaDevices.getUserMedia(constraints);
-        streamSuccess(stream);
-      } catch (error) {
-        console.error(error);
-        throw new Error('Cannot get local stream');
-      }
-    }
-  };
-
-  const goConnect = () => {
-    !device ? getRtpCapabilities() : createSendTransport();
-  };
-
-  const getRtpCapabilities = () => {
-    // get router rtp capabilities from server
-    if (!socketManager) throw new Error('No socket manager');
-    socketManager.emitCreateRoom(createDevice);
-    // peersSocketService.emitCreateRoom(createDevice);
-  };
-
-  const createSendTransport = (newDevice?: mediasoupClient.types.Device) => {
-    // if (!producerTransport)
-    //   throw new Error('No producer transport');
-    // if (!newDevice) throw new Error('No device');
-    // if (!device) throw new Error('No device');
-    if (!socketManager) throw new Error('No socket manager');
-    const d = newDevice ? newDevice : device;
-    if (!d) throw new Error('No device');
-    socketManager.emitcreateProducerWebRtcTransport(
-      // producerTransport,
-      setProducerTransport,
-      d,
-      // newDevice,
-      connectSendTransport,
-    );
-  };
-
-  const createDevice = async (rtpCapabilities: mediasoupTypes.RtpCapabilities) => {
-    try {
-      const newDevice = new mediasoupClient.Device();
-
-      await newDevice.load({ routerRtpCapabilities: rtpCapabilities });
-
-      console.log('Device RTP Capabilities', newDevice.rtpCapabilities);
-
-      setDevice(newDevice);
-
-      createSendTransport(newDevice);
-      // if (!device) throw new Error('No device');
-      // await device
-      //   .load({
-      //     routerRtpCapabilities: rtpCapabilities,
-      //   })
-      //   .then(() => {
-      //     createSendTransport();
-      //     console.log('Device RTP Capabilities', device.rtpCapabilities);
-      //     });
-
-      // once device loads create transport
-    } catch (err) {
-      console.error(err);
-      const error = err as Error;
-      if (error.name === 'UnsupportedError') console.warn('Browser not supported');
-    }
-  };
-
-  const connectSendTransport = async (producerTransport: mediasoupTypes.Transport) => {
-    console.log('ConnectSendTransport params: ', params);
-    console.log('ConnectSendTransport producerTransport: ', producerTransport);
-    const newProducer = await producerTransport.produce(params);
-
-    if (!newProducer) throw new Error('No producer');
-
-    newProducer.on('trackended', () => {
-      console.log('Track ended');
-      if (mediaStream) {
-        mediaStream.getTracks().map(track => track.stop());
-      }
-    });
-
-    newProducer.on('transportclose', () => {
-      console.log('transport ended');
-      if (mediaStream) {
-        mediaStream.getTracks().map(track => track.stop());
-      }
-    });
-    setProducer(newProducer);
-  };
-
-  const endStream = () => {
-    router.navigate('/');
-    if (!producer || !producerTransport) throw new Error('No producer or transport');
-    producer.close();
-    producerTransport.close();
-    // mediaStream.getTracks().forEach((track) => track.stop());
-  };
-
-  return {
-    endStream,
-    getLocalStream,
-    stream,
-    mediaStream,
-  };
-};

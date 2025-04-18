@@ -16,10 +16,7 @@ import type {
 } from '@/types/Types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const BASE_URL: string =
-  process.env.NODE_ENV === 'production'
-    ? process.env.EXPO_PUBLIC_BACKEND_URL || ''
-    : process.env.EXPO_PUBLIC_LOCAL_IP || '';
+const BASE_URL: string = process.env.EXPO_PUBLIC_SERVER_IP || '';
 
 export const backendApi = createApi({
   reducerPath: 'backendApi',

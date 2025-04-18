@@ -8,6 +8,8 @@ import quizCreationSlice from '@/features/quizCreationSlice';
 import quizzesSlice from '@/features/quizzesSlice';
 import userIdSlice from '@/features/userIdSlice';
 import userSlice from '@/features/userSlice';
+import mediaStreamSlice from '@/features/mediaStreamSlice';
+import quizSlice from '@/features/quizSlice';
 import { backendApi } from '@/services/backendApi';
 
 // Define the action type for resetting the store
@@ -21,6 +23,8 @@ const appReducer = combineReducers({
   participatingSlice,
   quizCreationSlice,
   quizzesSlice,
+  mediaStreamSlice,
+  quizSlice,
 });
 
 // This is the wrapper reducer that checks for the reset action

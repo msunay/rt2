@@ -1,12 +1,11 @@
 # syntax = docker/dockerfile:1
 
-# Adjust NODE_VERSION and ENV as desired
+# Adjust NODE_IMAGE and ENV as desired
 ARG NODE_IMAGE=20-alpine
 ARG ENV=production
 
 # Base Image
-# FROM node:${NODE_VERSION} as base
-FROM node:20-alpine as base
+FROM node:${NODE_IMAGE} as base
 
 LABEL launch_runtime="Node.js"
 WORKDIR /app
@@ -48,8 +47,8 @@ USER rt2-server
 
 COPY --from=build /app/dist .
 COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=prod-deps /app/package.json ./package.json
-COPY --from=prod-deps /app/package-lock.json ./package-lock.json
+# COPY --from=prod-deps /app/package.json ./package.json
+# COPY --from=prod-deps /app/package-lock.json ./package-lock.json
 
 # Expose the required ports || use host network, no need to expose in docker
 EXPOSE 8080

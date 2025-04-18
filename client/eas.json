@@ -7,7 +7,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.214:8080/",
+        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.159:8080/",
         "APP_VARIANT": "development",
         "EXPO_PUBLIC_BACKEND_URL": "https://rt2-server.fly.dev:8080/"
       }
@@ -15,7 +15,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.214:8080/",
+        "EXPO_PUBLIC_LOCAL_IP": "http://192.168.0.159:8080/",
         "APP_VARIANT": "development",
         "EXPO_PUBLIC_BACKEND_URL": "https://rt2-server.fly.dev:8080/"
       }

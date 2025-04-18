@@ -57,13 +57,14 @@ export default function RegistrationScreen() {
   });
 
   // Function to handle registration form submission.
-  const onRegister = (formData: UserPost) => {
-    if (register)
-      register({
-        email: formData.email,
-        username: formData.username,
-        password: formData.password,
-      }).then(res => {
+  const onRegister = async (formData: UserPost) => {
+    if (register) {
+      try {
+        const res = await register({
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        });
         // Construct a user response object from the registration response.
         const responseUser: ResponseLoginUser = {
           token: res.token, // Authentication token received upon registration.
@@ -72,20 +73,24 @@ export default function RegistrationScreen() {
         };
         dispatch(setUserId(responseUser)); // Dispatch action to store user ID and other details in Redux store.
         router.replace('/'); // Navigate to the home screen after successful registration.
-      });
+      } catch (error) {
+        // You might want to handle this error appropriately (e.g., show an error message to the user)
+        console.error('Registration failed:', error);
+      }
+    }
   };
 
   // Function to dynamically adjust Pressable component style based on press state.
   const pressableStyle = ({ pressed }: { pressed: boolean }) => {
     return pressed
       ? {
-          ...styles.loginBtn,
-          backgroundColor: '#ffb296',
-        }
+        ...styles.loginBtn,
+        backgroundColor: '#ffb296',
+      }
       : {
-          ...styles.loginBtn,
-          backgroundColor: '#FF7F50',
-        };
+        ...styles.loginBtn,
+        backgroundColor: '#FF7F50',
+      };
   };
 
   return (
