@@ -11,8 +11,8 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.msunay.rt2.nativeapp.dev",
-      "config": {
-        "usesNonExemptEncryption": false
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -82,8 +82,11 @@
     "experiments": {
       "typedRoutes": true
     },
-    "eas": {
-      "projectId": "436fe1ed-cca3-4600-8bf2-5bc99508f2a7"
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "436fe1ed-cca3-4600-8bf2-5bc99508f2a7"
+      }
     }
   }
 }
