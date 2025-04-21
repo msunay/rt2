@@ -8,7 +8,8 @@ import { addDemoQuiz } from '@/utils/demoQuiz';
 const router: Router = express.Router();
 
 //testing
-router.get('/', auth, (req, res) => {
+router.get('/', /* auth, */ (req, res) => {
+  console.log('all good');
   res.status(200).send({ message: 'all good' });
 });
 

@@ -1,26 +1,23 @@
-import express from 'express';
-import cors from 'cors';
-import router from '@/router';
-import http from 'http';
-import { Namespace, Server } from 'socket.io';
-import peersSocketInit from '@/controllers/peers.socket.controller';
-import quizSocketInit from '@/controllers/quiz.socket.controller';
-import {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/Types/PeerSocketTypes';
-import {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/Types/QuizSocketTypes';
-import { instrument } from '@socket.io/admin-ui';
+import express from "express";
+import cors from "cors";
+import router from "@/router";
+import http from "http";
+import { Namespace, Server } from "socket.io";
+import broadcastSocketInit from "@/controllers/broadcast.socket.controller";
+import quizSocketInit from "@/controllers/quiz.socket.controller";
+import type {
+  BroadcastListenEvents,
+  BroadcastEmitEvents,
+} from "@/Types/BroadcastSocketTypes";
+import type { QuizEmitEvents, QuizListenEvents } from "@/Types/QuizSocketTypes";
+import { instrument } from "@socket.io/admin-ui";
 
 const app = express();
 
 const corsOrigin =
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === "production"
     ? process.env.CORS_ORIGIN
-    : 'http://localhost:8081';
+    : "http://172.19.130.185:8081";
 
 const corsOptions = {
   // origin: '*',
@@ -44,16 +41,18 @@ export const io = new Server(server, {
   // },
 });
 
-export const peersNamespace: Namespace<PeersServerToClientEvents, PeersClientToServerEvents> =
-  io.of('/mediasoup');
+export const broadcastNamespace: Namespace<
+  BroadcastListenEvents,
+  BroadcastEmitEvents
+> = io.of("/mediasoup");
 
-export const quizNamespace: Namespace<QuizServerToClientEvents, QuizClientToServerEvents> =
-  io.of('/quizspace');
+export const quizNamespace: Namespace<QuizListenEvents, QuizEmitEvents> =
+  io.of("/quizspace");
 
-peersNamespace.on('connection', peersSocketInit);
+broadcastNamespace.on("connection", broadcastSocketInit);
 
-quizNamespace.on('connection', quizSocketInit);
+quizNamespace.on("connection", quizSocketInit);
 
-instrument(io, { auth: false, mode: 'development' })
+instrument(io, { auth: false, mode: "development" });
 
 export default app;

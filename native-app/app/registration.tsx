@@ -97,7 +97,7 @@ export default function RegistrationScreen() {
     <Pressable style={styles.background} onPress={Keyboard.dismiss}>
       <View style={styles.imageContainer}>
         <Image
-          source={require('../../assets/splash.png')}
+          source={require('../assets/splash.png')}
           contentFit='contain'
           style={styles.image}
         />

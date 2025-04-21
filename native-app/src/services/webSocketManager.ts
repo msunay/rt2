@@ -1,46 +1,8 @@
-import type {
-  PeersClientToServerEvents,
-  PeersServerToClientEvents,
-} from '@/src/types/PeerSocketTypes';
-import type {
-  QuizClientToServerEvents,
-  QuizServerToClientEvents,
-} from '@/src/types/QuizSocketTypes';
-import { type Socket, io } from 'socket.io-client';
+import { io } from "socket.io-client";
+import { NamespaceEventMap, NamespaceSocket } from "../types/NamespaceEventMap";
+import { ConnectionState } from "../types/CommonSocketTypes";
 
-const BASE_URL: string = process.env.EXPO_PUBLIC_SERVER_IP || '';
-
-/**
- * Event map for socket.io namespaces
- */
-type NamespaceEventMap = {
-  quizspace: {
-    serverToClient: QuizServerToClientEvents;
-    clientToServer: QuizClientToServerEvents;
-  };
-  mediasoup: {
-    serverToClient: PeersServerToClientEvents;
-    clientToServer: PeersClientToServerEvents;
-  };
-};  
-
-/**
- * Type for a socket with a specific namespace
- */
-type NamespaceSocket<Namespace extends keyof NamespaceEventMap> = Socket<
-  NamespaceEventMap[Namespace]['serverToClient'],
-  NamespaceEventMap[Namespace]['clientToServer']
->;
-
-/**
- * Connection state enum
- */
-export enum ConnectionState {
-  DISCONNECTED = 'disconnected',
-  CONNECTING = 'connecting',
-  CONNECTED = 'connected',
-  ERROR = 'error'
-}
+const BASE_URL: string = process.env.EXPO_PUBLIC_SERVER_IP || "";
 
 /**
  * Base socket manager class that handles connection to a namespace
@@ -64,9 +26,9 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
       reconnectionDelayMax: 5000,
       randomizationFactor: 0.5,
       timeout: 10000, // Connection timeout in ms
-      autoConnect: true
+      autoConnect: true,
     }) as NamespaceSocket<Namespace>;
-    
+
     this.setupSocketStateHandlers(namespace);
   }
 
@@ -77,52 +39,66 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    */
   private setupSocketStateHandlers(namespace: Namespace): void {
     // Connection successful
-    this.socket.on('connect', () => {
+    this.socket.on("connect", () => {
       this.connectionState = ConnectionState.CONNECTED;
       this.connectionError = null;
       this.reconnectAttempts = 0;
       this.log(`Socket connected to ${namespace} namespace`);
     });
-    
+
     // Connection error
-    this.socket.on('connect_error', (error) => {
+    this.socket.on("connect_error", (error) => {
       this.connectionState = ConnectionState.ERROR;
       this.connectionError = error;
-      this.log(`Socket connection error for ${namespace} namespace: ${error.message}`, 'error');
+      this.log(
+        `Socket connection error for ${namespace} namespace: ${error.message}`,
+        "error"
+      );
     });
-    
+
     // Disconnection
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on("disconnect", (reason) => {
       this.connectionState = ConnectionState.DISCONNECTED;
       this.log(`Socket disconnected from ${namespace} namespace: ${reason}`);
-      
+
       // Handle various disconnect reasons
-      if (reason === 'io server disconnect') {
+      if (reason === "io server disconnect") {
         // Server disconnected us, we need to manually reconnect
         this.socket.connect();
       }
       // For 'io client disconnect', the socket won't auto reconnect
     });
-    
+
     // Reconnection attempt
-    this.socket.on('reconnect_attempt', (attemptNumber) => {
+    // @ts-expect-error: this built-in event isn't in our type map
+    this.socket.on("reconnect_attempt", (attemptNumber) => {
       this.connectionState = ConnectionState.CONNECTING;
       this.reconnectAttempts = attemptNumber;
-      this.log(`Socket reconnection attempt ${attemptNumber}/${this.maxReconnectAttempts} for ${namespace} namespace`);
+      this.log(
+        `Socket reconnection attempt ${attemptNumber}/${this.maxReconnectAttempts} for ${namespace} namespace`
+      );
     });
-    
+
     // Reconnection error
-    this.socket.on('reconnect_error', (error) => {
+    // @ts-expect-error: this built-in event isn't in our type map
+    this.socket.on("reconnect_error", (error) => {
       this.connectionState = ConnectionState.ERROR;
       this.connectionError = error;
-      this.log(`Socket reconnection error for ${namespace} namespace: ${error.message}`, 'error');
+      this.log(
+        `Socket reconnection error for ${namespace} namespace: ${error.message}`,
+        "error"
+      );
     });
-    
+
     // Reconnection failed after all attempts
-    this.socket.on('reconnect_failed', () => {
+    // @ts-expect-error: this built-in event isn't in our type map
+    this.socket.on("reconnect_failed", () => {
       this.connectionState = ConnectionState.ERROR;
-      this.connectionError = new Error('Maximum reconnection attempts reached');
-      this.log(`Socket reconnection failed after ${this.maxReconnectAttempts} attempts for ${namespace} namespace`, 'error');
+      this.connectionError = new Error("Maximum reconnection attempts reached");
+      this.log(
+        `Socket reconnection failed after ${this.maxReconnectAttempts} attempts for ${namespace} namespace`,
+        "error"
+      );
     });
   }
 
@@ -156,25 +132,40 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * @param callback Event callback
    * @param logMessage Optional log message
    */
-  protected addListener<E extends keyof NamespaceEventMap[Namespace]['serverToClient']>(
+  protected addListener<
+    E extends keyof NamespaceEventMap[Namespace]["serverToClient"]
+  >(
     event: E,
-    callback: (data: NamespaceEventMap[Namespace]['serverToClient'][E] extends (data: infer T) => void ? T : never) => void,
+    callback: (
+      data: NamespaceEventMap[Namespace]["serverToClient"][E] extends (
+        data: infer T
+      ) => void
+        ? T
+        : never
+    ) => void,
     logMessage?: string
   ): void {
     if (logMessage) {
       this.log(`Setting up ${String(event)} listener: ${logMessage}`);
     }
-    
+
     try {
-      this.socket.on(event as any, (data) => {
+      this.socket.on(event as any, (data: any) => {
         try {
           callback(data);
         } catch (error) {
-          this.log(`Error in ${String(event)} callback: ${(error as Error).message}`, 'error');
+          this.log(
+            `Error in ${String(event)} callback: ${(error as Error).message}`,
+            "error"
+          );
         }
       });
     } catch (error) {
-      this.log(`Error setting up ${String(event)} listener: ${(error as Error).message}`, 'error');
+      this.log(
+        `Error setting up ${String(event)} listener: ${(error as Error).message
+        }`,
+        "error"
+      );
     }
   }
 
@@ -184,15 +175,25 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * @param callback Event callback
    * @param logMessage Optional log message
    */
-  protected removeListener<E extends keyof NamespaceEventMap[Namespace]['serverToClient']>(
+  protected removeListener<
+    E extends keyof NamespaceEventMap[Namespace]["serverToClient"]
+  >(
     event: E,
-    callback: ((data: NamespaceEventMap[Namespace]['serverToClient'][E] extends (data: infer T) => void ? T : never) => void) | null,
+    callback:
+      | ((
+        data: NamespaceEventMap[Namespace]["serverToClient"][E] extends (
+          data: infer T
+        ) => void
+          ? T
+          : never
+      ) => void)
+      | null,
     logMessage?: string
   ): void {
     if (logMessage) {
       this.log(`Removing ${String(event)} listener: ${logMessage}`);
     }
-    
+
     try {
       if (callback) {
         this.socket.off(event as any, callback);
@@ -200,7 +201,10 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
         this.socket.off(event as any);
       }
     } catch (error) {
-      this.log(`Error removing ${String(event)} listener: ${(error as Error).message}`, 'error');
+      this.log(
+        `Error removing ${String(event)} listener: ${(error as Error).message}`,
+        "error"
+      );
     }
   }
 
@@ -210,9 +214,12 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * @param data Event data
    * @param callback Callback function
    */
-  protected emitWithErrorHandling<E extends keyof NamespaceEventMap[Namespace]['clientToServer']>(
+  protected emitWithErrorHandling<
+    E extends keyof NamespaceEventMap[Namespace]["clientToServer"],
+    D extends NamespaceEventMap[Namespace]["clientToServer"][E] extends (data: infer T) => any ? T : never
+  >(
     event: E,
-    data: Parameters<NamespaceEventMap[Namespace]['clientToServer'][E]>[0],
+    data: D,
     callback?: (...args: any[]) => void
   ): void {
     try {
@@ -221,14 +228,22 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
           try {
             callback(...args);
           } catch (error) {
-            this.log(`Error in emit callback for ${String(event)}: ${(error as Error).message}`, 'error');
+            this.log(
+              `Error in emit callback for ${String(event)}: ${
+                (error as Error).message
+              }`,
+              "error"
+            );
           }
         });
       } else {
         this.socket.emit(event as any, data);
       }
     } catch (error) {
-      this.log(`Error emitting ${String(event)}: ${(error as Error).message}`, 'error');
+      this.log(
+        `Error emitting ${String(event)}: ${(error as Error).message}`,
+        "error"
+      );
     }
   }
 
@@ -245,7 +260,7 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * Disconnects the socket
    */
   public disconnect(): void {
-    this.log('Disconnecting socket...');
+    this.log("Disconnecting socket...");
     this.socket.disconnect();
   }
 
@@ -255,12 +270,15 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * @param level Log level (default: info)
    * @private
    */
-  protected log(message: string, level: 'info' | 'warn' | 'error' = 'info'): void {
+  protected log(
+    message: string,
+    level: "info" | "warn" | "error" = "info"
+  ): void {
     switch (level) {
-      case 'warn':
+      case "warn":
         console.warn(`[WebSocketManager] ${message}`);
         break;
-      case 'error':
+      case "error":
         console.error(`[WebSocketManager] ${message}`);
         break;
       default:

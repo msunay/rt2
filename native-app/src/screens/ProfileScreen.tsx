@@ -1,5 +1,5 @@
-import ProfileInfoComponent from '@/components/user/profileInfoComponent';
-import ProfileTitleComponent from '@/components/user/profileTitleComponent';
+import ProfileInfoComponent from '@/src/components/profileInfoComponent';
+import ProfileTitleComponent from '@/src/components/profileTitleComponent';
 import { StyleSheet, View } from 'react-native';
 
 export default function ProfileScreen() {

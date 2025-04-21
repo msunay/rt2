@@ -1,4 +1,4 @@
-import type { ResponseLoginUser } from '@/types/Types';
+import type { ResponseLoginUser } from '@/src/types/Types';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface userIdState {

@@ -1,7 +1,7 @@
 import models from '@/models/index';
 import moment from 'moment';
 import mocks from '@/utils/mocks';
-import { Quiz } from '@/models/associations';
+import { type Quiz } from '@/models/associations';
 /*
   The following function populates the database with 5 users (1 host and 4 players) and 4 quizzes.
   The host user will be the owner of all 4 quizzes and the players are generated without any participations.

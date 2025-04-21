@@ -1,14 +1,14 @@
 import { types as mediasoupTypes } from 'mediasoup';
-import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup/node/lib/RtpParameters';
-import { AppData, DtlsParameters, IceCandidate, IceParameters, SctpParameters } from 'mediasoup/node/lib/types';
+import type { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup/node/lib/RtpParameters';
+import type { AppData, DtlsParameters, IceCandidate, IceParameters, SctpParameters } from 'mediasoup/node/lib/types';
 
 
-export interface PeersClientToServerEvents {
+export interface BroadcastEmitEvents {
   connection_success: (Obj: connectionSuccess) => void;
   producer_closed: () => void;
 }
 
-export interface PeersServerToClientEvents {
+export interface BroadcastListenEvents {
   transport_produce: (
     transportProduce: transportProduce, callback: (id: { id: string }) => void) => void;
   getRtpCapabilities: (cb: any) => void;

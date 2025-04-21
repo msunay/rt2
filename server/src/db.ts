@@ -1,14 +1,8 @@
-import { Options, Sequelize } from 'sequelize';
+import { type Options, Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const isProd = process.env.NODE_ENV === 'production';
-
-const cloudConnection = [
-  `${process.env.DB_NAME}`,
-  `${process.env.DB_USERNAME}`,
-  `${process.env.DB_PASSWORD}`
-] as Options[];
 
 const flyConnectionString = process.env.DATABASE_URL
 
@@ -21,7 +15,7 @@ const localConnection = [
 
 const HOST = isProd ? process.env.DB_HOST : undefined;
 
-export const sequelize = new Sequelize(flyConnectionString!, {
+export const sequelize = new Sequelize(...localConnection, {
     dialect: 'postgres',
     host: HOST,
     benchmark: true,

@@ -1,7 +1,7 @@
 import models from '@/models/index';
-import { Request, Response } from 'express';
+import { type Request, type Response } from 'express';
 import { tokenGenerator } from '@/utils/token';
-import { CustomRequest } from '@/middleware/auth';
+import { type CustomRequest } from '@/middleware/auth';
 import { compareSync, hashSync } from 'bcrypt';
 
 async function addUser(req: Request, res: Response) {

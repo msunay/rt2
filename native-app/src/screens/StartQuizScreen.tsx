@@ -1,9 +1,9 @@
-import ParticipationQuizCard from '@/components/cards/participationQuizCard';
-import { setParticipationsList } from '@/features/participatingSlice';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { useGetUserParticipationsQuery } from '@/services/backendApi';
-import type { Quiz } from '@/types/Types';
-import { sortQuizzes } from '@/utils/helpers';
+import ParticipationQuizCard from '@/src/components/cards/participationQuizCard';
+import { setParticipationsList } from '@/src/features/participatingSlice';
+import { useAppDispatch, useAppSelector } from '@/src/hooks/reduxHooks';
+import { useGetUserParticipationsQuery } from '@/src/api/backendApi';
+import type { Quiz } from '@/src/types/Types';
+import { sortQuizzes } from '@/src/utils/helpers';
 import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';

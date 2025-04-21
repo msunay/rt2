@@ -1,5 +1,5 @@
-import type { Quiz } from '@/types/Types';
-import { sortQuizzes } from '@/utils/helpers';
+import type { Quiz } from '@/src/types/Types';
+import { sortQuizzes } from '@/src/utils/helpers';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface quizzesState {

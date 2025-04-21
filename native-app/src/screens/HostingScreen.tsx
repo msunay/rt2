@@ -1,9 +1,9 @@
 import { RefetchQuizzesContext } from '@/app/(app)/(tabs)/_layout';
-import HostingQuizCard from '@/components/cards/hostingQuizCard';
-import Header from '@/components/global/header';
-import CreateQuizBtn from '@/components/user/createQuizBtn';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import type { Quiz } from '@/types/Types';
+import HostingQuizCard from '@/src/components/cards/hostingQuizCard';
+import Header from '@/src/components/header';
+import CreateQuizBtn from '@/src/components/createQuizBtn';
+import { useAppSelector } from '@/src/hooks/reduxHooks';
+import type { Quiz } from '@/src/types/Types';
 import { FlashList } from '@shopify/flash-list';
 import { useContext, useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
