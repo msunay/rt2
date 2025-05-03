@@ -162,7 +162,8 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
       });
     } catch (error) {
       this.log(
-        `Error setting up ${String(event)} listener: ${(error as Error).message
+        `Error setting up ${String(event)} listener: ${
+          (error as Error).message
         }`,
         "error"
       );
@@ -181,12 +182,12 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
     event: E,
     callback:
       | ((
-        data: NamespaceEventMap[Namespace]["serverToClient"][E] extends (
-          data: infer T
-        ) => void
-          ? T
-          : never
-      ) => void)
+          data: NamespaceEventMap[Namespace]["serverToClient"][E] extends (
+            data: infer T
+          ) => void
+            ? T
+            : never
+        ) => void)
       | null,
     logMessage?: string
   ): void {
@@ -214,38 +215,46 @@ export class WebSocketManager<Namespace extends keyof NamespaceEventMap> {
    * @param data Event data
    * @param callback Callback function
    */
-  protected emitWithErrorHandling<
-    E extends keyof NamespaceEventMap[Namespace]["clientToServer"],
-    D extends NamespaceEventMap[Namespace]["clientToServer"][E] extends (data: infer T) => any ? T : never
-  >(
-    event: E,
-    data: D,
-    callback?: (...args: any[]) => void
-  ): void {
-    try {
-      if (callback) {
-        this.socket.emit(event as any, data, (...args: any[]) => {
-          try {
-            callback(...args);
-          } catch (error) {
-            this.log(
-              `Error in emit callback for ${String(event)}: ${
-                (error as Error).message
-              }`,
-              "error"
-            );
-          }
-        });
-      } else {
-        this.socket.emit(event as any, data);
-      }
-    } catch (error) {
-      this.log(
-        `Error emitting ${String(event)}: ${(error as Error).message}`,
-        "error"
-      );
-    }
-  }
+//   protected emitWithErrorHandling<
+//   E extends keyof NamespaceEventMap[Namespace]["clientToServer"]
+// >(
+//   event: E,
+//   data: any,
+//   callback?: (...args: any[]) => void
+// ): void {
+//   try {
+//     // Define a specific type for the emit function
+//     type EmitFunction = <Ev extends string | number | symbol>(
+//       event: Ev,
+//       ...args: any[]
+//     ) => void;
+
+//     if (callback) {
+//       // Wrap the callback to add error handling
+//       const wrappedCallback = (...args: any[]) => {
+//         try {
+//           callback(...args);
+//         } catch (error) {
+//           this.log(
+//             `Error in emit callback for ${String(event)}: ${
+//               (error as Error).message
+//             }`,
+//             "error"
+//           );
+//         }
+//       };
+
+//       (this.socket.emit as EmitFunction)(event, data, wrappedCallback);
+//     } else {
+//       (this.socket.emit as EmitFunction)(event, data);
+//     }
+//   } catch (error) {
+//     this.log(
+//       `Error emitting ${String(event)}: ${(error as Error).message}`,
+//       "error"
+//     );
+//   }
+// }
 
   /**
    * Forcefully connect the socket if not already connected

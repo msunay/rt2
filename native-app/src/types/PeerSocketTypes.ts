@@ -41,7 +41,7 @@ export interface PeersClientToServerEvents extends CommonSocketClientToServerEve
 
   // Request creation of a WebRTC transport
   createWebRtcTransport: (
-    { sender }: { sender: boolean },
+    { producer }: { producer: boolean },
     callback: ({
       transportOptions,
     }: {

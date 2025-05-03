@@ -3,7 +3,6 @@ import cors from "cors";
 import router from "@/router";
 import http from "http";
 import { Namespace, Server } from "socket.io";
-import broadcastSocketInit from "@/controllers/broadcast.socket.controller";
 import quizSocketInit from "@/controllers/quiz.socket.controller";
 import type {
   BroadcastListenEvents,
@@ -11,6 +10,7 @@ import type {
 } from "@/Types/BroadcastSocketTypes";
 import type { QuizEmitEvents, QuizListenEvents } from "@/Types/QuizSocketTypes";
 import { instrument } from "@socket.io/admin-ui";
+import { peerSocketInit } from "./controllers/broadcastSocketController";
 
 const app = express();
 
@@ -49,7 +49,7 @@ export const broadcastNamespace: Namespace<
 export const quizNamespace: Namespace<QuizListenEvents, QuizEmitEvents> =
   io.of("/quizspace");
 
-broadcastNamespace.on("connection", broadcastSocketInit);
+broadcastNamespace.on("connection", peerSocketInit);
 
 quizNamespace.on("connection", quizSocketInit);
 

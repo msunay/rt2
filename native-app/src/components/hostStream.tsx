@@ -80,7 +80,7 @@ const DEFAULT_ENCODING_PARAMS: mediasoupClient.types.AppData = {
 /**
  * Custom hook for mediasoup WebRTC functionality
  */
-function useMediasoup(streamSocketManager: MediaStreamBroadcaster) {
+const useMediasoup = (streamSocketManager: MediaStreamBroadcaster) => {
     const dispatch = useAppDispatch();
     const mediaStream = useAppSelector(state => state.mediaStreamSlice.mediaStream);
 
@@ -328,6 +328,10 @@ export default function HostStream({ quizId }: { quizId: string }) {
             // Ensure media streams are stopped - cleanup handled in useMediasoup hook
         };
     }, [quizId, quizSocketManager, streamSocketManager, getLocalStream]);
+
+useEffect(() => {
+    console.log('quizStarted:', quizStarted);
+}, [quizStarted])
 
     /**
      * Start the quiz
