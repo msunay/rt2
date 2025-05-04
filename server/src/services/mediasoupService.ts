@@ -1,4 +1,3 @@
-import { config } from "@/config";
 import { createWorker } from "mediasoup";
 import type { TransportOptions } from "mediasoup-client/types";
 import type {
@@ -6,11 +5,26 @@ import type {
   MediaKind,
   Producer,
   Router,
+  RouterOptions,
   WebRtcServer,
   WebRtcServerOptions,
   WebRtcTransport,
   Worker,
+  WorkerSettings,
 } from "mediasoup/types";
+
+interface RTCIceServer {
+  urls: string | string[];
+  username?: string;
+  credential?: string;
+}
+
+export interface MediaSoupServiceConfig {
+  worker: WorkerSettings;
+  webRtcServerOptions: WebRtcServerOptions;
+  router: RouterOptions;
+  iceServers?: RTCIceServer[];
+}
 
 export class MediaSoupService {
   private worker: Worker | null = null;
@@ -26,7 +40,7 @@ export class MediaSoupService {
   >();
   private transports = new Map<string, WebRtcTransport>();
 
-  constructor() {}
+  constructor(private config: MediaSoupServiceConfig) {}
 
   public async initialize(): Promise<void> {
     this.worker = await this.createWorker();
@@ -35,10 +49,8 @@ export class MediaSoupService {
 
   private async createWorker(): Promise<Worker> {
     const worker = await createWorker({
-      rtcMinPort: config.mediasoup.worker.rtcMinPort,
-      rtcMaxPort: config.mediasoup.worker.rtcMaxPort,
-      logLevel: config.mediasoup.worker.logLevel,
-      logTags: config.mediasoup.worker.logTags,
+      logLevel: this.config.worker.logLevel,
+      logTags: this.config.worker.logTags,
     });
 
     console.log(`MediaSoup worker created with pid: ${worker.pid}`);
@@ -52,26 +64,8 @@ export class MediaSoupService {
   }
 
   private async createWebRtcServer(worker: Worker): Promise<WebRtcServer> {
-    const { udpBindIp, udpAnnouncedAddress, tcpBindIp, tcpAnnouncedAddress } =
-      config.mediasoup.webRtcServer;
-
-    const webRtcServerOptions: WebRtcServerOptions = {
-      listenInfos: [
-        {
-          protocol: "udp",
-          ip: udpBindIp,
-          announcedAddress: udpAnnouncedAddress,
-        },
-        {
-          protocol: "tcp",
-          ip: tcpBindIp,
-          announcedAddress: tcpAnnouncedAddress,
-        },
-      ],
-    };
-
     try {
-      return await worker.createWebRtcServer(webRtcServerOptions);
+      return await worker.createWebRtcServer(this.config.webRtcServerOptions);
     } catch (error) {
       console.error("Failed to create WebRTC server:", error);
       throw error;
@@ -85,7 +79,7 @@ export class MediaSoupService {
 
     if (!this.router) {
       this.router = await this.worker.createRouter({
-        mediaCodecs: config.mediasoup.router.mediaCodecs,
+        mediaCodecs: this.config.router.mediaCodecs,
       });
       console.log(`Created router with ID: ${this.router.id}`);
     }
@@ -100,8 +94,8 @@ export class MediaSoupService {
     transport: WebRtcTransport;
     transportOptions: TransportOptions;
   }> {
-    if (!this.router || !this.webRtcServer) {
-      throw new Error("Router or WebRtcServer not initialized");
+    if (!this.webRtcServer || !this.router) {
+      throw new Error(`${!this.webRtcServer ? 'WebRtcServer' : 'Router'} not initialized`);
     }
 
     const transport = await this.router.createWebRtcTransport({
@@ -235,7 +229,7 @@ export class MediaSoupService {
     }
 
     */
-    public cleanup(peerId: string): void {
-      // Close all resources associated with this peer
-    }
+  public cleanup(peerId: string): void {
+    // Close all resources associated with this peer
+  }
 }

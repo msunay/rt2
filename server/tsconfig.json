@@ -30,7 +30,7 @@
     }
   },
   "include": [
-    "**/*.ts",
+    "**/*.ts", "__tests__/broadcastSocketController.test.ts",
   ],
   "exclude": [
     "node_modules",

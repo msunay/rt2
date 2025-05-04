@@ -11,6 +11,8 @@ import type {
 import type { QuizEmitEvents, QuizListenEvents } from "@/Types/QuizSocketTypes";
 import { instrument } from "@socket.io/admin-ui";
 import { peerSocketInit } from "./controllers/broadcastSocketController";
+import { MediaSoupService } from "./services/mediasoupService";
+import { config } from "./config";
 
 const app = express();
 
@@ -32,7 +34,7 @@ app.use(router);
 
 export const server = http.createServer(app);
 
-export const io = new Server(server, {
+const io = new Server(server, {
   // cors: {
   //   origin:
   //     [corsOrigin!, "https://admin.socket.io", '*'],
@@ -41,18 +43,22 @@ export const io = new Server(server, {
   // },
 });
 
-export const broadcastNamespace: Namespace<
+const broadcastNamespace: Namespace<
   BroadcastListenEvents,
   BroadcastEmitEvents
 > = io.of("/mediasoup");
 
-export const quizNamespace: Namespace<QuizListenEvents, QuizEmitEvents> =
+const quizNamespace: Namespace<QuizListenEvents, QuizEmitEvents> =
   io.of("/quizspace");
 
-broadcastNamespace.on("connection", peerSocketInit);
+const mediaSoupService = new MediaSoupService(config.mediasoup);
+
+mediaSoupService.initialize().then(() => {
+  broadcastNamespace.on("connection", (socket) =>
+    peerSocketInit(socket, mediaSoupService)
+  );
+});
 
 quizNamespace.on("connection", quizSocketInit);
 
 instrument(io, { auth: false, mode: "development" });
-
-export default app;
