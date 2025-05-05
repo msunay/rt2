@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
 import { View, Pressable, StyleSheet, Text } from 'react-native';
-import { registerGlobals } from 'react-native-webrtc';
 import { RTCView } from 'react-native-webrtc';
 import {
   useGetOneParticipationByPartIdQuery,
@@ -10,7 +9,7 @@ import { useQuizSocket, useMediaStream, useBroadcastState } from '@/hooks/broadc
 import PlayerQuestion from '../question/playerQuestion';
 import FinalScore from '../quiz/finalScore';
 import Winners from '../quiz/winners';
-import { transformQuizData, transformParticipationData } from '@/adapters/quizDataAdapters';
+import { transformQuizData, transformParticipationData } from '@/utils/quidDataAdapters';
 /**
  * Loading screen component
  */
@@ -51,13 +50,13 @@ function WaitingScreen() {
 function StreamControlButton() {
   const { isConnecting, isConnected } = useBroadcastState();
   const { startConsuming } = useMediaStream();
-  
+
   const handlePress = useCallback(() => {
     if (!isConnected && !isConnecting) {
       startConsuming();
     }
   }, [isConnected, isConnecting, startConsuming]);
-  
+
   const buttonStyle = useCallback(({ pressed }: { pressed: boolean }) => {
     return {
       ...styles.streamButton,
@@ -65,7 +64,7 @@ function StreamControlButton() {
       opacity: isConnecting ? 0.7 : 1
     };
   }, [isConnecting]);
-  
+
   return (
     <Pressable
       style={buttonStyle}
@@ -84,44 +83,42 @@ function StreamControlButton() {
  * Component for quiz participants to view host stream and participate in the quiz
  */
 export default function ParticipantStream({ partId }: { partId: string }) {
-  // Register WebRTC globals
-  registerGlobals();
-  
+
   // Get combined broadcast state for convenience
-  const { 
-    quizStarted, 
-    currentQuestionNumber, 
+  const {
+    quizStarted,
+    currentQuestionNumber,
     questionHidden,
     mediaStream,
     connectionError
   } = useBroadcastState();
-  
+
   // Fetch participation data
   const {
     data: participation,
     error: participationError,
     isLoading: participationLoading
   } = useGetOneParticipationByPartIdQuery(partId);
-  
+
   // Initialize socket managers when participation data is available
   useQuizSocket(participation?.QuizId);
   useMediaStream();
-  
+
   // Fetch quiz details based on participation data
   const {
     data: quizData,
     error: quizError,
     isLoading: quizLoading
   } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
-  
+
   // Transform API data to view models
   const quiz = transformQuizData(quizData);
   const participationViewModel = transformParticipationData(participation);
-  
+
   // Determine loading and error states
   const isLoading = participationLoading || quizLoading;
   const error = participationError || quizError || connectionError;
-  
+
   // Log errors to console
   useEffect(() => {
     if (participationError) {
@@ -136,19 +133,19 @@ export default function ParticipantStream({ partId }: { partId: string }) {
   if (isLoading) {
     return <LoadingScreen />;
   }
-  
+
   // Render error state
   if (error) {
-    const errorMessage = 
-      typeof error === 'string' 
-        ? error 
-        : error instanceof Error 
-          ? error.message 
+    const errorMessage =
+      typeof error === 'string'
+        ? error
+        : error instanceof Error
+          ? error.message
           : 'An error occurred';
-    
+
     return <ErrorScreen message={errorMessage} />;
   }
-  
+
   // Render content based on quiz state
   let content;
   if (!quizStarted) {
@@ -182,7 +179,7 @@ export default function ParticipantStream({ partId }: { partId: string }) {
       <ErrorScreen message="Quiz ID is unavailable" />
     );
   }
-  
+
   return (
     <View style={styles.container}>
       {/* Remote video stream from the host */}
@@ -193,16 +190,16 @@ export default function ParticipantStream({ partId }: { partId: string }) {
           style={styles.videoStream}
         />
       )}
-      
+
       <View style={styles.contentContainer}>
         <View style={styles.questionContainer}>
           {content}
         </View>
-        
+
         <View style={styles.buttonContainer}>
           <StreamControlButton />
         </View>
-        
+
         {__DEV__ && (
           <Text style={styles.debugText}>
             Question: {currentQuestionNumber}

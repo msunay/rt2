@@ -13,7 +13,7 @@ export default function HostStreamPage() {
   const { data: quiz } = useGetOneQuizQuery(quizId || '');
 
   return (
-    <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
+    <ImageBackground /* source={QUIZ_BACKGROUND.background} */ style={styles.background}>
       <HostStream quizId={quizId} />
     </ImageBackground>
   );

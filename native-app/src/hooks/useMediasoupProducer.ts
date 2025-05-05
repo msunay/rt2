@@ -1,10 +1,10 @@
 import {
   AppData,
-  /* Device, */ Producer,
+  Device,
+  Producer,
   RtpCapabilities,
   Transport,
 } from "mediasoup-client/types";
-import { Device } from "mediasoup-client";
 import type { MediaStreamBroadcaster } from "../services/mediaStreamBroadcaster";
 import { useAppDispatch, useAppSelector } from "./reduxHooks";
 import { useCallback, useEffect, useRef } from "react";

@@ -24,6 +24,7 @@
     "@reduxjs/toolkit": "^2.7.0",
     "@shopify/flash-list": "1.7.6",
     "date-fns": "^4.1.0",
+    "event-target-shim": "^6.0.2",
     "expo": "~53.0.7",
     "expo-av": "~15.1.4",
     "expo-camera": "~16.1.6",
@@ -67,6 +68,7 @@
     "jest-expo": "~53.0.4",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
+    "resolve-from": "^5.0.0",
     "typescript": "~5.8.3"
   },
   "private": true,
@@ -99,6 +101,8 @@
     }
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["styled-components"]
+    "onlyBuiltDependencies": [
+      "styled-components"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { View, Pressable, StyleSheet, Text } from 'react-native';
-import { registerGlobals, RTCView } from 'react-native-webrtc';
+import { RTCView } from 'react-native-webrtc';
 import {
   useGetOneParticipationByPartIdQuery,
   useGetOneQuizQuestionAnswerQuery,
@@ -77,8 +77,6 @@ const StreamControlButton = ({ onPress }: { onPress: () => void }) => {
  * Component for quiz participants
  */
 export default function ParticipantStream({ partId }: { partId: string }) {
-  // Register WebRTC globals
-  registerGlobals();
 
   const {
     quizStarted,

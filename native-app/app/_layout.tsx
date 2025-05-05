@@ -1,3 +1,8 @@
+import 'event-target-shim';
+import { registerGlobals } from 'react-native-webrtc';
+ // Register WebRTC globals for Mediasoup
+registerGlobals()
+
 import { store } from '@/src/store';
 import { SessionProvider } from '@/src/context/authContext';
 // import { ThemeProvider, createTheme } from '@rneui/themed';

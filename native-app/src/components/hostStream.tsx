@@ -6,7 +6,7 @@ import { MediaStreamBroadcaster } from '@/src/services/mediaStreamBroadcaster';
 import { QuizBroadcasterManager } from '@/src/services/quizBroadcasterManager';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { RTCView, registerGlobals } from 'react-native-webrtc';
+import { RTCView } from 'react-native-webrtc';
 import { useMediasoupProducer } from '../hooks/useMediasoupProducer';
 
 // Question timer duration
@@ -16,9 +16,6 @@ export const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
  * Host video streaming component
  */
 export default function HostStream({ quizId }: { quizId: string }) {
-    // Register WebRTC globals for Mediasoup
-    registerGlobals();
-
     // Redux state and dispatch
     const dispatch = useAppDispatch();
     const currentQuestionNumber = useAppSelector((state) => state.questionSlice.value);
@@ -42,9 +39,9 @@ export default function HostStream({ quizId }: { quizId: string }) {
         streamSocketManager.setupConnectionListener();
 
         // Get media permissions as soon as component mounts
-        getLocalStream().catch((err) => {
-            console.error('Error getting local stream on mount:', err);
-        });
+        // getLocalStream().catch((err) => {
+        //     console.error('Error getting local stream on mount:', err);
+        // });
 
         // Cleanup function
         return () => {
@@ -187,6 +184,9 @@ const styles = StyleSheet.create({
     },
     streamControls: {
         alignItems: 'center',
+        zIndex: 10,
+        borderWidth: 1,
+        borderColor: '#FF0000',
     },
     actionButton: {
         justifyContent: 'center',

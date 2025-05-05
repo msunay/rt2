@@ -13,7 +13,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import type { types as mediasoupTypes } from 'mediasoup-client';
 import { useEffect, useReducer, useRef, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View, Alert } from 'react-native';
-import { RTCView, mediaDevices, registerGlobals } from 'react-native-webrtc';
+import { RTCView, mediaDevices } from 'react-native-webrtc';
 import type { MediaStream } from 'react-native-webrtc';
 import HostQuestion from '../question/hostQuestion';
 
@@ -73,7 +73,7 @@ function useMediasoup(
   const producerTransportRef = useRef<mediasoupTypes.Transport>();
   const producerRef = useRef<mediasoupTypes.Producer>();
   const paramsRef = useRef<mediasoupClient.types.AppData>(DEFAULT_ENCODING_PARAMS);
-  
+
   /**
    * Gets local user media stream
    */
@@ -94,7 +94,7 @@ function useMediasoup(
    */
   const streamSuccess = useCallback((mediaStream: MediaStream) => {
     dispatchState({ type: 'SET_HVS_MEDIA_STREAM', payload: mediaStream });
-    
+
     const track = mediaStream.getVideoTracks()[0];
     paramsRef.current = {
       track,
@@ -129,7 +129,7 @@ function useMediasoup(
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
-      
+
       console.log('Device RTP Capabilities', device.rtpCapabilities);
       deviceRef.current = device;
       createSendTransport();
@@ -150,7 +150,7 @@ function useMediasoup(
       console.error('Device not initialized');
       return;
     }
-    
+
     streamSocketManager.createProducerTransport(
       (transport) => {
         producerTransportRef.current = transport as mediasoupTypes.Transport;
@@ -170,7 +170,7 @@ function useMediasoup(
         console.error('No track available to produce');
         return;
       }
-      
+
       const producer = await producerTransport.produce(paramsRef.current);
       producerRef.current = producer;
 
@@ -200,16 +200,16 @@ function useMediasoup(
     if (producerRef.current) {
       producerRef.current.close();
     }
-    
+
     if (producerTransportRef.current) {
       producerTransportRef.current.close();
     }
-    
+
     if (state.mediaStream) {
       state.mediaStream.getTracks().forEach(track => track.stop());
       dispatchState({ type: 'SET_HVS_MEDIA_STREAM', payload: undefined });
     }
-    
+
     router.navigate('/');
   }, [state.mediaStream, dispatchState]);
 
@@ -224,8 +224,6 @@ function useMediasoup(
  * Host video streaming component
  */
 export default function HostVideoStream({ quizId }: { quizId: string }) {
-  // Register WebRTC globals for Mediasoup
-  registerGlobals();
 
   // Redux state and dispatch
   const dispatch = useAppDispatch();
@@ -248,24 +246,24 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
   useEffect(() => {
     // Set up all quiz host listeners
     quizSocketManager.setupAllListeners(quizId);
-    
+
     // Set up streaming socket listeners
     streamSocketManager.setupConnectionListener();
-    
+
     // Get media permissions as soon as component mounts
     getLocalStream().catch(err => {
       console.error('Error getting local stream on mount:', err);
     });
-    
+
     // Cleanup function
     return () => {
       // Clean up socket listeners
       quizSocketManager.removeAllListeners();
       quizSocketManager.disconnect();
-      
+
       streamSocketManager.removeConnectionListener();
       streamSocketManager.disconnect();
-      
+
       // Ensure media streams are stopped
       if (state.mediaStream) {
         state.mediaStream.getTracks().forEach(track => track.stop());
@@ -290,7 +288,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
     dispatchState({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
     quizSocketManager.nextQuestion(quizId);
     dispatchState({ type: 'SET_HVS_Q_HIDDEN', payload: false });
-    
+
     // Optional: Add timer for auto-progression if needed
     // if (currentQuestionNumber < 9) {
     //   setTimeout(() => {
@@ -366,7 +364,7 @@ export default function HostVideoStream({ quizId }: { quizId: string }) {
               </Pressable>
             )}
           </View>
-          
+
           <View style={styles.streamControls}>
             <Pressable style={pressableStyle} onPress={getLocalStream}>
               <Text style={styles.buttonText}>Start Video</Text>

@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/src/hooks/reduxHooks';
-import { Alert } from 'react-native';
-import { Device } from 'mediasoup-client';
-import type {
-  AppData,
-  Consumer,
-  RtpCapabilities,
-  Transport
-} from 'mediasoup-client/types';
 
 // Import actions from both slices
 import {
