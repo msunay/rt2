@@ -37,5 +37,6 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+coverage/
 
 CLAUDE.md
