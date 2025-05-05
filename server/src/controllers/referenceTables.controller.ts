@@ -1,5 +1,5 @@
 import models from '@/models/index';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 
 async function createParticipation(req: Request, res: Response) {

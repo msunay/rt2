@@ -1,8 +1,8 @@
 import {
-  CreationOptional,
+  type CreationOptional,
   DataTypes,
-  InferCreationAttributes,
-  InferAttributes,
+  type InferCreationAttributes,
+  type InferAttributes,
   Model,
   Sequelize,
   UUIDV4,

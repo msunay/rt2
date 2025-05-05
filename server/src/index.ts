@@ -59,6 +59,8 @@ mediaSoupService.initialize().then(() => {
   );
 });
 
-quizNamespace.on("connection", quizSocketInit);
+quizNamespace.on("connection", (socket) =>
+  quizSocketInit(socket, quizNamespace)
+);
 
 instrument(io, { auth: false, mode: "development" });

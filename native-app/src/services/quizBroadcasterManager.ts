@@ -1,18 +1,12 @@
-import { AppDispatch } from '@/src/store';
-import { 
-  setQuizStarted,
-  setQuestionHidden,
-  incrementQuestionNumber,
-  incrementTrigger
-} from '@/src/features/quizSlice';
-import { QuizSocketBase, LegacyDispatch } from '@/src/services/quizSocketBase';
+import { AppDispatch } from "@/src/store";
+import { QuizSocketBase, LegacyDispatch } from "@/src/services/quizSocketBase";
 
 /**
  * Socket manager for quiz hosts/broadcasters
  */
 export class QuizBroadcasterManager extends QuizSocketBase {
-  private static readonly ROLE = 'Broadcaster';
-  
+  private static readonly ROLE = "Broadcaster";
+
   /**
    * Sets up connection success listener and automatically joins the specified room
    * @param quizId Quiz ID to join
@@ -33,7 +27,7 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    */
   public setupQuestionTimerListener(): void {
     super.setupQuestionTimerListener(
-      () => this.dispatchAction({ type: 'SET_HVS_Q_HIDDEN', payload: false }),
+      () => this.dispatchAction({ type: "SET_HVS_Q_HIDDEN", payload: false }),
       QuizBroadcasterManager.ROLE
     );
   }
@@ -49,35 +43,54 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    * Sets up answer reveal listener
    */
   public setupAnswerRevealListener(): void {
-    this.addListener('reveal_answers_host', () => {
-      setTimeout(() => {
-        this.dispatchAction({ type: 'SET_HVS_Q_HIDDEN', payload: true });
-      }, 2000);
-    }, `${QuizBroadcasterManager.ROLE} answer reveal`);
+    this.addListener(
+      "reveal_answers_host",
+      () => {
+        setTimeout(() => {
+          this.dispatchAction({ type: "SET_HVS_Q_HIDDEN", payload: true });
+        }, 2000);
+      },
+      `${QuizBroadcasterManager.ROLE} answer reveal`
+    );
   }
 
   /**
    * Removes answer reveal listener
    */
   public removeAnswerRevealListener(): void {
-    this.removeListener('reveal_answers_host', null, `${QuizBroadcasterManager.ROLE} answer reveal`);
+    this.removeListener(
+      "reveal_answers_host",
+      null,
+      `${QuizBroadcasterManager.ROLE} answer reveal`
+    );
   }
 
   /**
    * Sets up winners display listener
    */
   public setupWinnersListener(): void {
-    this.addListener('host_winners', () => {
-      console.log(`${QuizBroadcasterManager.ROLE} winners received`);
-      this.dispatchAction({ type: 'INCREMENT_HVS_TRIGGER', payload: undefined });
-    }, `${QuizBroadcasterManager.ROLE} winners`);
+    this.addListener(
+      "host_winners",
+      () => {
+        console.log(`${QuizBroadcasterManager.ROLE} winners received`);
+        this.dispatchAction({
+          type: "INCREMENT_HVS_TRIGGER",
+          payload: undefined,
+        });
+      },
+      `${QuizBroadcasterManager.ROLE} winners`
+    );
   }
 
   /**
    * Removes winners display listener
    */
   public removeWinnersListener(): void {
-    this.removeListener('host_winners', null, `${QuizBroadcasterManager.ROLE} winners`);
+    this.removeListener(
+      "host_winners",
+      null,
+      `${QuizBroadcasterManager.ROLE} winners`
+    );
   }
 
   /**
@@ -85,7 +98,7 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    * @param quizId Quiz ID
    */
   public startQuiz(quizId: string): void {
-    this.getSocket().emit('host_start_quiz', { roomId: quizId });
+    this.getSocket().emit("host_start_quiz", { roomId: quizId });
   }
 
   /**
@@ -93,7 +106,7 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    * @param quizId Quiz ID
    */
   public nextQuestion(quizId: string): void {
-    this.getSocket().emit('next_question', { roomId: quizId });
+    this.getSocket().emit("next_question", { roomId: quizId });
   }
 
   /**
@@ -101,7 +114,7 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    * @param quizId Quiz ID
    */
   public showWinners(quizId: string): void {
-    this.getSocket().emit('show_winners', { roomId: quizId });
+    this.getSocket().emit("show_winners", { roomId: quizId });
   }
 
   /**
@@ -130,7 +143,9 @@ export class QuizBroadcasterManager extends QuizSocketBase {
    * This maps the host broadcast state actions to Redux actions
    * @param dispatch Redux dispatch function
    */
-  public static withReduxDispatch(dispatch: AppDispatch): QuizBroadcasterManager {
+  public static withReduxDispatch(
+    dispatch: AppDispatch
+  ): QuizBroadcasterManager {
     // Create an adapter that translates legacy actions to Redux actions
     const dispatchAdapter: LegacyDispatch = QuizSocketBase.createReduxAdapter(
       dispatch,

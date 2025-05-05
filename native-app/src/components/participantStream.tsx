@@ -5,15 +5,16 @@ import {
   useGetOneParticipationByPartIdQuery,
   useGetOneQuizQuestionAnswerQuery,
 } from '@/src/api/backendApi';
-import { useQuizSocket, useMediaStream, useBroadcastState } from '@/src/hooks/broadcastHooks';
+import { useQuizSocket, useBroadcastState } from '@/src/hooks/broadcastHooks';
 import FinalScore from '@/src/components/finalScore';
 import Winners from '@/src/components/winners';
 import PlayerQuestion from '@/src/components/playerQuestion';
+import { useMediasoupConsumer } from '../hooks/useMediasoupConsumer';
 
 /**
  * Loading screen component
  */
-function LoadingScreen() {
+const LoadingScreen = () => {
   return (
     <View style={styles.centerContainer}>
       <Text style={styles.loadingText}>Loading quiz...</Text>
@@ -24,7 +25,7 @@ function LoadingScreen() {
 /**
  * Error screen component
  */
-function ErrorScreen({ message }: { message: string }) {
+const ErrorScreen = ({ message }: { message: string }) => {
   return (
     <View style={styles.centerContainer}>
       <Text style={styles.errorText}>{message}</Text>
@@ -35,7 +36,7 @@ function ErrorScreen({ message }: { message: string }) {
 /**
  * Waiting screen when quiz hasn't started yet
  */
-function WaitingScreen() {
+const WaitingScreen = () => {
   return (
     <View style={styles.centerContainer}>
       <Text style={styles.waitingText}>Waiting for the host to start the quiz...</Text>
@@ -47,16 +48,9 @@ function WaitingScreen() {
 /**
  * Stream Control Button
  */
-function StreamControlButton() {
+const StreamControlButton = ({ onPress }: { onPress: () => void }) => {
   const { isConnecting, isConnected } = useBroadcastState();
-  const { startConsuming } = useMediaStream();
-  
-  const handlePress = useCallback(() => {
-    if (!isConnected && !isConnecting) {
-      startConsuming();
-    }
-  }, [isConnected, isConnecting, startConsuming]);
-  
+
   const buttonStyle = useCallback(({ pressed }: { pressed: boolean }) => {
     return {
       ...styles.streamButton,
@@ -64,11 +58,11 @@ function StreamControlButton() {
       opacity: isConnecting ? 0.7 : 1
     };
   }, [isConnecting]);
-  
+
   return (
     <Pressable
       style={buttonStyle}
-      onPress={handlePress}
+      onPress={onPress}
       disabled={isConnecting || isConnected}
       accessibilityLabel="Join stream"
     >
@@ -80,43 +74,41 @@ function StreamControlButton() {
 }
 
 /**
- * Component for quiz participants to view host stream and participate in the quiz
+ * Component for quiz participants
  */
 export default function ParticipantStream({ partId }: { partId: string }) {
   // Register WebRTC globals
   registerGlobals();
-  
-  // Get combined broadcast state for convenience
-  const { 
-    quizStarted, 
-    currentQuestionNumber, 
+
+  const {
+    quizStarted,
+    currentQuestionNumber,
     questionHidden,
     mediaStream,
     connectionError
   } = useBroadcastState();
-  
-  // Fetch participation data
+
   const {
     data: participation,
     error: participationError,
     isLoading: participationLoading
   } = useGetOneParticipationByPartIdQuery(partId);
-  
-  // Initialize socket managers when participation data is available
+
+  // Initialize hooks for socket connection and media consumption
   useQuizSocket(participation?.QuizId);
-  useMediaStream();
-  
+  const { startConsuming /*, disconnect, isConnected: consumerIsConnected */ } = useMediasoupConsumer();
+
   // Fetch quiz details based on participation data
   const {
     data: quiz,
     error: quizError,
     isLoading: quizLoading
   } = useGetOneQuizQuestionAnswerQuery(participation?.QuizId || '');
-  
+
   // Determine loading and error states
   const isLoading = participationLoading || quizLoading;
   const error = participationError || quizError || connectionError;
-  
+
   // Log errors to console
   useEffect(() => {
     if (participationError) {
@@ -131,19 +123,19 @@ export default function ParticipantStream({ partId }: { partId: string }) {
   if (isLoading) {
     return <LoadingScreen />;
   }
-  
+
   // Render error state
   if (error) {
-    const errorMessage = 
-      typeof error === 'string' 
-        ? error 
-        : error instanceof Error 
-          ? error.message 
+    const errorMessage =
+      typeof error === 'string'
+        ? error
+        : error instanceof Error
+          ? error.message
           : 'An error occurred';
-    
+
     return <ErrorScreen message={errorMessage} />;
   }
-  
+
   // Render content based on quiz state
   let content;
   if (!quizStarted) {
@@ -177,7 +169,7 @@ export default function ParticipantStream({ partId }: { partId: string }) {
       <ErrorScreen message="Quiz ID is unavailable" />
     );
   }
-  
+
   return (
     <View style={styles.container}>
       {/* Remote video stream from the host */}
@@ -188,16 +180,16 @@ export default function ParticipantStream({ partId }: { partId: string }) {
           style={styles.videoStream}
         />
       )}
-      
+
       <View style={styles.contentContainer}>
         <View style={styles.questionContainer}>
           {content}
         </View>
-        
+
         <View style={styles.buttonContainer}>
-          <StreamControlButton />
+          <StreamControlButton onPress={startConsuming} />
         </View>
-        
+
         {__DEV__ && (
           <Text style={styles.debugText}>
             Question: {currentQuestionNumber}

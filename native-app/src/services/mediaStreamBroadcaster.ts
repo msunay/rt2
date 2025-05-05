@@ -8,7 +8,8 @@ import {
   RtpParameters,
   Transport,
   TransportOptions,
-} from "mediasoup-client/lib/types";
+  ConsumerOptions,
+} from "mediasoup-client/types";
 import { MediaStream, MediaStreamTrack } from "react-native-webrtc";
 import { WebSocketManager } from "@/src/services/webSocketManager";
 import {
@@ -128,14 +129,14 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
    * Creates a producer WebRTC transport
    * @param setProducerTransport Function to set the producer transport
    * @param device Mediasoup device
-   * @param connectSendTransport Function to connect the send transport
+  //  * @param connectSendTransport Function to connect the send transport
    */
   public createProducerTransport(
     setProducerTransport: (transport: Transport<AppData>) => void,
     device: Device,
-    connectSendTransport: (
-      producerTransport: Transport<AppData>
-    ) => Promise<void>
+    // connectSendTransport: (
+    //   producerTransport: Transport<AppData>
+    // ) => Promise<void>
   ): void {
     this.getSocket().emit(
       "createWebRtcTransport",
@@ -213,12 +214,12 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
             }
           );
 
-          connectSendTransport(newProducerTransport).catch((err) => {
-            this.log(
-              `Error connecting send transport: ${err.message}`,
-              "error"
-            );
-          });
+          // connectSendTransport(newProducerTransport).catch((err) => {
+          //   this.log(
+          //     `Error connecting send transport: ${err.message}`,
+          //     "error"
+          //   );
+          // });
         } catch (err) {
           this.log(
             `Error creating send transport: ${(err as Error).message}`,
@@ -239,15 +240,15 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
   public createConsumerTransport(
     setConsumerTransportCb: (transport: Transport<AppData>) => void,
     device: Device,
-    connectRecvTransport: (
-      consumerTransport: Transport<AppData>,
-      device: Device
-    ) => Promise<void>
+    // connectRecvTransport: (
+    //   consumerTransport: Transport<AppData>,
+    //   device: Device
+    // ) => Promise<void>
   ): void {
     this.getSocket().emit(
       "createWebRtcTransport",
       { producer: false },
-      ({ transportOptions }: { transportOptions: any }) => {
+      ({ transportOptions }: { transportOptions: TransportOptions }) => {
         if (!transportOptions) {
           const error = new Error("Transport options are null");
           this.log(error.message, "error");
@@ -288,12 +289,12 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
           );
 
           // Connect the transport
-          connectRecvTransport(newConsumerTransport, device).catch((err) => {
-            this.log(
-              `Error connecting receive transport: ${err.message}`,
-              "error"
-            );
-          });
+          // connectRecvTransport(newConsumerTransport, device).catch((err) => {
+          //   this.log(
+          //     `Error connecting receive transport: ${err.message}`,
+          //     "error"
+          //   );
+          // });
         } catch (err) {
           this.log(
             `Error creating receive transport: ${(err as Error).message}`,
@@ -322,7 +323,7 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
     this.getSocket().emit(
       "consume",
       { rtpCapabilities: device.rtpCapabilities },
-      async ({ consumerOptions }: { consumerOptions: any }) => {
+      async ({ consumerOptions }: { consumerOptions: ConsumerOptions }) => {
         if (!consumerOptions) {
           const error = new Error("Consumer options are null");
           this.log(error.message, "error");
@@ -375,7 +376,7 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
     this.createConsumerTransport(
       (transport) => dispatch(setConsumerTransport(transport)),
       device,
-      connectRecvTransport
+      // connectRecvTransport
     );
   }
 

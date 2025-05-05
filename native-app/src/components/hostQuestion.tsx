@@ -3,16 +3,14 @@ import { useGetOneQuizQuestionAnswerQuery } from '@/src/api/backendApi';
 import type { Answer, QuestionAnswer } from '@/src/types/Types';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
-import Animated from 'react-native-reanimated';
 
 interface Props {
-  hidden: boolean;  
+  hidden: boolean;
   trigger: number;
   quizId: string;
 }
 
-export default function HostQuestion({ hidden, trigger, quizId }: Props) {
+export const HostQuestion = ({ hidden, trigger, quizId }: Props) => {
   // Fetch quiz by its ID, including questions and answers.
   const { data: quiz } = useGetOneQuizQuestionAnswerQuery(quizId);
 

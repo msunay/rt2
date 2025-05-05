@@ -2,8 +2,7 @@ import type {
   QuizListenEvents,
   QuizEmitEvents,
 } from '@/Types/QuizSocketTypes';
-import type { Socket } from 'socket.io';
-import { quizNamespace } from '@/index';
+import type { Namespace, Socket } from 'socket.io';
 
 const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
 
@@ -12,7 +11,8 @@ const QUESTION_TIME = process.env.NODE_ENV === 'test' ? 0 : 7000;
  * @param quizSocket Socket instance for the quiz namespace
  */
 const quizSocketInit = (
-  quizSocket: Socket<QuizListenEvents, QuizEmitEvents>
+  quizSocket: Socket<QuizListenEvents, QuizEmitEvents>,
+  quizNamespace: Namespace<QuizListenEvents, QuizEmitEvents>,
 ) => {
   setTimeout(() => console.log('\tquiz ID : ', quizSocket.id), 100);
 

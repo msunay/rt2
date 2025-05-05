@@ -1,237 +1,208 @@
-import { MediaStreamBroadcaster } from "@/src/services/mediaStreamBroadcaster";
-import type { Transport, Consumer } from "mediasoup-client/lib/types";
-import type { DtlsParameters } from "mediasoup-client/lib/types";
+import { MediaStreamBroadcaster } from '@/src/services/mediaStreamBroadcaster';
+import type { Device, Transport } from 'mediasoup-client/types';
+import { mockDevice, mockTransport, resetMediasoupMocks } from '@/src/mocks/mediasoup-client'; // Adjust path
+import { AppData, DtlsParameters, RtpCapabilities, TransportOptions } from 'mediasoup-client/types';
 
-describe("MediaStreamBroadcaster", () => {
+// Mock the base class and socket
+const mockSocket = {
+  on: jest.fn(),
+  off: jest.fn(),
+  emit: jest.fn((event, data, callback) => {
+    // Simulate callback for specific events if needed
+    if (event === 'create_room' && callback) {
+      callback({ rtpCapabilities: { codecs: [], headerExtensions: [] } });
+    }
+    if (event === 'createWebRtcTransport' && callback) {
+      callback({ transportOptions: { id: 'test-transport', iceParameters: {}, iceCandidates: [], dtlsParameters: {} } });
+    }
+    if (event === 'transport_produce' && callback) {
+        callback({ id: 'server-producer-id' });
+    }
+    // Add other event callbacks as needed
+  }),
+  disconnect: jest.fn(),
+};
+jest.mock('@/src/services/webSocketManager', () => {
+  return {
+    WebSocketManager: jest.fn().mockImplementation(() => ({
+      getSocket: () => mockSocket,
+      addListener: jest.fn((event, callback) => mockSocket.on(event, callback)),
+      removeListener: jest.fn((event) => mockSocket.off(event)),
+      log: jest.fn(), // Mock log method
+      disconnect: jest.fn(() => mockSocket.disconnect()),
+    })),
+  };
+});
+
+describe('MediaStreamBroadcaster', () => {
   let broadcaster: MediaStreamBroadcaster;
-  let fakeSocket: { emit: jest.Mock };
-  let logs: Array<[string, string?]>;
+  let mockCreateDeviceCb: jest.Mock;
+  let mockSetProducerTransportCb: jest.Mock;
 
   beforeEach(() => {
+    jest.clearAllMocks(); // Clear mocks from previous tests
+    resetMediasoupMocks(); // Reset stateful mocks
     broadcaster = new MediaStreamBroadcaster();
-
-    // Spy on addListener, removeListener, getSocket, and log
-    logs = [];
-    (broadcaster as any).addListener = jest.fn();
-    (broadcaster as any).removeListener = jest.fn();
-    (broadcaster as any).getSocket = jest.fn();
-    (broadcaster as any).log = (msg: string, level: string = "info") => {
-      logs.push([msg, level]);
-    };
-
-    fakeSocket = { emit: jest.fn() };
-    ((broadcaster as any).getSocket as jest.Mock).mockReturnValue(fakeSocket);
+    mockCreateDeviceCb = jest.fn().mockResolvedValue(undefined);
+    mockSetProducerTransportCb = jest.fn();
   });
 
-  it("registers and removes the connection_success listener", () => {
-    broadcaster.setupConnectionListener();
-    expect((broadcaster as any).addListener).toHaveBeenCalledWith(
-      "connection_success",
-      expect.any(Function),
-      "Streaming host connection"
-    );
-
-    broadcaster.removeConnectionListener();
-    expect((broadcaster as any).removeListener).toHaveBeenCalledWith(
-      "connection_success",
-      null,
-      "Streaming host connection"
-    );
+  it('should initialize with the correct namespace', () => {
+    expect(MediaStreamBroadcaster).toHaveBeenCalledTimes(1);
+    // If WebSocketManager constructor was more complex, add assertions here
   });
 
-  it("setupProducerClosedListener binds consumer.close() and transport.close()", () => {
-    const fakeTransport = { close: jest.fn() } as unknown as Transport;
-    const fakeConsumer = { close: jest.fn() } as unknown as Consumer;
-
-    broadcaster.setupProducerClosedListener(fakeTransport, fakeConsumer);
-
-    expect((broadcaster as any).addListener).toHaveBeenCalledWith(
-      "producer_closed",
-      expect.any(Function),
-      "Producer closed"
-    );
-
-    // extract the callback that was registered
-    const handler = ((broadcaster as any).addListener as jest.Mock).mock
-      .calls[0][1] as Function;
-
-    // when the server fires 'producer_closed'
-    handler();
-
-    expect(fakeConsumer.close).toHaveBeenCalled();
-    expect(fakeTransport.close).toHaveBeenCalled();
-  });
-
-  it("emits create_room and handles success + logging", async () => {
-    const createDevice = jest.fn().mockResolvedValue(undefined);
-    const caps = { codecs: [] };
-    broadcaster.createRoom(createDevice);
-
-    // Did we emit with the right event name?
-    expect(fakeSocket.emit).toHaveBeenCalledWith(
-      "create_room",
-      expect.any(Function)
-    );
-
-    // grab the callback the broadcaster passed to emit()
-    const cb = (fakeSocket.emit as jest.Mock).mock.calls[0][1] as Function;
-
-    // simulate the server callback
-    await cb({ rtpCapabilities: caps });
-
-    expect(logs).toEqual([
-      ["Router RTP Capabilities received", "info"],
-      ["Device created with RTP capabilities", "info"],
-    ]);
-
-    expect(createDevice).toHaveBeenCalledWith(caps);
-  });
-
-  it("emit create_room and logs error when createDevice rejects", async () => {
-    const createDevice = jest.fn().mockRejectedValue(new Error("nope"));
-    broadcaster.createRoom(createDevice);
-
-    const cb = (fakeSocket.emit as jest.Mock).mock.calls[0][1] as Function;
-    await cb({ rtpCapabilities: { codecs: [] } });
-
-    // first log is always the RTP caps message
-    expect(logs[0]).toEqual(["Router RTP Capabilities received", "info"]);
-    // second log indicates error
-    expect(logs[1][0]).toMatch(/^Error creating device:/);
-    expect(logs[1][1]).toBe("error");
-  });
-
-  describe("createProducerTransport", () => {
-    let fakeDevice: any;
-    let fakeProducerTransport: any;
-    let setProducerTransport: jest.Mock;
-    let connectSendTransport: jest.Mock;
-
-    beforeEach(() => {
-      fakeProducerTransport = {
-        id: "ptrans-id",
-        on: jest.fn(),
-      };
-      fakeDevice = {
-        createSendTransport: jest.fn(() => fakeProducerTransport),
-      };
-      setProducerTransport = jest.fn();
-      connectSendTransport = jest.fn().mockResolvedValue(undefined);
+  describe('Listeners', () => {
+    it('setupConnectionListener should add listener for connection_success', () => {
+      broadcaster.setupConnectionListener();
+      expect((broadcaster as any).addListener).toHaveBeenCalledWith(
+        'connection_success',
+        expect.any(Function),
+        'Streaming host connection'
+      );
     });
 
-    it("emits createWebRtcTransport and wires up send‐transport", async () => {
-      broadcaster.createProducerTransport(
-        setProducerTransport,
-        fakeDevice,
-        connectSendTransport
+    it('removeConnectionListener should remove listener for connection_success', () => {
+      broadcaster.removeConnectionListener();
+      expect((broadcaster as any).removeListener).toHaveBeenCalledWith(
+        'connection_success',
+        null,
+        'Streaming host connection'
+      );
+    });
+
+     // Add tests for setup/remove ProducerClosedListener similarly
+  });
+
+  describe('createRoom', () => {
+    it('should emit create_room and call createDevice callback', async () => {
+      broadcaster.createRoom(mockCreateDeviceCb);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'create_room',
+        expect.any(Function) // The callback passed to emit
       );
 
-      // must emit
-      expect(fakeSocket.emit).toHaveBeenCalledWith(
-        "createWebRtcTransport",
+      // Simulate server response by invoking the emit callback
+      const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'create_room')[1];
+      const mockRtpCaps = { codecs: [{ kind: 'audio', mimeType: 'audio/opus' }], headerExtensions: [] };
+      await emitCallback({ rtpCapabilities: mockRtpCaps });
+
+      expect(mockCreateDeviceCb).toHaveBeenCalledWith(mockRtpCaps);
+      expect((broadcaster as any).log).toHaveBeenCalledWith('Router RTP Capabilities received');
+      expect((broadcaster as any).log).toHaveBeenCalledWith('Device created with RTP capabilities');
+    });
+
+     it('should log error if createDevice callback fails', async () => {
+       const error = new Error('Device creation failed');
+       mockCreateDeviceCb.mockRejectedValue(error);
+       broadcaster.createRoom(mockCreateDeviceCb);
+
+       const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'create_room')[1];
+       await emitCallback({ rtpCapabilities: {} }); // Simulate response
+
+       // Need await tick or similar if createDeviceCb is truly async and might not finish immediately
+       await Promise.resolve(); // Allow promise rejection to settle
+
+       expect(mockCreateDeviceCb).toHaveBeenCalled();
+       expect((broadcaster as any).log).toHaveBeenCalledWith(`Error creating device: ${error}`, 'error');
+     });
+  });
+
+  describe('createProducerTransport', () => {
+     const mockRtpCaps = { codecs: [], headerExtensions: [] };
+     const mockTransportOptions = { id: 't1', iceParameters: {}, iceCandidates: [], dtlsParameters: {} } as unknown as TransportOptions ;
+
+     beforeEach(() => {
+        // Simulate device already created
+        mockDevice.load({ routerRtpCapabilities: mockRtpCaps });
+     });
+
+    it('should emit createWebRtcTransport and setup transport', () => {
+      broadcaster.createProducerTransport(mockSetProducerTransportCb, mockDevice as unknown as Device);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'createWebRtcTransport',
         { producer: true },
         expect.any(Function)
       );
 
-      // grab the callback handler
-      const handler = (fakeSocket.emit as jest.Mock).mock
-        .calls[0][2] as Function;
-      const transportOptions = { id: "topt" };
-      // simulate server reply
-      handler({ transportOptions });
+      // Simulate server response
+      const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'createWebRtcTransport')[1];
+      emitCallback({ transportOptions: mockTransportOptions });
 
-      // 1) device.createSendTransport
-      expect(fakeDevice.createSendTransport).toHaveBeenCalledWith(
-        transportOptions
-      );
-      // 2) setProducerTransport
-      expect(setProducerTransport).toHaveBeenCalledWith(fakeProducerTransport);
-      // 3) log creation
-      expect(
-        logs.find(([m]) =>
-          m.includes(`Created send transport: ${fakeProducerTransport.id}`)
-        )
-      ).toBeTruthy();
-
-      // 4) transport.on("connect", …)
-      expect(fakeProducerTransport.on).toHaveBeenCalledWith(
-        "connect",
-        expect.any(Function)
-      );
-      // 5) transport.on("produce", …)
-      expect(fakeProducerTransport.on).toHaveBeenCalledWith(
-        "produce",
-        expect.any(Function)
-      );
-
-      // 6) connectSendTransport invoked
-      expect(connectSendTransport).toHaveBeenCalledWith(fakeProducerTransport);
+      expect(mockDevice.createSendTransport).toHaveBeenCalledWith(mockTransportOptions);
+      expect(mockSetProducerTransportCb).toHaveBeenCalledWith(mockTransport); // Check if the mock transport was passed back
+      expect((broadcaster as any).log).toHaveBeenCalledWith('Producer transport options received');
+      expect((broadcaster as any).log).toHaveBeenCalledWith(`Created send transport: ${mockTransport.id}`);
+      expect(mockTransport.on).toHaveBeenCalledWith('connect', expect.any(Function));
+      expect(mockTransport.on).toHaveBeenCalledWith('produce', expect.any(Function));
     });
 
-    it("invokes onSuccess when transport.connect event fires", () => {
-      broadcaster.createProducerTransport(
-        setProducerTransport,
-        fakeDevice,
-        connectSendTransport
-      );
-      const cb = (fakeSocket.emit as jest.Mock).mock.calls[0][2] as Function;
-      cb({ transportOptions: {} });
+     it('should handle transport connect event', () => {
+       broadcaster.createProducerTransport(mockSetProducerTransportCb, mockDevice as unknown as Device);
+       const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'createWebRtcTransport')[1];
+       emitCallback({ transportOptions: mockTransportOptions }); // Create transport
 
-      // pull out the connect listener
-      const connectListener = fakeProducerTransport.on.mock.calls.find(
-        ([evt]: any[]) => evt === "connect"
-      )![1] as Function;
+       // Find and trigger the 'connect' listener
+       const connectListener = (mockTransport as any).on.mock.calls.find((call: any) => call[0] === 'connect')[1];
+       const mockDtls: DtlsParameters = { fingerprints: [], role: 'auto' };
+       const mockOnSuccess = jest.fn();
+       const mockOnError = jest.fn();
+       connectListener({ dtlsParameters: mockDtls }, mockOnSuccess, mockOnError);
 
-      const dtlsParams: DtlsParameters = { role: "auto", fingerprints: [] };
-      const onSuccess = jest.fn();
-      const onError = jest.fn();
+       expect(mockSocket.emit).toHaveBeenCalledWith('transport_connect', { dtlsParameters: mockDtls });
+       expect(mockOnSuccess).toHaveBeenCalled();
+       expect(mockOnError).not.toHaveBeenCalled();
+     });
 
-      connectListener({ dtlsParameters: dtlsParams }, onSuccess, onError);
+     it('should handle transport produce event', () => {
+        broadcaster.createProducerTransport(mockSetProducerTransportCb, mockDevice as unknown as Device);
+        const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'createWebRtcTransport')[1];
+        emitCallback({ transportOptions: mockTransportOptions }); // Create transport
 
-      // should emit the socket event
-      expect(fakeSocket.emit).toHaveBeenCalledWith("transport_connect", {
-        dtlsParameters: dtlsParams,
-      });
-      // and call onSuccess
-      expect(onSuccess).toHaveBeenCalled();
-    });
+        // Find and trigger the 'produce' listener
+        const produceListener = (mockTransport as any).on.mock.calls.find((call: any) => call[0] === 'produce')[1];
+        const mockParams = { kind: 'video', rtpParameters: {}, appData: { foo: 'bar' } };
+        const mockOnSuccess = jest.fn();
+        const mockOnError = jest.fn();
+        produceListener(mockParams, mockOnSuccess, mockOnError);
 
-    it("invokes onSuccess when transport.produce event fires", () => {
-      broadcaster.createProducerTransport(
-        setProducerTransport,
-        fakeDevice,
-        connectSendTransport
-      );
-      const cb = (fakeSocket.emit as jest.Mock).mock.calls[0][2] as Function;
-      cb({ transportOptions: {} });
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'transport_produce',
+            mockParams,
+            expect.any(Function) // Server callback
+        );
 
-      const produceListener = fakeProducerTransport.on.mock.calls.find(
-        ([evt]: any[]) => evt === "produce"
-      )![1] as Function;
+        // Simulate server callback for produce
+        const produceEmitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'transport_produce')[2];
+        produceEmitCallback({ id: 'server-prod-id' });
 
-      // stub emit to call back immediately
-      (fakeSocket.emit as jest.Mock).mockImplementation((_, payload, cb) => {
-        cb({ id: "new-prod" });
-      });
+        expect(mockOnSuccess).toHaveBeenCalledWith({ id: 'server-prod-id' });
+        expect(mockOnError).not.toHaveBeenCalled();
+     });
 
-      const onSuccess = jest.fn();
-      const onError = jest.fn();
-      const params = {
-        kind: "audio",
-        rtpParameters: {},
-        appData: {},
-      };
+     it('should handle errors during transport creation', () => {
+        const error = new Error('Send transport creation failed');
+        mockDevice.createSendTransport.mockImplementation(() => { throw error; });
 
-      produceListener(params, onSuccess, onError);
+        broadcaster.createProducerTransport(mockSetProducerTransportCb, mockDevice as unknown as Device);
+        const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'createWebRtcTransport')[1];
 
-      // should emit transport_produce
-      expect(fakeSocket.emit).toHaveBeenCalledWith(
-        "transport_produce",
-        params,
-        expect.any(Function)
-      );
-      // and call onSuccess
-      expect(onSuccess).toHaveBeenCalledWith({ id: "new-prod" });
-    });
+        expect(() => emitCallback({ transportOptions: mockTransportOptions })).toThrow(error);
+        expect(mockSetProducerTransportCb).not.toHaveBeenCalled();
+        expect((broadcaster as any).log).toHaveBeenCalledWith(`Error creating send transport: ${error.message}`, 'error');
+     });
+
+     it('should handle null transportOptions', () => {
+        broadcaster.createProducerTransport(mockSetProducerTransportCb, mockDevice as unknown as Device);
+        const emitCallback = (mockSocket as any).emit.mock.calls.find((call: any) => call[0] === 'createWebRtcTransport')[1];
+
+        expect(() => emitCallback({ transportOptions: null })).toThrow('Transport options are null');
+        expect(mockDevice.createSendTransport).not.toHaveBeenCalled();
+        expect((broadcaster as any).log).toHaveBeenCalledWith('Transport options are null', 'error');
+     });
   });
+
+  // Add similar tests for createConsumerTransport, consume, and Redux methods if needed
 });

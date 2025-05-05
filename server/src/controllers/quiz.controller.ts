@@ -1,7 +1,7 @@
 import models from '@/models/index';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { Quiz } from '@/models/associations';
+import type { Quiz } from '@/models/associations';
 
 async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
   try {
