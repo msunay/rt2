@@ -63,4 +63,4 @@ quizNamespace.on("connection", (socket) =>
   quizSocketInit(socket, quizNamespace)
 );
 
-instrument(io, { auth: false, mode: "development" });
+// instrument(io, { auth: false, mode: "development" });

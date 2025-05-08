@@ -1,92 +1,202 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { MediaStream } from 'react-native-webrtc';
 import type { AVPlaybackStatus } from 'expo-av';
 import type { types as mediasoupTypes } from 'mediasoup-client';
 
-/**
- * Interface for media stream state
- * Handles both media streaming objects andconnection state
- */
 export interface MediaStreamState {
-  consumerTransport: mediasoupTypes.Transport | null;
-  consumer: mediasoupTypes.Consumer | null;
-  mediaStream: MediaStream | null;
-  avStatus: AVPlaybackStatus | null;
-  isConnecting: boolean;
-  isConnected: boolean;
-  connectionError: string | null;
+  // --- Producer (Broadcaster) Specific State ---
+  producerHasLocalMedia: boolean; // True if local media (camera/mic) is acquired
+  producerIsConnecting: boolean; // True when producer is attempting to connect/stream
+  producerIsStreaming: boolean; // True when producer is actively streaming to Mediasoup
+  producerConnectionError: string | null;
+
+  // --- Consumer (Receiver) Specific State ---
+  consumerTransport: mediasoupTypes.Transport | null; // Mediasoup transport for receiving
+  consumer: mediasoupTypes.Consumer | null; // Mediasoup consumer object
+  consumerIsConnecting: boolean; // True when consumer is attempting to connect/receive
+  consumerIsReceivingStream: boolean; // True when consumer is actively receiving a remote stream
+  consumerConnectionError: string | null;
+  consumerAVStatus: AVPlaybackStatus | null; // Playback status for the consumed stream
+
+  // --- Potentially Shared/Generic State (can be further split if needed) ---
+  // For now, connectionError is split. isConnecting is split.
 }
 
-/**
- * Initial media stream state
- */
 const initialState: MediaStreamState = {
+  // Producer
+  producerHasLocalMedia: false,
+  producerIsConnecting: false,
+  producerIsStreaming: false,
+  producerConnectionError: null,
+
+  // Consumer
   consumerTransport: null,
   consumer: null,
-  mediaStream: null,
-  avStatus: null,
-  isConnecting: false,
-  isConnected: false,
-  connectionError: null
+  consumerIsConnecting: false,
+  consumerIsReceivingStream: false,
+  consumerConnectionError: null,
+  consumerAVStatus: null,
 };
 
-/**
- * Media stream slice for Redux
- * Handles actions related to media streaming and connection status
- */
 const mediaStreamSlice = createSlice({
-  name: 'mediaStream',
+  name: 'mediaStreamSlice',
   initialState,
   reducers: {
-    // MediaSoup objects
-    setConsumerTransport: (state, action: PayloadAction<mediasoupTypes.Transport | null>) => {
+    // --- Producer Actions ---
+    setProducerHasLocalMedia: (state, action: PayloadAction<boolean>) => {
+      state.producerHasLocalMedia = action.payload;
+      if (!action.payload) {
+        state.producerIsStreaming = false;
+      }
+    },
+    setProducerIsConnecting: (state, action: PayloadAction<boolean>) => {
+      state.producerIsConnecting = action.payload;
+      if (action.payload) {
+        state.producerConnectionError = null;
+        state.producerIsStreaming = false;
+      }
+    },
+    setProducerStreamingStatus: (
+      state,
+      action: PayloadAction<{ isActive: boolean }>,
+    ) => {
+      state.producerIsStreaming = action.payload.isActive;
+      if (action.payload.isActive) {
+        state.producerIsConnecting = false;
+        state.producerConnectionError = null;
+      } else {
+        // state.producerIsConnecting = false; // Or handled by a specific reconnect logic
+      }
+    },
+    setProducerConnectionError: (
+      state,
+      action: PayloadAction<string | null>,
+    ) => {
+      state.producerConnectionError = action.payload;
+      state.producerIsConnecting = false;
+      state.producerIsStreaming = false;
+    },
+
+    // --- Consumer Actions ---
+    setConsumerTransport: (
+      state,
+      action: PayloadAction<mediasoupTypes.Transport | null>,
+    ) => {
       state.consumerTransport = action.payload;
     },
-    setConsumer: (state, action: PayloadAction<mediasoupTypes.Consumer | null>) => {
+    setConsumer: (
+      state,
+      action: PayloadAction<mediasoupTypes.Consumer | null>,
+    ) => {
       state.consumer = action.payload;
     },
-    setMediaStream: (state, action: PayloadAction<MediaStream | null>) => {
-      state.mediaStream = action.payload;
-      
-      // Update connection state when media stream changes
-      state.isConnected = !!action.payload;
+    setConsumerIsConnecting: (state, action: PayloadAction<boolean>) => {
+      state.consumerIsConnecting = action.payload;
       if (action.payload) {
-        state.isConnecting = false;
-        state.connectionError = null;
+        state.consumerConnectionError = null;
+        state.consumerIsReceivingStream = false;
       }
     },
-    setAVStatus: (state, action: PayloadAction<AVPlaybackStatus | null>) => {
-      state.avStatus = action.payload;
-    },
-    
-    // Connection UI state
-    setIsConnecting: (state, action: PayloadAction<boolean>) => {
-      state.isConnecting = action.payload;
-      if (action.payload) {
-        // Clear errors when starting to connect
-        state.connectionError = null;
+    setConsumerStreamActive: (
+      state,
+      action: PayloadAction<{ isActive: boolean }>,
+    ) => {
+      state.consumerIsReceivingStream = action.payload.isActive;
+      if (action.payload.isActive) {
+        state.consumerIsConnecting = false;
+        state.consumerConnectionError = null;
+      } else {
+        // state.consumerIsConnecting = false;
       }
     },
-    setConnectionError: (state, action: PayloadAction<string | null>) => {
-      state.connectionError = action.payload;
-      state.isConnecting = false;
+    setConsumerConnectionError: (
+      state,
+      action: PayloadAction<string | null>,
+    ) => {
+      state.consumerConnectionError = action.payload;
+      state.consumerIsConnecting = false;
+      state.consumerIsReceivingStream = false;
     },
-    
-    // Reset media stream state
-    resetMediaStreamState: () => initialState
-  }
+    setConsumerAVStatus: (
+      state,
+      action: PayloadAction<AVPlaybackStatus | null>,
+    ) => {
+      state.consumerAVStatus = action.payload;
+    },
+
+    // --- General Actions ---
+    resetMediaStreamState: () => initialState,
+  },
 });
 
-// Export actions
+// const mediaStreamSlice = createSlice({
+//   name: 'mediaStreamSlice', // Changed name to avoid conflict if 'mediaStream' is used elsewhere
+//   initialState,
+//   reducers: {
+//     setConsumerTransport: (
+//       state,
+//       action: PayloadAction<mediasoupTypes.Transport | null>,
+//     ) => {
+//       state.consumerTransport = action.payload;
+//     },
+//     setConsumer: (
+//       state,
+//       action: PayloadAction<mediasoupTypes.Consumer | null>,
+//     ) => {
+//       state.consumer = action.payload;
+//     },
+//     // setMediaStream: (state, action: PayloadAction<MediaStream | null>) => { ... }, // REMOVED
+//     setAVStatus: (state, action: PayloadAction<AVPlaybackStatus | null>) => {
+//       state.avStatus = action.payload;
+//     },
+//     setIsConnecting: (state, action: PayloadAction<boolean>) => {
+//       state.isConnecting = action.payload;
+//       if (action.payload) {
+//         state.connectionError = null;
+//         state.isConnected = false;
+//       }
+//     },
+//     setConnectionError: (state, action: PayloadAction<string | null>) => {
+//       state.connectionError = action.payload;
+//       state.isConnecting = false;
+//       state.isConnected = false;
+//     },
+//     setHasLocalMedia: (state, action: PayloadAction<boolean>) => {
+//       state.hasLocalMedia = action.payload;
+//       if (!action.payload) {
+//         state.isConnected = false;
+//       }
+//     },
+//     setStreamingStatus: (
+//       state,
+//       action: PayloadAction<{ isActive: boolean }>,
+//     ) => {
+//       state.isConnected = action.payload.isActive;
+//       if (action.payload.isActive) {
+//         state.isConnecting = false;
+//         state.connectionError = null;
+//       } else {
+//         state.isConnecting = false;
+//       }
+//     },
+//     resetMediaStreamState: () => initialState,
+//   },
+// });
+
 export const {
+  // Producer
+  setProducerHasLocalMedia,
+  setProducerIsConnecting,
+  setProducerStreamingStatus,
+  setProducerConnectionError,
+  // Consumer
   setConsumerTransport,
   setConsumer,
-  setMediaStream,
-  setAVStatus,
-  setIsConnecting,
-  setConnectionError,
-  resetMediaStreamState
+  setConsumerIsConnecting,
+  setConsumerStreamActive,
+  setConsumerConnectionError,
+  setConsumerAVStatus,
+  // General
+  resetMediaStreamState,
 } = mediaStreamSlice.actions;
 
-// Export reducer
 export default mediaStreamSlice.reducer;

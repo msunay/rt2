@@ -14,7 +14,7 @@ export default function HostingQuizCard({ quiz }: { quiz: Quiz }) {
     <Link
       href={{
         pathname: '/hostQuiz/[quizId]',
-        params: { quizId: quiz.id },
+        params: { quizId: quiz.id ?? '' },
       }}
       asChild
     >

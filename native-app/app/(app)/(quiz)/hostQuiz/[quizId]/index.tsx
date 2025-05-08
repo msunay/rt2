@@ -13,7 +13,10 @@ export default function HostStreamPage() {
   const { data: quiz } = useGetOneQuizQuery(quizId || '');
 
   return (
-    <ImageBackground /* source={QUIZ_BACKGROUND.background} */ style={styles.background}>
+    // <View /* source={QUIZ_BACKGROUND.background} */ style={styles.background}>
+    //   <HostStream quizId={quizId} />
+    // </View>
+    <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
       <HostStream quizId={quizId} />
     </ImageBackground>
   );
@@ -27,7 +30,7 @@ const styles = StyleSheet.create({
     // paddingBottom: 50,
     // borderWidth: 1,
   },
-  camera: {
-    flex: 1,
-  },
+  // camera: {
+  //   flex: 1,
+  // },
 });

@@ -27,7 +27,7 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
     <Link
       href={{
         pathname: '/playQuiz/[partId]',
-        params: { partId: participation?.id },
+        params: { partId: participation?.id ?? ''},
       }}
       asChild
     >

@@ -15,7 +15,6 @@ import { WebSocketManager } from "@/src/services/webSocketManager";
 import {
   setConsumerTransport,
   setConsumer,
-  setMediaStream,
 } from "@/src/features/mediaStreamSlice";
 import { AppDispatch } from "@/src/store";
 
@@ -319,7 +318,7 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
     device: Device,
     setConsumerCb: (consumer: Consumer<AppData>) => void,
     setMediaStreamCb: (mediaStream: MediaStream) => void
-  ): { consumerTransport: Transport<AppData> } {
+  ): void/* { consumerTransport: Transport<AppData> } */ {
     this.getSocket().emit(
       "consume",
       { rtpCapabilities: device.rtpCapabilities },
@@ -359,7 +358,7 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
       }
     );
 
-    return { consumerTransport };
+    // return { consumerTransport };
   }
 
   /**
@@ -380,16 +379,17 @@ export class MediaStreamBroadcaster extends WebSocketManager<"mediasoup"> {
     );
   }
 
-  public consumeWithRedux(
-    dispatch: AppDispatch,
+  public consumeAndManageStream(
     consumerTransport: Transport<AppData>,
-    device: Device
-  ): { consumerTransport: Transport<AppData> } {
-    return this.consume(
+    device: Device,
+    setConsumerInReduxCb: (consumer: Consumer<AppData>) => void,
+    handleReceivedStreamCb: (mediaStream: MediaStream) => void,
+  ): void {
+    this.consume(
       consumerTransport,
       device,
-      (consumer) => dispatch(setConsumer(consumer)),
-      (mediaStream) => dispatch(setMediaStream(mediaStream))
+      setConsumerInReduxCb,
+      handleReceivedStreamCb
     );
   }
 }

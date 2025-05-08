@@ -13,14 +13,10 @@ import {
 import {
   setConsumerTransport,
   setConsumer,
-  setMediaStream,
-  setIsConnecting,
-  setConnectionError
 } from '@/src/features/mediaStreamSlice';
 
 // Import socket managers
 import { QuizParticipantManager } from '@/src/services/quizParticipantManager';
-import { MediaStreamBroadcaster } from '@/src/services/mediaStreamBroadcaster';
 
 /**
  * Custom hook to use quiz socket connections
@@ -45,9 +41,9 @@ export function useQuizSocket(quizId?: string) {
         dispatch(incrementTrigger());
         break;
       // Media stream actions should go through the mediaStreamSlice now
-      case 'SET_US_MEDIA_STREAM':
-        dispatch(setMediaStream(action.payload));
-        break;
+      // case 'SET_US_MEDIA_STREAM':
+      //   dispatch(setMediaStream(action.payload));
+      //   break;
       case 'SET_US_CONSUMER_TS':
         dispatch(setConsumerTransport(action.payload));
         break;
@@ -87,18 +83,4 @@ export function useQuizSocket(quizId?: string) {
   }, [quizSocketManager, quizId]);
 
   return quizSocketManager;
-}
-
-/**
- * Custom hook to access quiz and media stream state together
- */
-export function useBroadcastState() {
-  const quizState = useAppSelector(state => state.quizSlice);
-  const mediaStreamState = useAppSelector(state => state.mediaStreamSlice);
-
-  // Combined state for components that need both
-  return {
-    ...quizState,
-    ...mediaStreamState
-  };
 }

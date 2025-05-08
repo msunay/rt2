@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/src/hooks/reduxHooks';
 import { MediaStreamBroadcaster } from '@/src/services/mediaStreamBroadcaster';
 import { QuizBroadcasterManager } from '@/src/services/quizBroadcasterManager';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
 import { useMediasoupProducer } from '../hooks/useMediasoupProducer';
 
@@ -20,7 +20,9 @@ export default function HostStream({ quizId }: { quizId: string }) {
     const dispatch = useAppDispatch();
     const currentQuestionNumber = useAppSelector((state) => state.questionSlice.value);
     const { quizStarted, questionHidden, trigger } = useAppSelector((state) => state.quizSlice);
-    const { mediaStream, isConnecting } = useAppSelector((state) => state.mediaStreamSlice);
+    const { producerHasLocalMedia, producerIsConnecting, producerIsStreaming, producerConnectionError } = useAppSelector(
+        (state) => state.mediaStreamSlice
+    );
 
     // Socket managers - use Redux dispatch
     const quizSocketManager = useMemo(() => QuizBroadcasterManager.withReduxDispatch(dispatch), [dispatch]);
@@ -28,7 +30,7 @@ export default function HostStream({ quizId }: { quizId: string }) {
     const streamSocketManager = useMemo(() => new MediaStreamBroadcaster(), []);
 
     // Initialize mediasoup functionality
-    const { getLocalStream, connect, endStream } = useMediasoupProducer(streamSocketManager);
+    const { getLocalStream, connect, endStream, localStreamRef } = useMediasoupProducer(streamSocketManager);
 
     // Set up socket listeners
     useEffect(() => {
@@ -54,11 +56,20 @@ export default function HostStream({ quizId }: { quizId: string }) {
 
             // Ensure media streams are stopped - cleanup handled in useMediasoup hook
         };
-    }, [quizId, quizSocketManager, streamSocketManager, getLocalStream]);
+    }, [quizId, quizSocketManager, streamSocketManager]);
 
     useEffect(() => {
         console.log('quizStarted:', quizStarted);
     }, [quizStarted]);
+
+    // Display connection error if any
+    useEffect(() => {
+        if (producerConnectionError) {
+            Alert.alert('Streaming Error', producerConnectionError);
+            // clear the error after showing it
+            // dispatch(setConnectionError(null));
+        }
+    }, [producerConnectionError, dispatch]);
 
     /**
      * Start the quiz
@@ -110,7 +121,14 @@ export default function HostStream({ quizId }: { quizId: string }) {
     }, []);
 
     return (
-        <RTCView streamURL={mediaStream?.toURL()} mirror={true} objectFit="cover" style={styles.rtcView}>
+        <View style={styles.outerContainer}>
+            <RTCView
+                streamURL={localStreamRef.current?.toURL()}
+                mirror={true}
+                objectFit="cover"
+                style={styles.rtcViewBackground}
+            />
+
             <View style={styles.container}>
                 <View style={styles.videoContainer}>
                     <View style={styles.questionComponentContainer}>
@@ -144,29 +162,45 @@ export default function HostStream({ quizId }: { quizId: string }) {
                     </View>
 
                     <View style={styles.streamControls}>
-                        <Pressable style={pressableStyle} onPress={getLocalStream} disabled={!!mediaStream}>
-                            <Text style={styles.buttonText}>Start Video</Text>
+                        <Pressable style={pressableStyle} onPress={getLocalStream} disabled={producerHasLocalMedia}>
+                            <Text style={styles.buttonText}>{producerHasLocalMedia ? 'Video Started' : 'Start Video'}</Text>
                         </Pressable>
-                        <Pressable style={pressableStyle} onPress={connect} disabled={!mediaStream || isConnecting}>
-                            <Text style={styles.buttonText}>{isConnecting ? 'Connecting...' : 'Stream'}</Text>
+                        <Pressable
+                            style={pressableStyle}
+                            onPress={connect}
+                            disabled={!producerHasLocalMedia || producerIsConnecting || producerIsStreaming}
+                        >
+                            <Text style={styles.buttonText}>
+                                {producerIsConnecting ? 'Connecting...' : producerIsStreaming ? 'Streaming' : 'Stream'}
+                            </Text>
                         </Pressable>
-                        <Pressable style={pressableStyle} onPress={() => endStream({})} disabled={!mediaStream}>
+                        <Pressable
+                            style={pressableStyle}
+                            onPress={() => endStream({})}
+                            disabled={!producerHasLocalMedia && !producerIsStreaming}
+                        >
                             <Text style={styles.buttonText}>End Stream</Text>
                         </Pressable>
                     </View>
                 </View>
             </View>
-        </RTCView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    rtcView: {
+    outerContainer: {
         flex: 1,
+        // backgroundColor: 'red',
+    },
+    rtcViewBackground: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 0,
     },
     container: {
         flex: 1,
         justifyContent: 'flex-end',
+        // zIndex: 1, // Optionally, ensure this is on top. Usually not needed if rendered after RTCView.
     },
     videoContainer: {
         flex: 1,
@@ -184,9 +218,7 @@ const styles = StyleSheet.create({
     },
     streamControls: {
         alignItems: 'center',
-        zIndex: 10,
-        borderWidth: 1,
-        borderColor: '#FF0000',
+        // zIndex: 10,
     },
     actionButton: {
         justifyContent: 'center',
