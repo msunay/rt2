@@ -10,8 +10,8 @@ export interface MediaStreamState {
   producerConnectionError: string | null;
 
   // --- Consumer (Receiver) Specific State ---
-  consumerTransport: mediasoupTypes.Transport | null; // Mediasoup transport for receiving
-  consumer: mediasoupTypes.Consumer | null; // Mediasoup consumer object
+  // consumerTransport: mediasoupTypes.Transport | null; // Mediasoup transport for receiving
+  consumerID: string | null; // Mediasoup consumer object
   consumerIsConnecting: boolean; // True when consumer is attempting to connect/receive
   consumerIsReceivingStream: boolean; // True when consumer is actively receiving a remote stream
   consumerConnectionError: string | null;
@@ -29,8 +29,8 @@ const initialState: MediaStreamState = {
   producerConnectionError: null,
 
   // Consumer
-  consumerTransport: null,
-  consumer: null,
+  // consumerTransport: null,
+  consumerID: null,
   consumerIsConnecting: false,
   consumerIsReceivingStream: false,
   consumerConnectionError: null,
@@ -77,17 +77,11 @@ const mediaStreamSlice = createSlice({
     },
 
     // --- Consumer Actions ---
-    setConsumerTransport: (
+    setConsumerID: (
       state,
-      action: PayloadAction<mediasoupTypes.Transport | null>,
+      action: PayloadAction<string | null>,
     ) => {
-      state.consumerTransport = action.payload;
-    },
-    setConsumer: (
-      state,
-      action: PayloadAction<mediasoupTypes.Consumer | null>,
-    ) => {
-      state.consumer = action.payload;
+      state.consumerID = action.payload;
     },
     setConsumerIsConnecting: (state, action: PayloadAction<boolean>) => {
       state.consumerIsConnecting = action.payload;
@@ -189,8 +183,8 @@ export const {
   setProducerStreamingStatus,
   setProducerConnectionError,
   // Consumer
-  setConsumerTransport,
-  setConsumer,
+  // setConsumerTransport,
+  setConsumerID,
   setConsumerIsConnecting,
   setConsumerStreamActive,
   setConsumerConnectionError,

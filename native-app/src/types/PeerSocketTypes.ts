@@ -6,14 +6,14 @@ import type {
   RtpCapabilities,
   RtpParameters,
   TransportOptions,
-} from "mediasoup-client/lib/types";
+} from "mediasoup-client/types";
 import { CommonSocketClientToServerEvents, CommonSocketServerToClientEvents } from "./CommonSocketTypes";
 
 /**
  * Interface for producer options
  */
 export interface ProducerOptions {
-  id?: string | undefined;
+  transportId: string;
   kind: MediaKind;
   rtpParameters: RtpParameters;
   paused?: boolean | undefined;
@@ -51,8 +51,10 @@ export interface PeersClientToServerEvents extends CommonSocketClientToServerEve
 
   // Connect a transport with DTLS parameters
   transport_connect: ({
+    transportId,
     dtlsParameters,
   }: {
+    transportId: string;
     dtlsParameters: DtlsParameters;
   }) => void;
 
@@ -64,8 +66,10 @@ export interface PeersClientToServerEvents extends CommonSocketClientToServerEve
 
   // Connect a receiving transport with DTLS parameters
   transport_recv_connect: ({
+    transportId,
     dtlsParameters,
   }: {
+    transportId: string;
     dtlsParameters: DtlsParameters;
   }) => void;
 

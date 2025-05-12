@@ -39,6 +39,7 @@ export class MediaSoupService {
     }
   >();
   private transports = new Map<string, WebRtcTransport>();
+  private activeProducer: string | null = null;
 
   constructor(private config: MediaSoupServiceConfig) {}
 
@@ -95,7 +96,7 @@ export class MediaSoupService {
     transportOptions: TransportOptions;
   }> {
     if (!this.webRtcServer || !this.router) {
-      throw new Error(`${!this.webRtcServer ? 'WebRtcServer' : 'Router'} not initialized`);
+      throw new Error(`${!this.webRtcServer ? "WebRtcServer" : "Router"} not initialized`);
     }
 
     const transport = await this.router.createWebRtcTransport({
@@ -129,10 +130,7 @@ export class MediaSoupService {
     return { transport, transportOptions };
   }
 
-  public async connectTransport(
-    transportId: string,
-    dtlsParameters: any
-  ): Promise<void> {
+  public async connectTransport(transportId: string, dtlsParameters: any): Promise<void> {
     const transport = this.transports.get(transportId);
     if (!transport) {
       throw new Error(`Transport with id ${transportId} not found`);
@@ -163,6 +161,15 @@ export class MediaSoupService {
     });
 
     return producer;
+  }
+
+  public setActiveProducer(producerId: string | null): void {
+    console.log(`Setting active producer to ${producerId}`);
+    this.activeProducer = producerId;
+  }
+
+  public getActiveProducer(): string | null {
+    return this.activeProducer;
   }
 
   public async createConsumer(

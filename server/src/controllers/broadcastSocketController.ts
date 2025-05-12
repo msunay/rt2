@@ -47,6 +47,12 @@ export const peerSocketInit = (
 
   socket.on("disconnect", () => {
     console.log("Peer disconnected:", socket.id);
+
+    const activeProducerId = mediaSoupService.getActiveProducer();
+    if (socket.data.producerId && socket.data.producerId === activeProducerId) {
+        console.log(`[SERVER] disconnect: Active producer ${activeProducerId} disconnected. Clearing activeProducerId.`);
+        mediaSoupService.setActiveProducer(null);
+    }
     mediaSoupService.cleanup(socket.id);
   });
 
@@ -73,39 +79,58 @@ export const peerSocketInit = (
     callback({ transportOptions });
   });
 
-  onAsync("transport_connect", async ({ dtlsParameters }) => {
+  onAsync("transport_connect", async ({ transportId, dtlsParameters }) => {
+    if (!transportId) throw new Error("transportId is required for transport_connect");
+
+    console.log(`Connecting transport ${transportId} for socket ${socket.id}`);
     await mediaSoupService.connectTransport(
-      socket.data.producerTransportId,
+      transportId,
       dtlsParameters
     );
   });
 
   onAsync(
     "transport_produce",
-    async ({ kind, rtpParameters, appData }, callback) => {
+    async ({ transportId, kind, rtpParameters, appData }, callback) => {
+
+      if (!transportId) throw new Error("transportId is required for transport_produce");
+
       const { id } = await mediaSoupService.createProducer(
-        socket.data.producerTransportId,
+        transportId,
         kind,
         rtpParameters,
         appData
       );
       socket.data.producerId = id;
+      mediaSoupService.setActiveProducer(id);
+      console.log(`[SERVER] transport_produce: Set activeProducerId to ${mediaSoupService.getActiveProducer()}`);
       callback({ id });
       socket.broadcast.emit("new_producer", { producerId: id });
     }
   );
 
-  onAsync("transport_recv_connect", async ({ dtlsParameters }) => {
+  onAsync("transport_recv_connect", async ({ transportId, dtlsParameters }) => {
+    if (!transportId) throw new Error("transportId is required for transport_recv_connect");
+     console.log(`Connecting recv transport ${transportId} for socket ${socket.id}`);
+
     await mediaSoupService.connectTransport(
-      socket.data.consumerTransportId,
+      transportId,
       dtlsParameters
     );
   });
 
   onAsync("consume", async ({ rtpCapabilities }, callback) => {
+
+    const transportId = socket.data.consumerTransportId;
+    if (!transportId) throw new Error("Consumer transport not found for this socket.");
+
+    const producerToConsume = mediaSoupService.getActiveProducer();
+    if (!producerToConsume) throw new Error("Producer not found or specified for consumption.");
+
+    console.log(`Consuming producer ${producerToConsume} on transport ${transportId} for socket ${socket.id}`);
     const consumer = await mediaSoupService.createConsumer(
-      socket.data.consumerTransportId,
-      socket.data.producerId,
+      transportId,
+      producerToConsume,
       rtpCapabilities
     );
     if (!consumer) throw new Error("cannot_consume");

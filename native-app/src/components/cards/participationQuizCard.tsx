@@ -9,6 +9,7 @@ import { formatDistance } from 'date-fns';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { use, useEffect } from 'react';
 
 export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
   // Fetches the host's details for the quiz using the quiz owner's ID.
@@ -23,6 +24,13 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
     quizId: quiz.id || '',
   });
 
+  // debug useEffect
+  useEffect(() => {
+    console.log('participation', participation);
+    console.log('quizId', quiz.id);
+    console.log('userId', id);
+  }, [participation]);
+
   return (
     <Link
       href={{
@@ -30,6 +38,9 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
         params: { partId: participation?.id ?? ''},
       }}
       asChild
+      onPress={() => {
+        console.log('participationId', participation?.id)
+      }}
     >
       <Pressable style={styles.container}>
         <View style={styles.imageContainer}>

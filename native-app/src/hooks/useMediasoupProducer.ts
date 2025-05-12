@@ -119,22 +119,46 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
     }, [streamSuccess, dispatch]);
 
     /**
-     * Start connection process
+     * Create transport for sending media
      */
-    const connect = useCallback(() => {
-        dispatch(setProducerIsConnecting(true));
-        if (!localStreamRef.current) {
-            console.error('No media stream available');
+    const createSendTransport = useCallback(() => {
+        if (!deviceRef.current) {
+            console.error('Device not initialized');
             dispatch(setProducerIsConnecting(false));
-            dispatch(setProducerConnectionError('No media stream available'));
+            dispatch(setProducerConnectionError('Device not initialized'));
             return;
         }
-        if (!deviceRef.current) {
-            getRtpCapabilities();
-        } else {
-            createSendTransport();
+
+        if (!paramsRef.current.track) {
+            console.error('Track not available for createSendTransport');
+            dispatch(setProducerIsConnecting(false));
+            dispatch(setProducerConnectionError('Video track not available. Start video.'));
+            return;
         }
-    }, [dispatch]);
+
+        try {
+            streamSocketManager.createProducerTransport((transport) => {
+                console.log('createSendTransport (callback): Transport created by manager, storing in ref.');
+                producerTransportRef.current = transport;
+
+                if (transport && !transport.closed && !producerRef.current) {
+                    console.log(
+                        'createSendTransport (callback): Transport ref set, directly calling connectSendTransport.'
+                    );
+                    connectSendTransport(transport);
+                } else {
+                    console.log('createSendTransport (callback): Conditions not met for immediate connect.', {
+                        transportClosed: transport?.closed,
+                        hasProducer: !!producerRef.current,
+                    });
+                }
+            }, deviceRef.current);
+        } catch (err) {
+            console.error('Failed to create send transport:', err);
+            dispatch(setProducerIsConnecting(false));
+            dispatch(setProducerConnectionError(err instanceof Error ? err.message : 'Transport creation failed'));
+        }
+    }, [dispatch, streamSocketManager]);
 
     /**
      * Create mediasoup device with router capabilities
@@ -149,7 +173,9 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
 
                 console.log('Device RTP Capabilities', device.rtpCapabilities);
                 deviceRef.current = device;
-                // createSendTransport();
+
+                console.log('createDevice: Device created, now calling createSendTransport.');
+                createSendTransport();
             } catch (err) {
                 console.error('Failed to create device:', err);
                 dispatch(setProducerIsConnecting(false));
@@ -161,7 +187,7 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
                 }
             }
         },
-        [dispatch]
+        [dispatch, createSendTransport]
     );
 
     /**
@@ -172,38 +198,23 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
     }, [streamSocketManager, createDevice]);
 
     /**
-     * Create transport for sending media
+     * Start connection process
      */
-    const createSendTransport = useCallback(() => {
-        if (!deviceRef.current) {
-            console.error('Device not initialized');
+    const connect = useCallback(() => {
+        dispatch(setProducerIsConnecting(true));
+        if (!localStreamRef.current) {
+            console.error('No media stream available');
             dispatch(setProducerIsConnecting(false));
-            dispatch(setProducerConnectionError('Device not initialized'));
+            dispatch(setProducerConnectionError('No media stream available'));
             return;
         }
-
-        if (!paramsRef.current.track) {
-          console.error('Track not available for createSendTransport');
-          dispatch(setProducerIsConnecting(false));
-          dispatch(setProducerConnectionError('Video track not available. Start video.'));
-          return;
+        if (!deviceRef.current || !deviceRef.current.loaded) {
+            getRtpCapabilities();
+        } else {
+            console.log('connect: Device already ready, calling createSendTransport...');
+            createSendTransport();
         }
-
-        try {
-            streamSocketManager.createProducerTransport(
-                (transport) => {
-                    producerTransportRef.current = transport;
-                    //   return connectSendTransport(transport);
-                },
-                deviceRef.current
-                // connectSendTransport
-            );
-        } catch (err) {
-            console.error('Failed to create send transport:', err);
-            dispatch(setProducerIsConnecting(false));
-            dispatch(setProducerConnectionError(err instanceof Error ? err.message : 'Transport creation failed'));
-        }
-    }, [dispatch, streamSocketManager]);
+    }, [dispatch, getRtpCapabilities, createSendTransport]);
 
     /**
      * End streaming and clean up resources
@@ -272,13 +283,23 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
     );
 
     // Effect to connect transport once it's created
-    useEffect(() => {
-        // Only run if transport exists, is not closed, and producer doesn't exist yet
-        if (producerTransportRef.current && !producerTransportRef.current.closed && !producerRef.current) {
-            console.log('Producer transport ref set, attempting to connect/produce...');
-            connectSendTransport(producerTransportRef.current);
-        }
-    }, [producerTransportRef.current]);
+    // useEffect(() => {
+    //     const transport = producerTransportRef.current;
+    //     console.log(
+    //         'useEffect [producer transport check]: transport?',
+    //         !!transport,
+    //         'transport closed?',
+    //         transport?.closed,
+    //         'producer?',
+    //         !!producerRef.current
+    //     );
+    //     if (transport && !transport.closed && !producerRef.current) {
+    //         console.log('useEffect [producer transport check]: Conditions met, calling connectSendTransport.'); // <<<< AND THIS
+    //         connectSendTransport(transport);
+    //     } else {
+    //         console.log('useEffect [producer transport check]: Conditions NOT met.');
+    //     }
+    // }, [producerTransportRef.current, connectSendTransport]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -289,6 +310,6 @@ export const useMediasoupProducer = (streamSocketManager: MediaStreamBroadcaster
         getLocalStream,
         connect,
         endStream,
-        localStreamRef
+        localStreamRef,
     };
 };

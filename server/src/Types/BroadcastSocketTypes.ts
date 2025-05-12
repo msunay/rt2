@@ -28,9 +28,9 @@ export interface BroadcastListenEvents {
     callback: (response: { transportOptions: TransportOptions }) => void
   ) => void;
 
-  transport_connect: (opts: { dtlsParameters: DtlsParameters }) => void;
+  transport_connect: (opts: { transportId: string; dtlsParameters: DtlsParameters }) => void;
 
-  transport_recv_connect: (opts: { dtlsParameters: DtlsParameters }) => void;
+  transport_recv_connect: (opts: { transportId: string; dtlsParameters: DtlsParameters }) => void;
 
   transport_produce: (
     payload: TransportProducePayload,
