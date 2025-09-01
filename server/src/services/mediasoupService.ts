@@ -11,41 +11,43 @@ import type {
   WebRtcTransport,
   Worker,
   WorkerSettings,
+  DtlsParameters,
+  RtpCapabilities,
+  RtpParameters,
+  AppData,
 } from "mediasoup/types";
-
-interface RTCIceServer {
-  urls: string | string[];
-  username?: string;
-  credential?: string;
-}
 
 export interface MediaSoupServiceConfig {
   worker: WorkerSettings;
   webRtcServerOptions: WebRtcServerOptions;
   router: RouterOptions;
-  iceServers?: RTCIceServer[];
+}
+
+interface PeerResources {
+  producerTransport?: WebRtcTransport;
+  consumerTransport?: WebRtcTransport;
+  producer?: Producer;
+  consumers: Map<string, Consumer>;
 }
 
 export class MediaSoupService {
   private worker: Worker | null = null;
   private webRtcServer: WebRtcServer | null = null;
   private router: Router | null = null;
-  private rooms = new Map<
-    string,
-    {
-      router: Router;
-      producers: Map<string, Producer>;
-      consumers: Map<string, Consumer>;
-    }
-  >();
-  private transports = new Map<string, WebRtcTransport>();
-  private activeProducer: string | null = null;
+
+  // Track resources by peer ID
+  private peers = new Map<string, PeerResources>();
+
+  // Track the current active producer (for single-producer scenarios)
+  private activeProducerId: string | null = null;
+  private activeProducerPeerId: string | null = null;
 
   constructor(private config: MediaSoupServiceConfig) {}
 
   public async initialize(): Promise<void> {
     this.worker = await this.createWorker();
     this.webRtcServer = await this.createWebRtcServer(this.worker);
+    this.router = await this.createRouter();
   }
 
   private async createWorker(): Promise<Worker> {
@@ -73,30 +75,41 @@ export class MediaSoupService {
     }
   }
 
-  public async getOrCreateRouter(): Promise<Router> {
+  private async createRouter(): Promise<Router> {
     if (!this.worker) {
       throw new Error("Worker not initialized");
     }
 
-    if (!this.router) {
-      this.router = await this.worker.createRouter({
-        mediaCodecs: this.config.router.mediaCodecs,
-      });
-      console.log(`Created router with ID: ${this.router.id}`);
-    }
+    const router = await this.worker.createRouter({
+      mediaCodecs: this.config.router.mediaCodecs,
+    });
 
-    return this.router;
+    console.log(`Created router with ID: ${router.id}`);
+    return router;
+  }
+
+  public getRtpCapabilities(): RtpCapabilities {
+    if (!this.router) {
+      throw new Error("Router not initialized");
+    }
+    return this.router.rtpCapabilities;
+  }
+
+  private ensurePeerResources(peerId: string): PeerResources {
+    if (!this.peers.has(peerId)) {
+      this.peers.set(peerId, {
+        consumers: new Map(),
+      });
+    }
+    return this.peers.get(peerId)!;
   }
 
   public async createTransport(
     peerId: string,
     isProducer: boolean
-  ): Promise<{
-    transport: WebRtcTransport;
-    transportOptions: TransportOptions;
-  }> {
+  ): Promise<TransportOptions> {
     if (!this.webRtcServer || !this.router) {
-      throw new Error(`${!this.webRtcServer ? "WebRtcServer" : "Router"} not initialized`);
+      throw new Error("WebRtcServer or Router not initialized");
     }
 
     const transport = await this.router.createWebRtcTransport({
@@ -106,137 +119,254 @@ export class MediaSoupService {
       preferUdp: true,
     });
 
-    this.transports.set(transport.id, transport);
+    // Store transport in peer resources
+    const peerResources = this.ensurePeerResources(peerId);
+    if (isProducer) {
+      peerResources.producerTransport = transport;
+    } else {
+      peerResources.consumerTransport = transport;
+    }
 
+    // Set up transport event handlers
     transport.on("dtlsstatechange", (dtlsState) => {
+      console.log(`Transport ${transport.id} DTLS state changed to ${dtlsState}`);
       if (dtlsState === "closed") {
         transport.close();
-        this.transports.delete(transport.id);
       }
     });
 
+    transport.on('icestatechange', (iceState) => {
+    console.log(`Transport ${transport.id} ICE state changed to: ${iceState}`);
+    if (iceState === 'disconnected') {
+      console.error(`Transport ${transport.id} ICE ${iceState}!`);
+      transport.close();
+    }
+  });
+
     transport.on("@close", () => {
-      console.log(`Transport ${transport.id} closed`);
-      this.transports.delete(transport.id);
+      console.log(`Transport ${transport.id} closed for peer ${peerId}`);
     });
 
-    const transportOptions = {
+    // Return transport options for client
+    return {
       id: transport.id,
       iceParameters: transport.iceParameters,
       iceCandidates: transport.iceCandidates,
       dtlsParameters: transport.dtlsParameters,
     };
-
-    return { transport, transportOptions };
   }
 
-  public async connectTransport(transportId: string, dtlsParameters: any): Promise<void> {
-    const transport = this.transports.get(transportId);
+  public async connectTransport(
+    peerId: string,
+    transportId: string,
+    dtlsParameters: DtlsParameters
+  ): Promise<void> {
+    const peerResources = this.peers.get(peerId);
+    if (!peerResources) {
+      throw new Error(`No resources found for peer ${peerId}`);
+    }
+
+    // Find the transport (could be producer or consumer)
+    const transport =
+      (peerResources.producerTransport?.id === transportId ? peerResources.producerTransport : null) ||
+      (peerResources.consumerTransport?.id === transportId ? peerResources.consumerTransport : null);
+
     if (!transport) {
-      throw new Error(`Transport with id ${transportId} not found`);
+      throw new Error(`Transport ${transportId} not found for peer ${peerId}`);
     }
 
     await transport.connect({ dtlsParameters });
+    console.log(`Transport ${transportId} connected for peer ${peerId}`);
   }
 
   public async createProducer(
+    peerId: string,
     transportId: string,
     kind: MediaKind,
-    rtpParameters: any,
-    appData: any = {}
-  ): Promise<Producer> {
-    const transport = this.transports.get(transportId);
-    if (!transport) {
-      throw new Error(`Transport with id ${transportId} not found`);
+    rtpParameters: RtpParameters,
+    appData: AppData = {}
+  ): Promise<string> {
+    const peerResources = this.peers.get(peerId);
+    if (!peerResources?.producerTransport) {
+      throw new Error(`Producer transport not found for peer ${peerId}`);
     }
 
-    const producer = await transport.produce({
+    if (peerResources.producerTransport.id !== transportId) {
+      throw new Error(`Transport ID mismatch for peer ${peerId}`);
+    }
+
+    // Close existing producer if any
+    if (peerResources.producer) {
+      console.log(`Closing existing producer for peer ${peerId}`);
+      peerResources.producer.close();
+    }
+
+    const producer = await peerResources.producerTransport.produce({
       kind,
       rtpParameters,
       appData,
     });
 
+    peerResources.producer = producer;
+
+    // Update active producer
+    this.activeProducerId = producer.id;
+    this.activeProducerPeerId = peerId;
+
+    console.log(`Created producer ${producer.id} for peer ${peerId}`);
+
     producer.on("transportclose", () => {
       console.log(`Producer ${producer.id} transport closed`);
+      if (this.activeProducerId === producer.id) {
+        this.activeProducerId = null;
+        this.activeProducerPeerId = null;
+      }
     });
 
-    return producer;
-  }
-
-  public setActiveProducer(producerId: string | null): void {
-    console.log(`Setting active producer to ${producerId}`);
-    this.activeProducer = producerId;
-  }
-
-  public getActiveProducer(): string | null {
-    return this.activeProducer;
+    return producer.id;
   }
 
   public async createConsumer(
-    consumerTransportId: string,
-    producerId: string,
-    rtpCapabilities: any
-  ): Promise<Consumer | null> {
+    peerId: string,
+    transportId: string,
+    rtpCapabilities: RtpCapabilities
+  ): Promise<{
+    id: string;
+    producerId: string;
+    kind: MediaKind;
+    rtpParameters: RtpParameters;
+  } | null> {
     if (!this.router) {
       throw new Error("Router not initialized");
     }
 
-    // Check if the client can consume the producer
-    if (!this.router.canConsume({ producerId, rtpCapabilities })) {
-      console.warn("Client cannot consume the producer");
+    const peerResources = this.peers.get(peerId);
+    if (!peerResources?.consumerTransport) {
+      throw new Error(`Consumer transport not found for peer ${peerId}`);
+    }
+
+    if (peerResources.consumerTransport.id !== transportId) {
+      throw new Error(`Transport ID mismatch for peer ${peerId}`);
+    }
+
+    // Find the active producer
+    if (!this.activeProducerId || !this.activeProducerPeerId) {
+      throw new Error("No active producer available");
+    }
+
+    const producerPeer = this.peers.get(this.activeProducerPeerId);
+    if (!producerPeer?.producer) {
+      throw new Error("Active producer not found");
+    }
+
+    const producer = producerPeer.producer;
+
+    // Check if client can consume
+    if (!this.router.canConsume({
+      producerId: producer.id,
+      rtpCapabilities
+    })) {
+      console.warn(`Client ${peerId} cannot consume producer ${producer.id}`);
       return null;
     }
 
-    const transport = this.transports.get(consumerTransportId);
-    if (!transport) {
-      throw new Error(`Transport with id ${consumerTransportId} not found`);
-    }
+    // Create consumer
+    const consumer = await peerResources.consumerTransport.consume({
+      producerId: producer.id,
+      rtpCapabilities,
+      paused: true, // Start paused
+    });
 
-    try {
-      const consumer = await transport.consume({
-        producerId,
-        rtpCapabilities,
-        paused: true, // Start paused, then resume after client is ready
-      });
+    peerResources.consumers.set(consumer.id, consumer);
 
-      consumer.on("transportclose", () => {
-        console.log(`Consumer ${consumer.id} transport closed`);
-      });
+    // Set up consumer event handlers
+    consumer.on("transportclose", () => {
+      console.log(`Consumer ${consumer.id} transport closed`);
+      peerResources.consumers.delete(consumer.id);
+    });
 
-      consumer.on("producerclose", () => {
-        console.log(`Producer of consumer ${consumer.id} closed`);
-      });
+    consumer.on("producerclose", () => {
+      console.log(`Producer for consumer ${consumer.id} closed`);
+      peerResources.consumers.delete(consumer.id);
+    });
 
-      return consumer;
-    } catch (error) {
-      console.error("Error creating consumer:", error);
-      return null;
-    }
+    console.log(`Created consumer ${consumer.id} for peer ${peerId}`);
+
+    return {
+      id: consumer.id,
+      producerId: consumer.producerId,
+      kind: consumer.kind,
+      rtpParameters: consumer.rtpParameters,
+    };
   }
-  /*
-    public async resumeConsumer(consumerId: string): Promise<void> {
-      // Find the consumer by ID (would need to track consumers)
-      const consumer = this.findConsumer(consumerId);
-      if (consumer) {
-        await consumer.resume();
-      }
+
+  public async resumeConsumer(peerId: string, consumerId: string): Promise<void> {
+    const peerResources = this.peers.get(peerId);
+    if (!peerResources) {
+      throw new Error(`No resources found for peer ${peerId}`);
     }
 
-    private findConsumer(consumerId: string): Consumer | null {
-      // Implementation depends on how we track consumers
+    const consumer = peerResources.consumers.get(consumerId);
+    if (!consumer) {
+      throw new Error(`Consumer ${consumerId} not found for peer ${peerId}`);
+    }
+
+    await consumer.resume();
+    console.log(`Resumed consumer ${consumerId} for peer ${peerId}`);
+  }
+
+  public getActiveProducer(): { producerId: string; peerId: string } | null {
+    if (!this.activeProducerId || !this.activeProducerPeerId) {
       return null;
     }
+    return {
+      producerId: this.activeProducerId,
+      peerId: this.activeProducerPeerId,
+    };
+  }
 
-    public closeTransport(transportId: string): void {
-      const transport = this.transports.get(transportId);
-      if (transport) {
-        transport.close();
-        this.transports.delete(transportId);
+  public cleanup(peerId: string): void {
+    const peerResources = this.peers.get(peerId);
+    if (!peerResources) return;
+
+    // Close all consumers
+    peerResources.consumers.forEach((consumer) => {
+      consumer.close();
+    });
+
+    // Close producer if exists
+    if (peerResources.producer) {
+      peerResources.producer.close();
+
+      // Clear active producer if it matches
+      if (this.activeProducerId === peerResources.producer.id) {
+        this.activeProducerId = null;
+        this.activeProducerPeerId = null;
       }
     }
 
-    */
-  public cleanup(peerId: string): void {
-    // Close all resources associated with this peer
+    // Close transports
+    peerResources.producerTransport?.close();
+    peerResources.consumerTransport?.close();
+
+    // Remove peer from map
+    this.peers.delete(peerId);
+
+    console.log(`Cleaned up resources for peer ${peerId}`);
+  }
+
+  public async close(): Promise<void> {
+    // Clean up all peers
+    this.peers.forEach((_, peerId) => {
+      this.cleanup(peerId);
+    });
+
+    // Close router
+    this.router?.close();
+
+    // Close worker
+    this.worker?.close();
+
+    console.log("MediaSoup service closed");
   }
 }

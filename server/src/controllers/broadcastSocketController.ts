@@ -1,153 +1,222 @@
-import type { MediaSoupService } from "@/services/mediasoupService";
+import type { Socket } from "socket.io";
+import type { MediaSoupService } from "../services/mediasoupService";
 import type {
   BroadcastEmitEvents,
   BroadcastListenEvents,
-} from "@/Types/BroadcastSocketTypes";
-import type { Socket } from "socket.io";
+} from "../Types/BroadcastSocketTypes";
 
-export const peerSocketInit = (
-  socket: Socket<BroadcastListenEvents, BroadcastEmitEvents>,
-  mediaSoupService: MediaSoupService
-) => {
-  console.log(`New connection: ${socket.id}`);
+interface SocketData {
+  peerId: string;
+  producerTransportId?: string;
+  consumerTransportId?: string;
+  producerId?: string;
+  consumerIds: Set<string>;
+}
 
-  socket.data = {
-    producerTransportId: "",
-    consumerTransportId: "",
-    producerId: "",
-    consumerId: "",
-  };
-
-  /**
-   * Wrap every async handler in try/catch + auto‐error‐callback
-   */
-  function onAsync<E extends keyof BroadcastListenEvents>(
-    event: E,
-    handler: (...args: Parameters<BroadcastListenEvents[E]>) => Promise<void>
+export class BroadcastSocketController {
+  constructor(
+    private socket: Socket<BroadcastListenEvents, BroadcastEmitEvents>,
+    private mediaSoupService: MediaSoupService
   ) {
-    const listener = async (...rawArgs: any[]) => {
-      try {
-        await handler(...(rawArgs as Parameters<BroadcastListenEvents[E]>));
-      } catch (err: any) {
-        console.error(`Error handling ${event}:`, err);
-        const cb = rawArgs[rawArgs.length - 1];
-        if (typeof cb === "function") {
-          cb({ error: err.message ?? String(err) });
-        }
-      }
-    };
+    this.socket.data = {
+      peerId: socket.id,
+      consumerIds: new Set(),
+    } as SocketData;
 
-    (socket as any).on(event, listener);
+    this.setupHandlers();
+    this.emitConnectionSuccess();
   }
 
- socket.emit("connection_success", {
-    socketId: socket.id,
-    producerAlreadyExists: false,
-  });
+  private setupHandlers(): void {
+    // Use typed event handlers
+    this.socket.on("disconnect", this.handleDisconnect.bind(this));
+    this.socket.on("create_room", this.handleCreateRoom.bind(this));
+    this.socket.on("createWebRtcTransport", this.handleCreateTransport.bind(this));
+    this.socket.on("transport_connect", this.handleTransportConnect.bind(this));
+    this.socket.on("transport_recv_connect", this.handleTransportRecvConnect.bind(this));
+    this.socket.on("transport_produce", this.handleTransportProduce.bind(this));
+    this.socket.on("consume", this.handleConsume.bind(this));
+    this.socket.on("consumer_resume", this.handleConsumerResume.bind(this));
+  }
 
-  socket.on("disconnect", () => {
-    console.log("Peer disconnected:", socket.id);
+  private emitConnectionSuccess(): void {
+    const activeProducer = this.mediaSoupService.getActiveProducer();
 
-    const activeProducerId = mediaSoupService.getActiveProducer();
-    if (socket.data.producerId && socket.data.producerId === activeProducerId) {
-        console.log(`[SERVER] disconnect: Active producer ${activeProducerId} disconnected. Clearing activeProducerId.`);
-        mediaSoupService.setActiveProducer(null);
+    this.socket.emit("connection_success", {
+      socketId: this.socket.id,
+      producerAlreadyExists: activeProducer !== null,
+    });
+
+    console.log(`Peer connected: ${this.socket.id}`);
+  }
+
+  private handleDisconnect(): void {
+    console.log(`Peer disconnected: ${this.socket.id}`);
+
+    // Clean up MediaSoup resources
+    this.mediaSoupService.cleanup(this.socket.id);
+
+    // Notify other peers if this was the active producer
+    const activeProducer = this.mediaSoupService.getActiveProducer();
+    if (activeProducer?.peerId === this.socket.id) {
+      this.socket.broadcast.emit("producer_closed");
     }
-    mediaSoupService.cleanup(socket.id);
-  });
+  }
 
-  // ─── register all the rest via onAsync ────────────────────────────────
-
-  onAsync("create_room", async (callback) => {
-    const { rtpCapabilities } = await mediaSoupService.getOrCreateRouter();
-    callback({ rtpCapabilities });
-  });
-
-  onAsync("getRtpCapabilities", async (callback) => {
-    const { rtpCapabilities } = await mediaSoupService.getOrCreateRouter();
-    callback({ rtpCapabilities });
-  });
-
-  onAsync("createWebRtcTransport", async ({ producer }, callback) => {
-    const { transport, transportOptions } =
-      await mediaSoupService.createTransport(socket.id, producer);
-    if (producer) {
-      socket.data.producerTransportId = transport.id;
-    } else {
-      socket.data.consumerTransportId = transport.id;
+  private async handleCreateRoom(
+    callback: (response: { rtpCapabilities: any } | { error: string }) => void
+  ): Promise<void> {
+    try {
+      const rtpCapabilities = this.mediaSoupService.getRtpCapabilities();
+      callback({ rtpCapabilities });
+    } catch (error) {
+      console.error("Error in create_room:", error);
+      callback({ error: this.getErrorMessage(error) });
     }
-    callback({ transportOptions });
-  });
+  }
 
-  onAsync("transport_connect", async ({ transportId, dtlsParameters }) => {
-    if (!transportId) throw new Error("transportId is required for transport_connect");
+  private async handleCreateTransport(
+    { producer }: { producer: boolean },
+    callback: (response: { transportOptions: any } | { error: string }) => void
+  ): Promise<void> {
+    try {
+      const transportOptions = await this.mediaSoupService.createTransport(
+        this.socket.id,
+        producer
+      );
 
-    console.log(`Connecting transport ${transportId} for socket ${socket.id}`);
-    await mediaSoupService.connectTransport(
-      transportId,
-      dtlsParameters
-    );
-  });
+      // Store transport ID in socket data
+      const data = this.socket.data as SocketData;
+      if (producer) {
+        data.producerTransportId = transportOptions.id;
+      } else {
+        data.consumerTransportId = transportOptions.id;
+      }
 
-  onAsync(
-    "transport_produce",
-    async ({ transportId, kind, rtpParameters, appData }, callback) => {
+      callback({ transportOptions });
+    } catch (error) {
+      console.error("Error creating transport:", error);
+      callback({ error: this.getErrorMessage(error) });
+    }
+  }
 
-      if (!transportId) throw new Error("transportId is required for transport_produce");
+  private async handleTransportConnect({
+    transportId,
+    dtlsParameters,
+  }: {
+    transportId: string;
+    dtlsParameters: any;
+  }): Promise<void> {
+    try {
+      await this.mediaSoupService.connectTransport(
+        this.socket.id,
+        transportId,
+        dtlsParameters
+      );
+    } catch (error) {
+      console.error("Error connecting transport:", error);
+    }
+  }
 
-      const { id } = await mediaSoupService.createProducer(
+  private async handleTransportRecvConnect({
+    transportId,
+    dtlsParameters,
+  }: {
+    transportId: string;
+    dtlsParameters: any;
+  }): Promise<void> {
+    try {
+      await this.mediaSoupService.connectTransport(
+        this.socket.id,
+        transportId,
+        dtlsParameters
+      );
+    } catch (error) {
+      console.error("Error connecting recv transport:", error);
+    }
+  }
+
+  private async handleTransportProduce(
+    payload: any,
+    callback: (response: { id: string } | { error: string }) => void
+  ): Promise<void> {
+    try {
+      const { transportId, kind, rtpParameters, appData } = payload;
+
+      if (!transportId) {
+        throw new Error("transportId is required");
+      }
+
+      const producerId = await this.mediaSoupService.createProducer(
+        this.socket.id,
         transportId,
         kind,
         rtpParameters,
         appData
       );
-      socket.data.producerId = id;
-      mediaSoupService.setActiveProducer(id);
-      console.log(`[SERVER] transport_produce: Set activeProducerId to ${mediaSoupService.getActiveProducer()}`);
-      callback({ id });
-      socket.broadcast.emit("new_producer", { producerId: id });
+
+      this.socket.data.producerId = producerId;
+
+      // Notify other peers about new producer
+      this.socket.broadcast.emit("new_producer", { producerId });
+
+      callback({ id: producerId });
+    } catch (error) {
+      console.error("Error creating producer:", error);
+      callback({ error: this.getErrorMessage(error) });
     }
-  );
+  }
 
-  onAsync("transport_recv_connect", async ({ transportId, dtlsParameters }) => {
-    if (!transportId) throw new Error("transportId is required for transport_recv_connect");
-     console.log(`Connecting recv transport ${transportId} for socket ${socket.id}`);
+  private async handleConsume(
+    { rtpCapabilities }: { rtpCapabilities: any },
+    callback: (response: { consumerOptions: any } | { error: string }) => void
+  ): Promise<void> {
+    try {
+      const data = this.socket.data as SocketData;
 
-    await mediaSoupService.connectTransport(
-      transportId,
-      dtlsParameters
-    );
-  });
+      if (!data.consumerTransportId) {
+        throw new Error("Consumer transport not created");
+      }
 
-  onAsync("consume", async ({ rtpCapabilities }, callback) => {
+      const result = await this.mediaSoupService.createConsumer(
+        this.socket.id,
+        data.consumerTransportId,
+        rtpCapabilities
+      );
 
-    const transportId = socket.data.consumerTransportId;
-    if (!transportId) throw new Error("Consumer transport not found for this socket.");
+      if (!result) {
+        callback({ error: "Cannot consume - client capabilities insufficient" });
+        return;
+      }
 
-    const producerToConsume = mediaSoupService.getActiveProducer();
-    if (!producerToConsume) throw new Error("Producer not found or specified for consumption.");
+      data.consumerIds.add(result.id);
 
-    console.log(`Consuming producer ${producerToConsume} on transport ${transportId} for socket ${socket.id}`);
-    const consumer = await mediaSoupService.createConsumer(
-      transportId,
-      producerToConsume,
-      rtpCapabilities
-    );
-    if (!consumer) throw new Error("cannot_consume");
-    socket.data.consumerId = consumer.id;
-    callback({
-      consumerOptions: {
-        id: consumer.id,
-        producerId: consumer.producerId,
-        kind: consumer.kind,
-        rtpParameters: consumer.rtpParameters,
-      },
-    });
-  });
+      callback({
+        consumerOptions: {
+          id: result.id,
+          producerId: result.producerId,
+          kind: result.kind,
+          rtpParameters: result.rtpParameters,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating consumer:", error);
+      callback({ error: this.getErrorMessage(error) });
+    }
+  }
 
-  // If you ever add resumeConsumer later:
-  // onAsync("consumer_resume", async (_, callback) => {
-  //   await mediaSoupService.resumeConsumer(socket.data.consumerId);
-  //   callback({ ok: true });
-  // });
-};
+  private async handleConsumerResume({ consumerId }: { consumerId: string }): Promise<void> {
+    try {
+      await this.mediaSoupService.resumeConsumer(this.socket.id, consumerId);
+    } catch (error) {
+      console.error("Error resuming consumer:", error);
+    }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error);
+  }
+}

@@ -12,7 +12,18 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.msunay.rt2.nativeapp.dev",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "turn.alexeze.co.uk": {
+              "NSIncludesSubdomains": true,
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
+              "NSTemporaryExceptionMinimumTLSVersion": "TLSv1.1"
+            }
+          }
+        },
+        "NSCameraUsageDescription": "This app needs camera access to stream video",
+        "NSMicrophoneUsageDescription": "This app needs microphone access for audio streaming"
       }
     },
     "android": {

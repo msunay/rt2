@@ -8,7 +8,6 @@ import quizCreationSlice from '@/src/features/quizCreationSlice';
 import quizzesSlice from '@/src/features/quizzesSlice';
 import userIdSlice from '@/src/features/userIdSlice';
 import userSlice from '@/src/features/userSlice';
-import mediaStreamSlice from '@/src/features/mediaStreamSlice';
 import quizSlice from '@/src/features/quizSlice';
 import { backendApi } from '@/src/api/backendApi';
 
@@ -23,7 +22,6 @@ const appReducer = combineReducers({
   participatingSlice,
   quizCreationSlice,
   quizzesSlice,
-  mediaStreamSlice,
   quizSlice,
 });
 

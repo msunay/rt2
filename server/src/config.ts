@@ -9,30 +9,22 @@ interface Config {
 export const config: Config = {
   mediasoup: {
     worker: {
-      rtcMinPort: 40000,
-      rtcMaxPort: 49999,
+      rtcMinPort: 49152,
+      rtcMaxPort: 50000,
       logLevel: "debug",
-      logTags: [
-        "info",
-        "ice",
-        "dtls",
-        "rtp",
-        "srtp",
-        "rtcp",
-        "message",
-      ] as WorkerLogTag[],
+      logTags: ["info", "ice", "dtls", "rtp", "srtp", "rtcp", "message"] as WorkerLogTag[],
     },
     webRtcServerOptions: {
       listenInfos: [
         {
           protocol: "udp",
-          ip: process.env.UDP_BIND_IP || "0.0.0.0",
-          announcedAddress: process.env.UDP_ANNOUNCED_ADDRESS || "127.0.0.1",
+          ip: process.env.SERVER_BIND_IP || "0.0.0.0",
+          announcedAddress: process.env.SERVER_PUBLIC_IP || "127.0.0.1",
         },
         {
           protocol: "tcp",
-          ip: process.env.TCP_BIND_IP || "0.0.0.0",
-          announcedAddress: process.env.TCP_ANNOUNCED_ADDRESS || "127.0.0.1",
+          ip: process.env.SERVER_BIND_IP || "0.0.0.0",
+          announcedAddress: process.env.SERVER_PUBLIC_IP || "127.0.0.1",
         },
       ],
     },
@@ -85,27 +77,5 @@ export const config: Config = {
         },
       ],
     },
-    iceServers: [
-      {
-        urls: "turn:a.relay.metered.ca:80",
-        username: process.env.ICE_USERNAME,
-        credential: process.env.ICE_CREDENTIAL,
-      },
-      {
-        urls: "turn:a.relay.metered.ca:80?transport=tcp",
-        username: process.env.ICE_USERNAME,
-        credential: process.env.ICE_CREDENTIAL,
-      },
-      {
-        urls: "turn:a.relay.metered.ca:443",
-        username: process.env.ICE_USERNAME,
-        credential: process.env.ICE_CREDENTIAL,
-      },
-      {
-        urls: "turn:a.relay.metered.ca:443?transport=tcp",
-        username: process.env.ICE_USERNAME,
-        credential: process.env.ICE_CREDENTIAL,
-      },
-    ],
   },
 };

@@ -10,7 +10,7 @@ import type {
 } from "@/Types/BroadcastSocketTypes";
 import type { QuizEmitEvents, QuizListenEvents } from "@/Types/QuizSocketTypes";
 import { instrument } from "@socket.io/admin-ui";
-import { peerSocketInit } from "./controllers/broadcastSocketController";
+import { BroadcastSocketController } from "./controllers/broadcastSocketController";
 import { MediaSoupService } from "./services/mediasoupService";
 import { config } from "./config";
 
@@ -55,7 +55,7 @@ const mediaSoupService = new MediaSoupService(config.mediasoup);
 
 mediaSoupService.initialize().then(() => {
   broadcastNamespace.on("connection", (socket) =>
-    peerSocketInit(socket, mediaSoupService)
+    new BroadcastSocketController(socket, mediaSoupService)
   );
 });
 

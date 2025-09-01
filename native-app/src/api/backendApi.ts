@@ -138,6 +138,10 @@ export const backendApi = createApi({
     getParticipationAnswers: build.query<ParticipationAndAnswers, string>({
       query: (participationId) => `participationAnswers/${participationId}`,
     }),
+
+    getCoturnCredentials: build.query<{ username: string; credential: string }, void>({
+      query: () => `coturn/credentials`,
+    }),
   }),
 });
 
@@ -160,4 +164,5 @@ export const {
   useDeleteParticipationMutation,
   useCreateParticipationAnswerMutation,
   useGetParticipationAnswersQuery,
+  useGetCoturnCredentialsQuery,
 } = backendApi;

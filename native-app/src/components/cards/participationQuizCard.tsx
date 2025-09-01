@@ -38,9 +38,9 @@ export default function ParticipationQuizCard({ quiz }: { quiz: Quiz }) {
         params: { partId: participation?.id ?? ''},
       }}
       asChild
-      onPress={() => {
-        console.log('participationId', participation?.id)
-      }}
+      // onPress={() => {
+      //   console.log('participationId', participation?.id)
+      // }}
     >
       <Pressable style={styles.container}>
         <View style={styles.imageContainer}>
