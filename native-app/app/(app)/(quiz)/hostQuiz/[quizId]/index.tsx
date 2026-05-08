@@ -1,4 +1,4 @@
-import { HostStreamNew } from '@/src/components/hostStream';
+import { HostStream } from '@/src/components/hostStream';
 import { incrementQuestionNumber, incrementTrigger, setQuestionHidden, setQuizStarted } from '@/src/features/quizSlice';
 import { useAppDispatch, useAppSelector } from '@/src/hooks/reduxHooks';
 import { QuizBroadcasterManager } from '@/src/services/quizBroadcasterManager';
@@ -19,7 +19,7 @@ export default function HostStreamPage() {
 
     return (
         <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
-            <HostStreamNew
+            <HostStream
                 quizId={quizId}
                 quizStarted={quizStarted}
                 currentQuestionNumber={currentQuestionNumber}

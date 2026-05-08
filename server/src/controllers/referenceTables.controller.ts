@@ -75,7 +75,6 @@ async function getParticipationAnswers(req: Request, res: Response) {
 }
 
 async function getOneParticipation(req: Request, res: Response) {
-  console.log('getOneParticipation: ', req.params);
   try {
     const response = await models.Participation.findOne({
       where: {
@@ -85,7 +84,6 @@ async function getOneParticipation(req: Request, res: Response) {
         ],
       },
     });
-    console.log('getOneParticipation response: ', response);
     res.status(200).send(response);
   } catch (err) {
     console.error('Could not get participations::', err);

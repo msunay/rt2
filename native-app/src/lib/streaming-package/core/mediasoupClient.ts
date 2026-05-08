@@ -1,3 +1,4 @@
+import { Logger, LogLevel } from '@/src/utils/logger';
 import {
     Consumer,
     ConsumerOptions,
@@ -21,7 +22,6 @@ import {
     StreamingStats,
 } from './types';
 import { toMediasoupTrack, toRNMediaStreamTrack } from './utils';
-import { Logger, LogLevel } from '@/src/utils/logger';
 
 export class MediaSoupClient extends Logger implements IStreamingProvider {
     private state: StreamingState = {
@@ -47,7 +47,7 @@ export class MediaSoupClient extends Logger implements IStreamingProvider {
         super('MediaSoupClient', { minLevel: LogLevel.DEBUG });
 
         if (config.useIce) {
-          StreamingConfiguration.validateConfig(config);
+            StreamingConfiguration.validateConfig(config);
         }
         this.config = config;
 
@@ -502,16 +502,23 @@ export class MediaSoupClient extends Logger implements IStreamingProvider {
         }
     }
 
-    private async collectStats(): Promise<StreamingStats | null> {
+    private async collectStats(): Promise<Partial<RTCOutboundRtpStreamStats> | Partial<RTCInboundRtpStreamStats> | null> {
         try {
-            const stats: StreamingStats = {};
+            const stats: Partial<RTCOutboundRtpStreamStats> | Partial<RTCInboundRtpStreamStats> = {};
 
             if (this.producer) {
                 const producerStats = await this.producer.getStats();
                 producerStats.forEach((report) => {
-                    if (report.type === 'outbound-rtp' && report.kind === 'video') {
-                        stats.bytesSent = report.bytesSent;
-                        stats.packetsSent = report.packetsSent;
+                    if (report.type === 'outbound-rtp') {
+                        if (report.kind === 'video') {
+                            (stats as Partial<RTCOutboundRtpStreamStats>).bytesSent = report.bytesSent;
+                            (stats as Partial<RTCOutboundRtpStreamStats>).packetsSent = report.packetsSent;
+
+                            (stats as Partial<RTCOutboundRtpStreamStats>).framesSent = report.framesSent;
+                            (stats as Partial<RTCOutboundRtpStreamStats>).framesPerSecond = report.framesPerSecond; // Or framesEncoded/s
+                            (stats as Partial<RTCOutboundRtpStreamStats>).frameWidth = report.frameWidth;
+                            (stats as Partial<RTCOutboundRtpStreamStats>).frameHeight = report.frameHeight;
+                        }
                     }
                 });
             }
@@ -520,8 +527,15 @@ export class MediaSoupClient extends Logger implements IStreamingProvider {
                 const consumerStats = await this.consumer.getStats();
                 consumerStats.forEach((report) => {
                     if (report.type === 'inbound-rtp' && report.kind === 'video') {
-                        stats.bytesReceived = report.bytesReceived;
-                        stats.packetsReceived = report.packetsReceived;
+                        (stats as Partial<RTCInboundRtpStreamStats>).bytesReceived = report.bytesReceived;
+                        (stats as Partial<RTCInboundRtpStreamStats>).packetsReceived = report.packetsReceived;
+                        (stats as Partial<RTCInboundRtpStreamStats>).jitter = report.jitter;
+                        (stats as Partial<RTCInboundRtpStreamStats>).packetsLost = report.packetsLost;
+
+                        (stats as Partial<RTCInboundRtpStreamStats>).framesReceived = report.framesReceived;
+                        (stats as Partial<RTCInboundRtpStreamStats>).framesPerSecond = report.framesPerSecond; // Or framesDecoded/s
+                        (stats as Partial<RTCInboundRtpStreamStats>).frameWidth = report.frameWidth;
+                        (stats as Partial<RTCInboundRtpStreamStats>).frameHeight = report.frameHeight;
                     }
                 });
             }

@@ -55,6 +55,8 @@ export interface StreamingStats {
     packetsReceived?: number;
     bitrate?: number;
     latency?: number;
+    packetsLost?: number;
+    jitter?: number;
 }
 
 export interface StreamingEvents {

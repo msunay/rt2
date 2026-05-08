@@ -1,5 +1,5 @@
-import { useGetOneParticipationByPartIdQuery, useGetOneQuizQuery, useGetOneQuizQuestionAnswerQuery } from '@/src/api/backendApi';
-import { ParticipantStreamNew } from '@/src/components/participantStream';
+import { useGetOneParticipationByPartIdQuery, useGetOneQuizQuestionAnswerQuery } from '@/src/api/backendApi';
+import { ParticipantStream } from '@/src/components/participantStream';
 import { useAppSelector } from '@/src/hooks/reduxHooks';
 import { QUIZ_BACKGROUND } from '@/src/utils/images';
 import { useLocalSearchParams } from 'expo-router';
@@ -18,7 +18,7 @@ export default function ParticipantStreamPage() {
     return (
         <ImageBackground source={QUIZ_BACKGROUND.background} style={styles.background}>
             {participation && quiz ? (
-                <ParticipantStreamNew
+                <ParticipantStream
                     participation={participation}
                     quiz={quiz}
                     quizStarted={quizStarted}
