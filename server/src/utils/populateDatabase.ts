@@ -1,0 +1,106 @@
+import models from '@/models/index';
+import moment from 'moment';
+import mocks from '@/utils/mocks';
+import { type Quiz } from '@/models/associations';
+/*
+  The following function populates the database with 5 users (1 host and 4 players) and 4 quizzes.
+  The host user will be the owner of all 4 quizzes and the players are generated without any participations.
+  The quiz has 10 questions associated with it.
+  Each question has 4 answers associated with it.
+  TO GET THE DATA:
+  1. Clear your database tables.
+  2. Open the terminal and start the server.
+  3. From another terminal tab "cd" into the server folder.
+  4. Run the command: "ts-node controllers/populateDatabase.ts"
+  5. You will see the log "Database populated" -> this means it was successful.
+*/
+
+async function addMockUsers() {
+  try {
+    mocks.hosts.forEach(async (host) => {
+      await models.User.create(host);
+    });
+
+    mocks.players.forEach(async (player) => {
+      await models.User.create(player);
+    });
+    console.log('Successfully added users to database');
+  } catch (err) {
+    console.error('Failed to add users to database::', err);
+  }
+}
+
+async function populateDatabase() {
+  try {
+    await addMockUsers();
+    // Create the quiz
+    for (let i = 0; i < mocks.quizIdArray.length; i++) {
+      let quiz: Quiz;
+      let isPrivate: boolean;
+      // One video quiz
+      if (i === 0) {
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[0]!.id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))]!,
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          hasVideo: true,
+          isPrivate: false,
+        });
+      } else if (Math.round(Math.random()) === 0) {
+        isPrivate = false
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))]!.id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))]!,
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          hasVideo: false,
+          isPrivate,
+        });
+      } else {
+        isPrivate = true
+        quiz = await models.Quiz.create({
+          id: mocks.quizIdArray[i],
+          quizName: `Mock Quiz ${i}`,
+          quizOwner: mocks.hosts[Math.round(Math.random() * (mocks.hosts.length - 1))]!.id,
+          category: mocks.categories[Math.round(Math.random() * (mocks.categories.length - 1))]!,
+          dateTime: moment().add(i + 1, 'days').toDate(),
+          hasVideo: false,
+          isPrivate,
+          pin: '1111'
+        });
+      }
+
+      // Create questions and answers
+      for (let i = 0; i < 10; i++) {
+        const question = await models.Question.create({
+          questionText: mocks.testQuiz[i]!.question,
+          positionInQuiz: i + 1,
+        });
+
+        // Associate the question with the quiz
+        await quiz.addQuestion(question);
+
+        // Create 4 answers for each question
+        // const correctIndex = Math.floor(Math.random() * 4) + 1;
+        for (let j = 0; j <= 3; j++) {
+          const isCorrect = j === mocks.testQuiz[i]!.correctAnswer;
+          await question.createAnswer({
+            answerText: mocks.testQuiz[i]!.answers[j]!,
+            isCorrect,
+            answerNumber: j
+          });
+        }
+      }
+    }
+    console.log('Database populated');
+  } catch (err) {
+    console.error("Failed to populate database::",err);
+  }
+}
+
+populateDatabase();
+
+export default populateDatabase;

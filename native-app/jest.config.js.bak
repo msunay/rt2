@@ -1,0 +1,14 @@
+module.exports = {
+    preset: 'react-native',
+    // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    moduleNameMapper: {
+      // Map your aliases like @/src
+      '^@/src/(.*)$': '<rootDir>/src/$1',
+      // Mock specific libraries
+      '^react-native-webrtc$': '<rootDir>/src/mocks/react-native-webrtc',
+      '^mediasoup-client$': '<rootDir>/src/mocks/mediasoup-client',
+      '^expo-router$': '<rootDir>/src/mocks/expo-router',
+    },
+    // ... other Jest config
+  };
+

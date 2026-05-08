@@ -1,0 +1,43 @@
+import type { RootState } from '@/src/store';
+import type { User } from '@/src/types/Types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
+interface UserState {
+  id?: string;
+  username: string;
+  email: string;
+  isPremiumMember: boolean;
+  pointsWon: number;
+}
+
+export const userSlice = createSlice({
+  name: 'user',
+  initialState: {
+    id: '',
+    username: '',
+    email: '',
+    isPremiumMember: false,
+    pointsWon: 0,
+  } as UserState,
+  reducers: {
+    setCurrentUser: (
+      state,
+      {
+        payload: { id, username, email, isPremiumMember, pointsWon },
+      }: PayloadAction<User>,
+    ) => {
+      state.id = id;
+      state.username = username;
+      state.email = email;
+      state.isPremiumMember = isPremiumMember;
+      state.pointsWon = pointsWon;
+    },
+  },
+});
+
+export const { setCurrentUser } = userSlice.actions;
+
+export default userSlice.reducer;
+
+export const selectCurrentUser = (state: RootState) => state.userSlice;

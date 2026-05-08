@@ -1,0 +1,33 @@
+name: App Controller
+
+on:
+  push:
+    branches: ['main', 'develop']
+
+jobs:
+  whats-changed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: updated-packages
+        uses: vgpastor/monorepo-updated-packages@v1.3
+        with:
+          folder: ../../
+
+      - name: Print outputs
+        run: echo "${{ steps.updated-packages.projects }}"
+
+      - name: Print outputs
+        run: echo "${{ steps.updated-packages.outputs.packages }}"
+
+      - name: Build backend
+        if: contains(steps.updated-packages.outputs.packages, 'server')
+        run: echo "backend"
+
+      - name: Build frontend
+        if: contains(steps.updated-packages.outputs.packages, 'client')
+        run: echo "frontend"
+
+

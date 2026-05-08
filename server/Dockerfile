@@ -1,11 +1,11 @@
 # syntax = docker/dockerfile:1
 
-# Adjust NODE_VERSION and ENV as desired
-ARG NODE_VERSION=20.11.1
+# Adjust NODE_IMAGE and ENV as desired
+ARG NODE_IMAGE=20-alpine
 ARG ENV=production
 
 # Base Image
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_IMAGE} as base
 
 LABEL launch_runtime="Node.js"
 WORKDIR /app
@@ -14,36 +14,49 @@ ENV NODE_ENV=development
 # Update and install necessary packages for building native extensions
 FROM base as update
 
-RUN apt-get update -qq && \
-    apt-get install -y build-essential pkg-config python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update && \
+    apk add --no-cache build-base pkgconfig python3 py3-pip linux-headers
 
 # Install dev dependencies and compile typescript
-FROM update as devdeps
+FROM update as dev-deps
 
-COPY package-lock.json package.json ./
+COPY package*.json .
 RUN npm ci
 
-FROM devdeps as build
+FROM dev-deps as build
 
 COPY . .
 RUN npm run build
 
 # Install non-dev dependencies
-FROM update as proddeps
+FROM update as prod-deps
 ENV NODE_ENV=production
 
-COPY package-lock.json package.json ./
+COPY package*.json .
 RUN npm ci
 
 # Production Image
-FROM proddeps
-ENV NODE_ENV=${ENV}
+FROM base as production
+ENV NODE_ENV=production
+
+# Add user and group so don't have to run as root
+RUN addgroup -g 1001 -S nodejs \
+    && adduser -S rt2-server -u 1001 -G nodejs
+
+USER rt2-server
 
 COPY --from=build /app/dist .
-# Expose the required ports
+COPY --from=prod-deps /app/node_modules ./node_modules
+# COPY --from=prod-deps /app/package.json ./package.json
+# COPY --from=prod-deps /app/package-lock.json ./package-lock.json
+
+# Expose the required ports || use host network, no need to expose in docker
 EXPOSE 8080
+
+EXPOSE 40000-40100/udp
+EXPOSE 40000-40100/tcp
+
 
 # Define the default command
 ENV PORT=8080
-CMD [ "node", "server.js" ]
+CMD ["sh", "-c", "node server.js"]

@@ -1,0 +1,56 @@
+# fly.toml app configuration file generated for rt2-server on 2024-06-16T19:41:50+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "rt2-server"
+primary_region = "lhr"
+
+[build]
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/"
+
+
+[[services]]
+  internal_port = 40000
+  protocol = "udp"
+
+  [[services.ports]]
+    start_port = 40000
+    end_port = 40100
+
+  [[services.udp_checks]]
+    grace_period = "5s"
+    interval = "15s"
+    timeout = "2s"
+    restart_limit = 2
+
+[[services]]
+  internal_port = 40000
+  protocol = "tcp"
+
+  [[services.ports]]
+    start_port = 40000
+    end_port = 40100
+
+  [[services.tcp_checks]]
+    grace_period = "5s"
+    interval = "15s"
+    timeout = "2s"
+    restart_limit = 2
