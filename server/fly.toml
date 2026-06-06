@@ -28,12 +28,12 @@ primary_region = "lhr"
 
 
 [[services]]
-  internal_port = 40000
+  internal_port = 49152
   protocol = "udp"
 
   [[services.ports]]
-    start_port = 40000
-    end_port = 40100
+    start_port = 49152
+    end_port = 50000
 
   [[services.udp_checks]]
     grace_period = "5s"
@@ -42,12 +42,12 @@ primary_region = "lhr"
     restart_limit = 2
 
 [[services]]
-  internal_port = 40000
+  internal_port = 49152
   protocol = "tcp"
 
   [[services.ports]]
-    start_port = 40000
-    end_port = 40100
+    start_port = 49152
+    end_port = 50000
 
   [[services.tcp_checks]]
     grace_period = "5s"

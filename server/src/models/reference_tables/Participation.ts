@@ -19,8 +19,9 @@ import {
   Sequelize,
 } from "sequelize";
 import type { Answer } from "@/models/objects/Answer";
+import type { User } from "@/models/objects/User";
 
-type ParticipationAssociations = "answers";
+type ParticipationAssociations = "answers" | "User";
 
 export class Participation extends Model<
   InferAttributes<Participation, { omit: ParticipationAssociations }>,
@@ -35,6 +36,7 @@ export class Participation extends Model<
 
   // Participation belongsToMany Answer
   declare answers?: NonAttribute<Answer[]>;
+  declare User?: NonAttribute<User>;
   declare getAnswers: BelongsToManyGetAssociationsMixin<Answer>;
   declare setAnswers: BelongsToManySetAssociationsMixin<Answer, string>;
   declare addAnswer: BelongsToManyAddAssociationMixin<Answer, string>;

@@ -54,10 +54,7 @@ export const quizCreationSlice = createSlice({
     ) => {
       state.Questions = [...state.Questions, payload];
     },
-    resetQuizStore: state => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      state = initialState;
-    },
+    resetQuizStore: () => initialState,
   },
 });
 

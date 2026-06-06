@@ -17,7 +17,6 @@ export interface UserAuth {
   id?: string;
   email: string;
   username: string;
-  password: string;
   isPremiumMember: boolean;
   pointsWon: number;
   createdAt?: Date;
@@ -37,7 +36,6 @@ export interface Quiz {
   createdAt?: Date;
   updatedAt?: Date;
   host_name?: string;
-  [key: string]: string | Date | boolean | number | undefined;
 }
 
 export interface Question {
@@ -106,7 +104,6 @@ export interface QuestionAnswer {
 export interface UserParticipations {
   id: string;
   email: string;
-  password: string;
   isPremiumMember: boolean;
   pointsWon: number;
   createdAt: Date;

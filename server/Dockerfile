@@ -53,8 +53,8 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 # Expose the required ports || use host network, no need to expose in docker
 EXPOSE 8080
 
-EXPOSE 40000-40100/udp
-EXPOSE 40000-40100/tcp
+EXPOSE 49152-50000/udp
+EXPOSE 49152-50000/tcp
 
 
 # Define the default command

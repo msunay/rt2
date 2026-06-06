@@ -5,7 +5,7 @@ const PORT = parseInt(process.env.PORT || '3001');
 const HOST = '0.0.0.0';
 
 (async () => {
-  await sequelize.sync();
+  await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
   console.log('Connected to the database');
 
   server.listen(PORT, HOST, () => {

@@ -23,13 +23,13 @@ export async function addDemoQuiz(req: Request, res: Response) {
         positionInQuiz,
       });
 
-      answers.forEach((answer, index) => {
-        question.createAnswer({
+      await Promise.all(answers.map(async (answer, index) => {
+        await question.createAnswer({
           answerText: answer,
           isCorrect: index === correctIndex,
           answerNumber: index
         });
-      });
+      }));
       await quiz.addQuestion(question);
     }
 

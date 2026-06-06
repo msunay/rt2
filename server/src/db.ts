@@ -4,9 +4,7 @@ dotenv.config();
 
 const isProd = process.env.NODE_ENV === 'production';
 
-const flyConnectionString = process.env.DATABASE_URL
-
-const localConnection = [
+const localConnection: string[] = [
   `${process.env.DB_NAME}`,
   `${process.env.DB_USERNAME}`,
   `${process.env.DB_PASSWORD}`
@@ -35,26 +33,5 @@ export const sequelize = new Sequelize(...localConnection, {
       }
     },
   })
-
-// export const sequelize = new Sequelize(...localConnection, {
-//   dialect: 'postgres',
-//   host: HOST,
-//   benchmark: true,
-//   logging: (msg: string, queryTime: string) => {
-
-//     if (msg) {
-//       const tableQueried = msg.match(/FROM\s(\"\w+\")/)?.[1] ?
-//         `Query to table ${msg.match(/FROM\s(\"\w+\")/)?.[1]}`
-//         : msg.match(/table_name\s=\s(\'\w+\')/)?.[1] ?
-//           `...sequelize config - setup ${msg.match(/table_name\s=\s(\'\w+\')/)?.[1]}`
-//           : null;
-
-//       if (tableQueried) {
-//         console.log(`\n${tableQueried}\n   QueryTime: ${queryTime}ms`)
-
-//       }
-//     }
-//   },
-// });
 
 export default sequelize;

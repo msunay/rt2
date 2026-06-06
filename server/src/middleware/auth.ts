@@ -1,8 +1,10 @@
 import jwt, { type Secret, type JwtPayload } from 'jsonwebtoken';
 import type { Request, Response, NextFunction } from 'express';
 
-const SECRET_KEY: Secret =
-  process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET_KEY! : process.env.JWT_SECRET_KEY!; //TODO production secret key
+const SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
+if (!SECRET_KEY) {
+  throw new Error('JWT_SECRET_KEY environment variable is required');
+}
 
 export interface CustomRequest extends Request {
   token: string | JwtPayload;

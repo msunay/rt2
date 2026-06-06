@@ -17,13 +17,14 @@ import { type Quiz } from '@/models/associations';
 
 async function addMockUsers() {
   try {
-    mocks.hosts.forEach(async (host) => {
-      await models.User.create(host);
-    });
-
-    mocks.players.forEach(async (player) => {
-      await models.User.create(player);
-    });
+    await Promise.all([
+      ...mocks.hosts.map(async (host) => {
+        await models.User.create(host);
+      }),
+      ...mocks.players.map(async (player) => {
+        await models.User.create(player);
+      }),
+    ]);
     console.log('Successfully added users to database');
   } catch (err) {
     console.error('Failed to add users to database::', err);

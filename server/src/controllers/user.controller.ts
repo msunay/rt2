@@ -13,7 +13,7 @@ async function addUser(req: Request, res: Response) {
     const response = await models.User.create({ email, username, password: hash });
 
     const token = tokenGenerator(response?.id, response?.username);
-    res.status(201).send({ ...response, token });
+    res.status(201).send({ id: response.id, email: response.email, username: response.username, token });
   } catch (err) {
     console.error('Could not add user::', err);
     res.status(500).send();
@@ -24,9 +24,10 @@ async function getOneUser(req: Request, res: Response) {
   try {
     const response = await models.User.findOne({
       where: { username: req.params.id },
+      attributes: { exclude: ['password'] },
     });
     const token = tokenGenerator(response?.id || '', response?.username || '');
-    res.status(200).send({ ...response, token });
+    res.status(200).send({ id: response?.id, email: response?.email, username: response?.username, token });
   } catch (err) {
     console.error('Could not get user::', err);
     res.status(500).send();
@@ -57,9 +58,10 @@ async function getAllUsers(req: Request, res: Response) {
 
 async function changeUsername(req: Request, res: Response) {
   try {
+    const userId = (req as CustomRequest).userId;
     const response = await models.User.update(
       { username: req.body.newUsername },
-      { where: { id: req.body.id } }
+      { where: { id: userId } }
     );
     res.status(200).send(response);
   } catch (err) {
@@ -70,9 +72,12 @@ async function changeUsername(req: Request, res: Response) {
 
 async function changePassword(req: Request, res: Response) {
   try {
+    const saltRounds = 10;
+    const userId = (req as CustomRequest).userId;
+    const hash = hashSync(req.body.newPassword, saltRounds);
     const response = await models.User.update(
-      { password: req.body.newPassword },
-      { where: { id: req.body.id } }
+      { password: hash },
+      { where: { id: userId } }
     );
     res.status(200).send(response);
   } catch (err) {

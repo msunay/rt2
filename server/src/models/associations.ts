@@ -38,6 +38,9 @@ export function initModels(sequelize: Sequelize) {
     onDelete: 'CASCADE',
   });
 
+  Participation.belongsTo(User);
+  Participation.belongsTo(Quiz);
+
   Quiz.hasMany(Question);
   Question.belongsTo(Quiz);
 

@@ -27,8 +27,8 @@ const corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   credentials: true,
 };
-app.use(cors());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
+// Legacy: app.use(cors()) would allow all origins
 app.use(express.json());
 app.use(router);
 
@@ -37,7 +37,7 @@ export const server = http.createServer(app);
 const io = new Server(server, {
   // cors: {
   //   origin:
-  //     [corsOrigin!, "https://admin.socket.io", '*'],
+  //     [corsOrigin!, "https://admin.socket.io"],
   //   methods: ['GET', 'POST'],
   //   credentials: true,
   // },

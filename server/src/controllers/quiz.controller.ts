@@ -5,6 +5,8 @@ import type { Quiz } from '@/models/associations';
 
 async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
   try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
     const response = await models.Quiz.findAll({
       where: {
         dateTime: {
@@ -15,6 +17,8 @@ async function getQuizzesQuestionsAnswers(req: Request, res: Response) {
         model: models.Question,
         include: [models.Answer],
       },
+      limit,
+      offset,
     });
     res.status(200).send(response);
   } catch (err) {
@@ -41,12 +45,16 @@ async function getOneQuizQuestionAnswers(req: Request, res: Response) {
 
 async function getAllQuizzes(req: Request, res: Response) {
   try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
     const response = await models.Quiz.findAll({
       where: {
         dateTime: {
           [Op.gte]: Date.now(),
         },
       },
+      limit,
+      offset,
     });
     res.status(200).send(response);
   } catch (err) {
@@ -73,26 +81,25 @@ async function getWinners(req: Request, res: Response) {
       where: {
         QuizId: req.params.quizId,
       },
-      include: {
-        model: models.Answer,
-        as: 'answers',
-      },
+      include: [
+        {
+          model: models.Answer,
+          as: 'answers',
+        },
+        {
+          model: models.User,
+          attributes: ['username'],
+        },
+      ],
     });
 
-    const userScores = await Promise.all(
-      participationsAndAnswers.map(async (answerSheet) => {
-        const user = await models.User.findOne({
-          where: {
-            id: answerSheet.UserId,
-          },
-        });
-        const score = answerSheet.answers!.reduce(
-          (count, answer) => count + (answer.isCorrect ? 1 : 0),
-          0
-        );
-        return { username: user!.username, userScore: score };
-      })
-    );
+    const userScores = participationsAndAnswers.map((answerSheet) => {
+      const score = answerSheet.answers!.reduce(
+        (count, answer) => count + (answer.isCorrect ? 1 : 0),
+        0
+      );
+      return { username: answerSheet.User!.username, userScore: score };
+    });
     const maxUserScore = Math.max(...userScores.map((item) => item.userScore));
     const winners = userScores.filter(
       (element) => element.userScore === maxUserScore
@@ -138,13 +145,13 @@ async function createFullQuiz(req: Request, res: Response) {
         positionInQuiz,
       });
 
-      answers.forEach( async (answer, index) => {
+      for (const [index, answer] of answers.entries()) {
         await question.createAnswer({
           answerText: answer.answerText,
           isCorrect: answer.isCorrect,
           answerNumber: index
         });
-      });
+      }
       await quiz.addQuestion(question);
     }
 
